@@ -1,0 +1,76 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f4f8;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.sensor-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 280px;
+    transition: transform 0.2s ease;
+}
+
+.sensor-card:hover {
+    transform: scale(1.03);
+}
+
+.sensor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.sensor-name {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.sensor-type {
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    color: white;
+}
+
+.type-solar {
+    background-color: #ffa500; /* orange */
+}
+
+.type-wind {
+    background-color: #00aaff; /* blue */
+}
+
+.sensor-data p {
+    margin: 6px 0;
+    font-size: 1em;
+}
+
+.timestamp {
+    font-size: 0.8em;
+    color: #666;
+    text-align: right;
+    margin-top: 10px;
+}
+
+.no-sensors {
+    text-align: center;
+    color: #555;
+    font-size: 1.2em;
+}

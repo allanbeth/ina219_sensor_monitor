@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Sensor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Edit Sensor: {{ sensor_name }}</h1>
+    <form method="post">
+        Name: <input type="text" name="name" required value="{{ sensor_name }}">
+        Type: <select name="type">
+            <option value="solar">Solar</option>
+            <option value="wind">Wind</option>
+        </select>
+        <button type="submit">Save Changes</button>
+    </form>
+</body>
+</html>

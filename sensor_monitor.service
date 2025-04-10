@@ -1,0 +1,13 @@
+[Unit]
+Description=Sensor Monitor Service
+After=network.target
+
+[Service]
+Type=simple
+User=allan
+WorkingDirectory=/home/allan/EnergyMonitor/sensor_monitor/
+ExecStart=/srv/EnergyMonitor/bin/python3 /home/allan/EnergyMonitor/sensor_monitor/main.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
