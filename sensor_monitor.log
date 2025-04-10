@@ -53612,3 +53612,1278 @@ INA219 sensor connected
 2025-04-11 00:03:27,221 - INFO - INA219 sensor connected
 INA219 sensor connected
 2025-04-11 00:03:27,Turbine,10.73V,-0.002A,-0.016W,
+2025-04-11 00:03:32,242 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:03:32,Turbine,12.14V,-0.000A,-0.001W,
+2025-04-11 00:03:37,259 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:03:37,Turbine,12.10V,-0.001A,-0.012W,
+2025-04-11 00:03:42,279 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:03:42,Turbine,12.12V,-0.004A,-0.052W,
+2025-04-11 00:03:47,299 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:03:47,Turbine,10.93V,-0.093A,-1.014W,
+2025-04-11 00:03:52,320 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:03:52,Turbine,12.13V,-0.006A,-0.068W,
+2025-04-11 00:03:57,340 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:03:57,Turbine,12.12V,0.003A,0.040W,
+2025-04-11 00:04:02,360 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:04:02,Turbine,14.09V,-0.373A,-5.260W,
+2025-04-11 00:04:07,378 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:04:07,Turbine,12.14V,-0.000A,-0.002W,
+2025-04-11 00:04:12,394 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:04:12,Turbine,12.14V,-0.211A,-2.564W,
+2025-04-11 00:04:17,411 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:04:17,Turbine,12.11V,0.003A,0.034W,
+2025-04-11 00:04:22,431 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:04:22,Turbine,9.91V,-0.002A,-0.018W,
+2025-04-11 00:04:27,452 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:04:27,Turbine,12.10V,-0.002A,-0.023W,
+2025-04-11 00:04:32,471 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:04:32,Turbine,5.63V,-0.002A,-0.009W,
+2025-04-11 00:04:37,491 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:04:37,Turbine,12.13V,0.000A,0.000W,
+2025-04-11 00:04:42,509 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:04:42,Turbine,8.70V,-0.002A,-0.013W,
+2025-04-11 00:04:47,530 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:04:47,Turbine,12.13V,-0.002A,-0.018W,
+2025-04-11 00:04:52,550 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:04:52,Turbine,12.14V,0.092A,1.114W,
+2025-04-11 00:04:57,570 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:04:57,Turbine,12.13V,-0.001A,-0.010W,
+2025-04-11 00:05:02,591 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:05:02,Turbine,11.96V,0.026A,0.310W,
+2025-04-11 00:05:07,615 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:05:07,Turbine,11.62V,-0.002A,-0.019W,
+2025-04-11 00:05:12,632 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:05:12,Turbine,9.82V,0.184A,1.805W,
+2025-04-11 00:05:17,649 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:05:17,Turbine,12.12V,-0.001A,-0.017W,
+2025-04-11 00:05:22,670 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:05:22,Turbine,12.16V,-0.060A,-0.725W,
+2025-04-11 00:05:27,687 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:05:27,Turbine,12.18V,0.177A,2.160W,
+2025-04-11 00:05:32,709 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:05:32,Turbine,12.48V,-0.260A,-3.241W,
+2025-04-11 00:05:37,731 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:05:37,Turbine,12.15V,0.316A,3.833W,
+2025-04-11 00:05:42,748 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:05:42,Turbine,10.71V,-0.002A,-0.016W,
+2025-04-11 00:05:47,765 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:05:47,Turbine,12.12V,-0.237A,-2.876W,
+2025-04-11 00:05:52,786 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:05:52,Turbine,12.12V,0.002A,0.025W,
+2025-04-11 00:05:57,803 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:05:57,Turbine,12.13V,0.242A,2.937W,
+2025-04-11 00:06:02,823 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:06:02,Turbine,12.12V,-0.000A,-0.005W,
+2025-04-11 00:06:07,844 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:06:07,Turbine,10.06V,-0.490A,-4.929W,
+2025-04-11 00:06:12,861 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:06:12,Turbine,12.15V,-0.119A,-1.444W,
+2025-04-11 00:06:17,878 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:06:17,Turbine,12.13V,-0.001A,-0.008W,
+2025-04-11 00:06:22,895 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:06:22,Turbine,9.57V,-0.089A,-0.853W,
+2025-04-11 00:06:27,913 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:06:27,Turbine,12.38V,-0.181A,-2.244W,
+2025-04-11 00:06:32,930 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:06:32,Turbine,11.74V,-0.001A,-0.016W,
+2025-04-11 00:06:37,947 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:06:37,Turbine,12.10V,0.368A,4.457W,
+2025-04-11 00:06:42,970 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:06:42,Turbine,10.64V,-0.002A,-0.016W,
+2025-04-11 00:06:47,989 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:06:47,Turbine,12.10V,-0.145A,-1.757W,
+2025-04-11 00:06:53,010 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:06:52,Turbine,10.96V,-0.001A,-0.014W,
+2025-04-11 00:06:58,030 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:06:58,Turbine,14.09V,-0.001A,-0.018W,
+2025-04-11 00:07:03,047 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:07:03,Turbine,12.06V,-0.001A,-0.017W,
+2025-04-11 00:07:08,064 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:07:08,Turbine,12.12V,0.312A,3.786W,
+2025-04-11 00:07:13,079 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:07:13,Turbine,14.16V,-0.002A,-0.025W,
+2025-04-11 00:07:18,095 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:07:18,Turbine,12.12V,-0.208A,-2.523W,
+2025-04-11 00:07:23,118 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:07:23,Turbine,12.11V,0.001A,0.010W,
+2025-04-11 00:07:28,140 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:07:28,Turbine,7.24V,-0.002A,-0.013W,
+2025-04-11 00:07:33,162 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:07:33,Turbine,13.17V,-0.002A,-0.022W,
+2025-04-11 00:07:38,185 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:07:38,Turbine,12.14V,0.052A,0.635W,
+2025-04-11 00:07:43,202 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:07:43,Turbine,12.12V,-0.080A,-0.963W,
+2025-04-11 00:07:48,222 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:07:48,Turbine,12.12V,-0.528A,-6.399W,
+2025-04-11 00:07:53,239 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:07:53,Turbine,12.14V,0.058A,0.708W,
+2025-04-11 00:07:58,261 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:07:58,Turbine,10.58V,-0.001A,-0.014W,
+2025-04-11 00:08:03,282 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:08:03,Turbine,12.11V,-0.000A,-0.005W,
+2025-04-11 00:08:08,304 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:08:08,Turbine,12.04V,-0.002A,-0.018W,
+2025-04-11 00:08:13,322 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:08:13,Turbine,12.11V,-0.002A,-0.023W,
+2025-04-11 00:08:18,344 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:08:18,Turbine,9.75V,-0.002A,-0.017W,
+2025-04-11 00:08:23,367 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:08:23,Turbine,12.13V,-0.001A,-0.017W,
+2025-04-11 00:08:28,390 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:08:28,Turbine,10.01V,-0.467A,-4.670W,
+2025-04-11 00:08:33,411 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:08:33,Turbine,12.14V,-0.002A,-0.021W,
+2025-04-11 00:08:38,428 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:08:38,Turbine,12.13V,0.141A,1.713W,
+2025-04-11 00:08:43,445 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:08:43,Turbine,10.01V,-0.637A,-6.377W,
+2025-04-11 00:08:48,461 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:08:48,Turbine,12.12V,-0.002A,-0.018W,
+2025-04-11 00:08:53,479 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:08:53,Turbine,12.12V,-0.000A,-0.004W,
+2025-04-11 00:08:58,496 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:08:58,Turbine,12.12V,-0.119A,-1.440W,
+2025-04-11 00:09:03,513 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:09:03,Turbine,12.02V,-0.001A,-0.016W,
+2025-04-11 00:09:08,530 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:09:08,Turbine,16.44V,-0.002A,-0.028W,
+2025-04-11 00:09:13,551 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:09:13,Turbine,12.12V,-0.000A,-0.001W,
+2025-04-11 00:09:18,568 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:09:18,Turbine,13.30V,-0.052A,-0.698W,
+2025-04-11 00:09:23,586 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:09:23,Turbine,12.16V,-0.237A,-2.885W,
+2025-04-11 00:09:28,603 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:09:28,Turbine,12.12V,-0.001A,-0.016W,
+2025-04-11 00:09:33,619 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:09:33,Turbine,12.11V,0.478A,5.786W,
+2025-04-11 00:09:38,635 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:09:38,Turbine,5.56V,-0.002A,-0.008W,
+2025-04-11 00:09:43,653 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:09:43,Turbine,13.22V,-0.277A,-3.662W,
+2025-04-11 00:09:48,673 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:09:48,Turbine,10.66V,-0.002A,-0.016W,
+2025-04-11 00:09:53,694 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:09:53,Turbine,12.14V,-0.003A,-0.032W,
+2025-04-11 00:09:58,714 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:09:58,Turbine,12.20V,-0.145A,-1.771W,
+2025-04-11 00:10:03,732 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:10:03,Turbine,12.12V,-0.188A,-2.275W,
+2025-04-11 00:10:08,756 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:10:08,Turbine,12.18V,0.026A,0.319W,
+2025-04-11 00:10:13,773 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:10:13,Turbine,12.13V,-0.000A,-0.001W,
+2025-04-11 00:10:18,790 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:10:18,Turbine,9.74V,-0.001A,-0.014W,
+2025-04-11 00:10:23,807 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:10:23,Turbine,10.28V,-0.001A,-0.014W,
+2025-04-11 00:10:28,824 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:10:28,Turbine,12.12V,-0.002A,-0.018W,
+2025-04-11 00:10:33,841 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:10:33,Turbine,12.14V,-0.027A,-0.324W,
+2025-04-11 00:10:38,859 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:10:38,Turbine,12.82V,-0.003A,-0.033W,
+2025-04-11 00:10:43,876 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:10:43,Turbine,12.14V,-0.002A,-0.022W,
+2025-04-11 00:10:48,894 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:10:48,Turbine,12.13V,-0.002A,-0.021W,
+2025-04-11 00:10:53,911 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:10:53,Turbine,13.40V,-0.330A,-4.415W,
+2025-04-11 00:10:58,928 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:10:58,Turbine,13.04V,-0.002A,-0.021W,
+2025-04-11 00:11:03,944 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:11:03,Turbine,9.49V,-0.226A,-2.148W,
+2025-04-11 00:11:08,965 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:11:08,Turbine,12.13V,-0.721A,-8.748W,
+2025-04-11 00:11:13,985 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:11:13,Turbine,12.12V,-0.000A,-0.001W,
+2025-04-11 00:11:19,005 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:11:19,Turbine,8.33V,-0.000A,-0.002W,
+2025-04-11 00:11:24,025 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:11:24,Turbine,12.12V,0.000A,0.002W,
+2025-04-11 00:11:29,043 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:11:29,Turbine,12.12V,0.013A,0.154W,
+2025-04-11 00:11:34,064 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:11:34,Turbine,12.04V,0.000A,0.001W,
+2025-04-11 00:11:39,084 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:11:39,Turbine,12.12V,-0.053A,-0.640W,
+2025-04-11 00:11:44,100 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:11:44,Turbine,12.14V,-0.002A,-0.019W,
+2025-04-11 00:11:49,117 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:11:49,Turbine,12.14V,0.134A,1.630W,
+2025-04-11 00:11:54,134 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:11:54,Turbine,12.11V,0.000A,0.004W,
+2025-04-11 00:11:59,152 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:11:59,Turbine,10.80V,-0.002A,-0.019W,
+2025-04-11 00:12:04,173 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:12:04,Turbine,11.69V,-0.002A,-0.018W,
+2025-04-11 00:12:09,194 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:12:09,Turbine,9.75V,0.021A,0.201W,
+2025-04-11 00:12:14,214 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:12:14,Turbine,12.13V,-0.000A,-0.001W,
+2025-04-11 00:12:19,235 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:12:19,Turbine,5.56V,-0.002A,-0.009W,
+2025-04-11 00:12:24,255 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:12:24,Turbine,12.10V,-0.244A,-2.951W,
+2025-04-11 00:12:29,272 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:12:29,Turbine,12.13V,-0.002A,-0.018W,
+2025-04-11 00:12:34,292 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:12:34,Turbine,12.13V,0.029A,0.354W,
+2025-04-11 00:12:39,310 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:12:39,Turbine,14.09V,-0.002A,-0.023W,
+2025-04-11 00:12:44,330 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:12:44,Turbine,8.38V,-0.001A,-0.011W,
+2025-04-11 00:12:49,351 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:12:49,Turbine,12.18V,-0.249A,-3.031W,
+2025-04-11 00:12:54,371 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:12:54,Turbine,12.14V,-0.001A,-0.016W,
+2025-04-11 00:12:59,391 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:12:59,Turbine,12.10V,-0.191A,-2.306W,
+2025-04-11 00:13:04,412 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:13:04,Turbine,11.37V,-0.002A,-0.020W,
+2025-04-11 00:13:09,429 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:13:09,Turbine,11.06V,-0.002A,-0.022W,
+2025-04-11 00:13:14,445 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:13:14,Turbine,13.03V,-0.002A,-0.020W,
+2025-04-11 00:13:19,462 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:13:19,Turbine,10.78V,-0.002A,-0.017W,
+2025-04-11 00:13:24,479 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:13:24,Turbine,10.54V,-0.224A,-2.364W,
+2025-04-11 00:13:29,499 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:13:29,Turbine,12.17V,-0.422A,-5.132W,
+2025-04-11 00:13:34,519 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:13:34,Turbine,12.11V,0.048A,0.586W,
+2025-04-11 00:13:39,540 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:13:39,Turbine,8.48V,-0.001A,-0.008W,
+2025-04-11 00:13:44,560 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:13:44,Turbine,12.12V,-0.013A,-0.164W,
+2025-04-11 00:13:49,578 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:13:49,Turbine,4.82V,-0.001A,-0.006W,
+2025-04-11 00:13:54,595 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:13:54,Turbine,12.14V,-0.262A,-3.182W,
+2025-04-11 00:13:59,613 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:13:59,Turbine,12.10V,0.002A,0.022W,
+2025-04-11 00:14:04,631 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:14:04,Turbine,12.14V,-0.251A,-3.042W,
+2025-04-11 00:14:09,652 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:14:09,Turbine,12.12V,-0.002A,-0.019W,
+2025-04-11 00:14:14,672 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:14:14,Turbine,8.94V,-0.001A,-0.013W,
+2025-04-11 00:14:19,693 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:14:19,Turbine,9.76V,-0.002A,-0.017W,
+2025-04-11 00:14:24,709 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:14:24,Turbine,12.16V,-0.237A,-2.887W,
+2025-04-11 00:14:29,724 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:14:29,Turbine,12.14V,-0.002A,-0.019W,
+2025-04-11 00:14:34,738 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:14:34,Turbine,11.78V,-0.002A,-0.020W,
+2025-04-11 00:14:39,753 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:14:39,Turbine,12.13V,0.870A,10.555W,
+2025-04-11 00:14:44,769 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:14:44,Turbine,12.11V,0.171A,2.069W,
+2025-04-11 00:14:49,784 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:14:49,Turbine,6.84V,-0.002A,-0.010W,
+2025-04-11 00:14:54,798 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:14:54,Turbine,12.34V,-0.252A,-3.111W,
+2025-04-11 00:14:59,814 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:14:59,Turbine,11.94V,-0.002A,-0.018W,
+2025-04-11 00:15:04,832 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:15:04,Turbine,11.20V,-0.002A,-0.020W,
+2025-04-11 00:15:09,847 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:15:09,Turbine,11.20V,-0.077A,-0.863W,
+2025-04-11 00:15:14,862 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:15:14,Turbine,12.11V,-0.000A,-0.001W,
+2025-04-11 00:15:19,881 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:15:19,Turbine,11.50V,-0.001A,-0.015W,
+2025-04-11 00:15:24,896 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:15:24,Turbine,12.13V,0.513A,6.222W,
+2025-04-11 00:15:29,911 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:15:29,Turbine,12.14V,-0.001A,-0.013W,
+2025-04-11 00:15:34,926 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:15:34,Turbine,12.12V,-0.248A,-3.011W,
+2025-04-11 00:15:39,945 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:15:39,Turbine,11.40V,-0.002A,-0.017W,
+2025-04-11 00:15:44,963 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:15:44,Turbine,9.62V,-0.001A,-0.013W,
+2025-04-11 00:15:49,978 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:15:49,Turbine,12.13V,0.001A,0.017W,
+2025-04-11 00:15:54,997 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:15:54,Turbine,10.69V,-0.001A,-0.015W,
+2025-04-11 00:16:00,012 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:16:00,Turbine,12.12V,-0.040A,-0.483W,
+2025-04-11 00:16:05,030 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:16:05,Turbine,12.38V,-0.002A,-0.022W,
+2025-04-11 00:16:10,045 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:16:10,Turbine,12.14V,-0.000A,-0.004W,
+2025-04-11 00:16:15,063 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:16:15,Turbine,12.03V,-0.001A,-0.016W,
+2025-04-11 00:16:20,081 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:16:20,Turbine,12.58V,-0.001A,-0.018W,
+2025-04-11 00:16:25,100 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:16:25,Turbine,12.14V,-0.198A,-2.401W,
+2025-04-11 00:16:30,118 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:16:30,Turbine,12.13V,0.001A,0.013W,
+2025-04-11 00:16:35,136 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:16:35,Turbine,12.11V,0.342A,4.136W,
+2025-04-11 00:16:40,152 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:16:40,Turbine,12.11V,0.214A,2.592W,
+2025-04-11 00:16:45,167 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:16:45,Turbine,12.12V,-0.002A,-0.019W,
+2025-04-11 00:16:50,186 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:16:50,Turbine,12.12V,-0.119A,-1.441W,
+2025-04-11 00:16:55,204 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:16:55,Turbine,11.11V,-0.002A,-0.021W,
+2025-04-11 00:17:00,224 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:17:00,Turbine,12.12V,-0.002A,-0.018W,
+2025-04-11 00:17:05,240 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:17:05,Turbine,11.16V,-0.002A,-0.017W,
+2025-04-11 00:17:10,254 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:17:10,Turbine,9.22V,0.190A,1.756W,
+2025-04-11 00:17:15,269 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:17:15,Turbine,12.11V,0.066A,0.793W,
+2025-04-11 00:17:20,284 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:17:20,Turbine,12.13V,-0.002A,-0.022W,
+2025-04-11 00:17:25,302 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:17:25,Turbine,7.38V,-0.158A,-1.167W,
+2025-04-11 00:17:30,321 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:17:30,Turbine,10.28V,-0.001A,-0.005W,
+2025-04-11 00:17:35,339 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:17:35,Turbine,12.10V,0.002A,0.024W,
+2025-04-11 00:17:40,358 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:17:40,Turbine,12.13V,-0.002A,-0.021W,
+2025-04-11 00:17:45,377 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:17:45,Turbine,11.79V,0.109A,1.284W,
+2025-04-11 00:17:50,395 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:17:50,Turbine,12.11V,-0.000A,-0.005W,
+2025-04-11 00:17:55,411 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:17:55,Turbine,7.52V,-0.094A,-0.704W,
+2025-04-11 00:18:00,429 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:18:00,Turbine,12.12V,0.002A,0.024W,
+2025-04-11 00:18:05,447 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:18:05,Turbine,12.12V,0.002A,0.019W,
+2025-04-11 00:18:10,465 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:18:10,Turbine,10.54V,-0.002A,-0.019W,
+2025-04-11 00:18:15,483 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:18:15,Turbine,12.13V,-0.053A,-0.643W,
+2025-04-11 00:18:20,501 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:18:20,Turbine,12.11V,0.001A,0.012W,
+2025-04-11 00:18:25,519 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:18:25,Turbine,12.11V,-0.264A,-3.195W,
+2025-04-11 00:18:30,534 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:18:30,Turbine,7.27V,-0.001A,-0.010W,
+2025-04-11 00:18:35,552 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:18:35,Turbine,12.11V,-0.002A,-0.019W,
+2025-04-11 00:18:40,570 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:18:40,Turbine,12.12V,0.032A,0.390W,
+2025-04-11 00:18:45,588 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:18:45,Turbine,12.10V,0.000A,0.002W,
+2025-04-11 00:18:50,607 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:18:50,Turbine,12.11V,0.001A,0.010W,
+2025-04-11 00:18:55,625 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:18:55,Turbine,12.13V,-0.002A,-0.018W,
+2025-04-11 00:19:00,643 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:19:00,Turbine,9.34V,-0.002A,-0.018W,
+2025-04-11 00:19:05,658 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:19:05,Turbine,12.01V,-0.002A,-0.018W,
+2025-04-11 00:19:10,676 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:19:10,Turbine,12.13V,-0.148A,-1.796W,
+2025-04-11 00:19:15,694 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:19:15,Turbine,12.18V,-0.106A,-1.289W,
+2025-04-11 00:19:20,713 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:19:20,Turbine,12.10V,-0.002A,-0.022W,
+2025-04-11 00:19:25,731 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:19:25,Turbine,10.00V,-0.516A,-5.158W,
+2025-04-11 00:19:30,749 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:19:30,Turbine,12.13V,-0.001A,-0.017W,
+2025-04-11 00:19:35,768 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:19:35,Turbine,12.11V,-0.070A,-0.851W,
+2025-04-11 00:19:40,783 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:19:40,Turbine,10.28V,-0.124A,-1.276W,
+2025-04-11 00:19:45,801 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:19:45,Turbine,12.15V,-0.002A,-0.023W,
+2025-04-11 00:19:50,819 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:19:50,Turbine,11.33V,-0.194A,-2.199W,
+2025-04-11 00:19:55,837 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:19:55,Turbine,12.13V,-0.553A,-6.710W,
+2025-04-11 00:20:00,852 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:20:00,Turbine,12.13V,-0.002A,-0.021W,
+2025-04-11 00:20:05,871 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:20:05,Turbine,12.13V,-0.172A,-2.082W,
+2025-04-11 00:20:10,889 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:20:10,Turbine,10.93V,0.263A,2.874W,
+2025-04-11 00:20:15,904 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:20:15,Turbine,12.11V,-0.002A,-0.019W,
+2025-04-11 00:20:20,923 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:20:20,Turbine,12.12V,-0.001A,-0.017W,
+2025-04-11 00:20:25,938 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:20:25,Turbine,8.66V,-0.002A,-0.015W,
+2025-04-11 00:20:30,953 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:20:30,Turbine,12.12V,0.026A,0.315W,
+2025-04-11 00:20:35,972 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:20:35,Turbine,12.11V,0.002A,0.018W,
+2025-04-11 00:20:40,986 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:20:40,Turbine,12.18V,-0.002A,-0.022W,
+2025-04-11 00:20:46,004 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:20:46,Turbine,4.95V,-0.002A,-0.008W,
+2025-04-11 00:20:51,020 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:20:51,Turbine,7.24V,-0.002A,-0.012W,
+2025-04-11 00:20:56,035 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:20:56,Turbine,12.12V,-0.002A,-0.019W,
+2025-04-11 00:21:01,050 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:21:01,Turbine,11.59V,-0.001A,-0.014W,
+2025-04-11 00:21:06,065 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:21:06,Turbine,9.00V,-0.002A,-0.013W,
+2025-04-11 00:21:11,080 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:21:11,Turbine,12.13V,0.004A,0.042W,
+2025-04-11 00:21:16,098 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:21:16,Turbine,12.11V,-0.069A,-0.839W,
+2025-04-11 00:21:21,114 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:21:21,Turbine,12.14V,0.065A,0.794W,
+2025-04-11 00:21:26,132 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:21:26,Turbine,12.10V,0.003A,0.031W,
+2025-04-11 00:21:31,147 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:21:31,Turbine,12.11V,-0.002A,-0.021W,
+2025-04-11 00:21:36,166 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:21:36,Turbine,12.14V,-0.507A,-6.157W,
+2025-04-11 00:21:41,182 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:21:41,Turbine,12.11V,0.000A,0.001W,
+2025-04-11 00:21:46,197 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:21:46,Turbine,9.00V,-0.002A,-0.017W,
+2025-04-11 00:21:51,215 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:21:51,Turbine,13.96V,-0.047A,-0.650W,
+2025-04-11 00:21:56,230 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:21:56,Turbine,12.12V,-0.408A,-4.949W,
+2025-04-11 00:22:01,245 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:22:01,Turbine,12.10V,-0.002A,-0.022W,
+2025-04-11 00:22:06,264 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:22:06,Turbine,10.54V,-0.002A,-0.016W,
+2025-04-11 00:22:11,279 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:22:11,Turbine,11.33V,-0.001A,-0.010W,
+2025-04-11 00:22:16,294 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:22:16,Turbine,12.21V,-0.303A,-3.705W,
+2025-04-11 00:22:21,309 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:22:21,Turbine,12.12V,-0.002A,-0.018W,
+2025-04-11 00:22:26,324 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:22:26,Turbine,11.02V,-0.001A,-0.015W,
+2025-04-11 00:22:31,338 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:22:31,Turbine,7.77V,-0.106A,-0.825W,
+2025-04-11 00:22:36,352 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:22:36,Turbine,12.10V,0.001A,0.011W,
+2025-04-11 00:22:41,370 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:22:41,Turbine,11.20V,-0.002A,-0.018W,
+2025-04-11 00:22:46,386 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:22:46,Turbine,12.12V,-0.132A,-1.601W,
+2025-04-11 00:22:51,405 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:22:51,Turbine,12.15V,0.115A,1.396W,
+2025-04-11 00:22:56,420 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:22:56,Turbine,12.11V,0.003A,0.035W,
+2025-04-11 00:23:01,435 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:23:01,Turbine,12.09V,0.002A,0.028W,
+2025-04-11 00:23:06,453 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:23:06,Turbine,12.10V,-0.002A,-0.018W,
+2025-04-11 00:23:11,468 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:23:11,Turbine,12.12V,-0.047A,-0.566W,
+2025-04-11 00:23:16,486 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:23:16,Turbine,9.36V,-0.002A,-0.016W,
+2025-04-11 00:23:21,501 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:23:21,Turbine,13.77V,-0.002A,-0.026W,
+2025-04-11 00:23:26,516 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:23:26,Turbine,12.10V,-0.277A,-3.350W,
+2025-04-11 00:23:31,535 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:23:31,Turbine,10.47V,-0.002A,-0.019W,
+2025-04-11 00:23:36,550 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:23:36,Turbine,14.48V,-0.359A,-5.198W,
+2025-04-11 00:23:41,566 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:23:41,Turbine,10.28V,-0.066A,-0.673W,
+2025-04-11 00:23:46,583 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:23:46,Turbine,12.09V,0.000A,0.000W,
+2025-04-11 00:23:51,600 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:23:51,Turbine,12.13V,-0.215A,-2.604W,
+2025-04-11 00:23:56,622 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:23:56,Turbine,12.10V,-0.002A,-0.018W,
+2025-04-11 00:24:01,639 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:24:01,Turbine,12.11V,0.184A,2.228W,
+2025-04-11 00:24:06,660 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:24:06,Turbine,12.18V,0.342A,4.163W,
+2025-04-11 00:24:11,680 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:24:11,Turbine,12.10V,-0.001A,-0.016W,
+2025-04-11 00:24:16,701 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:24:16,Turbine,12.12V,-0.002A,-0.019W,
+2025-04-11 00:24:21,718 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:24:21,Turbine,8.11V,-0.002A,-0.014W,
+2025-04-11 00:24:26,739 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:24:26,Turbine,8.75V,-0.002A,-0.017W,
+2025-04-11 00:24:31,761 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:24:31,Turbine,6.33V,-0.002A,-0.009W,
+2025-04-11 00:24:36,779 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:24:36,Turbine,12.02V,-0.002A,-0.019W,
+2025-04-11 00:24:41,799 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:24:41,Turbine,11.24V,-0.002A,-0.018W,
+2025-04-11 00:24:46,817 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:24:46,Turbine,11.46V,-0.002A,-0.026W,
+2025-04-11 00:24:51,834 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:24:51,Turbine,12.90V,-0.002A,-0.021W,
+2025-04-11 00:24:56,852 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:24:56,Turbine,12.10V,-0.001A,-0.017W,
+2025-04-11 00:25:01,869 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:25:01,Turbine,10.59V,0.000A,0.002W,
+2025-04-11 00:25:06,890 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:25:06,Turbine,12.11V,-0.002A,-0.018W,
+2025-04-11 00:25:11,912 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:25:11,Turbine,12.14V,-0.002A,-0.018W,
+2025-04-11 00:25:16,926 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:25:16,Turbine,10.67V,-0.106A,-1.130W,
+2025-04-11 00:25:21,941 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:25:21,Turbine,12.18V,-0.092A,-1.127W,
+2025-04-11 00:25:26,956 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:25:26,Turbine,12.14V,-0.002A,-0.021W,
+2025-04-11 00:25:31,970 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:25:31,Turbine,12.07V,-0.001A,-0.017W,
+2025-04-11 00:25:36,985 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:25:36,Turbine,12.12V,-0.271A,-3.280W,
+2025-04-11 00:25:42,000 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:25:41,Turbine,12.14V,-0.000A,-0.002W,
+2025-04-11 00:25:47,015 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:25:47,Turbine,9.42V,-0.382A,-3.602W,
+2025-04-11 00:25:52,034 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:25:52,Turbine,12.04V,-0.002A,-0.018W,
+2025-04-11 00:25:57,052 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:25:57,Turbine,12.11V,-0.002A,-0.021W,
+2025-04-11 00:26:02,066 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:26:02,Turbine,14.76V,-0.212A,-3.127W,
+2025-04-11 00:26:07,080 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:26:07,Turbine,12.13V,0.034A,0.415W,
+2025-04-11 00:26:12,096 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:26:12,Turbine,12.12V,-0.001A,-0.015W,
+2025-04-11 00:26:17,111 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:26:17,Turbine,8.94V,-0.002A,-0.013W,
+2025-04-11 00:26:22,127 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:26:22,Turbine,11.51V,-0.002A,-0.017W,
+2025-04-11 00:26:27,145 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:26:27,Turbine,6.14V,0.049A,0.303W,
+2025-04-11 00:26:32,160 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:26:32,Turbine,12.94V,-0.001A,-0.018W,
+2025-04-11 00:26:37,178 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:26:37,Turbine,16.32V,-0.001A,-0.023W,
+2025-04-11 00:26:42,194 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:26:42,Turbine,12.10V,-0.303A,-3.670W,
+2025-04-11 00:26:47,212 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:26:47,Turbine,13.85V,-0.001A,-0.019W,
+2025-04-11 00:26:52,228 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:26:52,Turbine,5.64V,-0.001A,-0.007W,
+2025-04-11 00:26:57,244 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:26:57,Turbine,12.12V,0.001A,0.015W,
+2025-04-11 00:27:02,262 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:27:02,Turbine,12.10V,-0.002A,-0.022W,
+2025-04-11 00:27:07,277 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:27:07,Turbine,8.70V,0.032A,0.280W,
+2025-04-11 00:27:12,296 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:27:12,Turbine,12.12V,0.286A,3.468W,
+2025-04-11 00:27:17,311 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:27:17,Turbine,12.10V,-0.001A,-0.015W,
+2025-04-11 00:27:22,330 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:27:22,Turbine,13.66V,-0.002A,-0.022W,
+2025-04-11 00:27:27,345 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:27:27,Turbine,6.55V,-0.002A,-0.011W,
+2025-04-11 00:27:32,361 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:27:32,Turbine,12.64V,-0.002A,-0.020W,
+2025-04-11 00:27:37,376 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:27:37,Turbine,12.10V,0.002A,0.021W,
+2025-04-11 00:27:42,391 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:27:42,Turbine,12.10V,-0.251A,-3.030W,
+2025-04-11 00:27:47,406 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:27:47,Turbine,12.12V,-0.002A,-0.021W,
+2025-04-11 00:27:52,422 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:27:52,Turbine,9.78V,-0.002A,-0.017W,
+2025-04-11 00:27:57,437 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:27:57,Turbine,10.59V,-0.001A,-0.005W,
+2025-04-11 00:28:02,452 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:28:02,Turbine,12.10V,-0.002A,-0.018W,
+2025-04-11 00:28:07,471 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:28:07,Turbine,8.70V,-0.002A,-0.016W,
+2025-04-11 00:28:12,490 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:28:12,Turbine,12.20V,-0.158A,-1.931W,
+2025-04-11 00:28:17,505 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:28:17,Turbine,12.12V,-0.001A,-0.017W,
+2025-04-11 00:28:22,520 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:28:22,Turbine,12.12V,-0.301A,-3.646W,
+2025-04-11 00:28:27,538 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:28:27,Turbine,12.11V,-0.172A,-2.078W,
+2025-04-11 00:28:32,555 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:28:32,Turbine,8.84V,-0.002A,-0.015W,
+2025-04-11 00:28:37,570 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:28:37,Turbine,12.12V,-0.178A,-2.159W,
+2025-04-11 00:28:42,589 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:28:42,Turbine,7.97V,-0.002A,-0.013W,
+2025-04-11 00:28:47,607 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:28:47,Turbine,11.68V,-0.001A,-0.016W,
+2025-04-11 00:28:52,623 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:28:52,Turbine,12.10V,-0.002A,-0.018W,
+2025-04-11 00:28:57,638 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:28:57,Turbine,11.36V,-0.002A,-0.020W,
+2025-04-11 00:29:02,653 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:29:02,Turbine,6.44V,-0.000A,-0.001W,
+2025-04-11 00:29:07,668 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:29:07,Turbine,17.05V,-0.002A,-0.026W,
+2025-04-11 00:29:12,683 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:29:12,Turbine,12.12V,0.250A,3.029W,
+2025-04-11 00:29:17,702 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:29:17,Turbine,15.16V,-0.516A,-7.829W,
+2025-04-11 00:29:22,717 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:29:22,Turbine,12.13V,-0.002A,-0.022W,
+2025-04-11 00:29:27,736 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:29:27,Turbine,12.10V,-0.575A,-6.955W,
+2025-04-11 00:29:32,751 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:29:32,Turbine,10.41V,-0.002A,-0.017W,
+2025-04-11 00:29:37,769 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:29:37,Turbine,6.86V,-0.002A,-0.011W,
+2025-04-11 00:29:42,785 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:29:42,Turbine,11.61V,-0.001A,-0.014W,
+2025-04-11 00:29:47,800 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:29:47,Turbine,10.14V,0.234A,2.379W,
+2025-04-11 00:29:52,818 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:29:52,Turbine,12.09V,-0.007A,-0.083W,
+2025-04-11 00:29:57,833 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:29:57,Turbine,12.12V,0.000A,0.005W,
+2025-04-11 00:30:02,848 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:30:02,Turbine,11.91V,-0.002A,-0.018W,
+2025-04-11 00:30:07,863 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:30:07,Turbine,9.51V,-0.053A,-0.505W,
+2025-04-11 00:30:12,881 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:30:12,Turbine,12.11V,-0.000A,-0.005W,
+2025-04-11 00:30:17,897 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:30:17,Turbine,0.67V,-0.002A,-0.001W,
+2025-04-11 00:30:22,912 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:30:22,Turbine,12.11V,0.003A,0.040W,
+2025-04-11 00:30:27,926 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:30:27,Turbine,10.99V,-0.002A,-0.021W,
+2025-04-11 00:30:32,941 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:30:32,Turbine,12.12V,0.202A,2.445W,
+2025-04-11 00:30:37,960 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:30:37,Turbine,12.10V,0.001A,0.011W,
+2025-04-11 00:30:42,981 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:30:42,Turbine,6.00V,-0.002A,-0.009W,
+2025-04-11 00:30:48,001 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:30:47,Turbine,12.11V,0.003A,0.035W,
+2025-04-11 00:30:53,016 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:30:53,Turbine,12.13V,0.001A,0.010W,
+2025-04-11 00:30:58,035 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:30:58,Turbine,11.43V,-0.002A,-0.021W,
+2025-04-11 00:31:03,053 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:31:03,Turbine,12.12V,-0.043A,-0.523W,
+2025-04-11 00:31:08,072 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:31:08,Turbine,12.10V,0.001A,0.006W,
+2025-04-11 00:31:13,087 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:31:13,Turbine,12.18V,-0.001A,-0.016W,
+2025-04-11 00:31:18,106 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:31:18,Turbine,12.15V,0.069A,0.842W,
+2025-04-11 00:31:23,124 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:31:23,Turbine,12.02V,-0.001A,-0.017W,
+2025-04-11 00:31:28,143 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:31:28,Turbine,10.28V,-0.143A,-1.475W,
+2025-04-11 00:31:33,157 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:31:33,Turbine,9.34V,-0.002A,-0.014W,
+2025-04-11 00:31:38,170 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:31:38,Turbine,11.45V,0.329A,3.765W,
+2025-04-11 00:31:43,185 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:31:43,Turbine,9.56V,-0.252A,-2.412W,
+2025-04-11 00:31:48,200 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:31:48,Turbine,12.11V,-0.001A,-0.017W,
+2025-04-11 00:31:53,217 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:31:53,Turbine,12.10V,0.164A,1.987W,
+2025-04-11 00:31:58,233 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:31:58,Turbine,12.11V,-0.001A,-0.012W,
+2025-04-11 00:32:03,254 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:32:03,Turbine,15.99V,-0.001A,-0.022W,
+2025-04-11 00:32:08,268 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:32:08,Turbine,12.12V,0.001A,0.007W,
+2025-04-11 00:32:13,283 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:32:13,Turbine,12.11V,-0.001A,-0.015W,
+2025-04-11 00:32:18,303 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:32:18,Turbine,12.14V,-0.356A,-4.318W,
+2025-04-11 00:32:23,324 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:32:23,Turbine,12.10V,-0.001A,-0.017W,
+2025-04-11 00:32:28,339 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:32:28,Turbine,11.87V,-0.002A,-0.018W,
+2025-04-11 00:32:33,353 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:32:33,Turbine,12.10V,-0.002A,-0.019W,
+2025-04-11 00:32:38,368 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:32:38,Turbine,8.62V,-0.253A,-2.179W,
+2025-04-11 00:32:43,383 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:32:43,Turbine,12.12V,-0.172A,-2.079W,
+2025-04-11 00:32:48,397 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:32:48,Turbine,8.36V,-0.001A,-0.009W,
+2025-04-11 00:32:53,412 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:32:53,Turbine,11.77V,-0.056A,-0.656W,
+2025-04-11 00:32:58,427 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:32:58,Turbine,12.11V,0.001A,0.015W,
+2025-04-11 00:33:03,442 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:33:03,Turbine,12.11V,-0.002A,-0.022W,
+2025-04-11 00:33:08,458 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:33:08,Turbine,12.08V,-0.002A,-0.019W,
+2025-04-11 00:33:13,473 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:33:13,Turbine,8.43V,0.184A,1.551W,
+2025-04-11 00:33:18,487 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:33:18,Turbine,12.11V,0.000A,0.004W,
+2025-04-11 00:33:23,502 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:33:23,Turbine,13.71V,-0.001A,-0.018W,
+2025-04-11 00:33:28,519 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:33:28,Turbine,12.12V,0.002A,0.029W,
+2025-04-11 00:33:33,534 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:33:33,Turbine,12.10V,-0.001A,-0.017W,
+2025-04-11 00:33:38,550 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:33:38,Turbine,12.14V,-0.002A,-0.027W,
+2025-04-11 00:33:43,566 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:33:43,Turbine,15.66V,-0.002A,-0.023W,
+2025-04-11 00:33:48,585 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:33:48,Turbine,12.13V,-0.001A,-0.011W,
+2025-04-11 00:33:53,600 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:33:53,Turbine,12.12V,-0.090A,-1.091W,
+2025-04-11 00:33:58,619 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:33:58,Turbine,12.11V,-0.000A,-0.002W,
+2025-04-11 00:34:03,634 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:34:03,Turbine,12.12V,-0.002A,-0.018W,
+2025-04-11 00:34:08,652 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:34:08,Turbine,12.10V,-0.002A,-0.018W,
+2025-04-11 00:34:13,667 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:34:13,Turbine,11.99V,-0.001A,-0.017W,
+2025-04-11 00:34:18,683 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:34:18,Turbine,13.43V,-0.002A,-0.024W,
+2025-04-11 00:34:23,698 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:34:23,Turbine,12.02V,-0.002A,-0.018W,
+2025-04-11 00:34:28,713 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:34:28,Turbine,12.14V,-0.001A,-0.017W,
+2025-04-11 00:34:33,731 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:34:33,Turbine,11.98V,-0.002A,-0.018W,
+2025-04-11 00:34:38,746 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:34:38,Turbine,12.12V,-0.002A,-0.018W,
+2025-04-11 00:34:43,761 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:34:43,Turbine,12.12V,-0.120A,-1.450W,
+2025-04-11 00:34:48,778 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:34:48,Turbine,12.13V,-0.000A,-0.002W,
+2025-04-11 00:34:53,793 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:34:53,Turbine,10.01V,-0.002A,-0.015W,
+2025-04-11 00:34:58,808 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:34:58,Turbine,11.48V,-0.002A,-0.018W,
+2025-04-11 00:35:03,850 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:35:03,Turbine,12.09V,-0.001A,-0.017W,
+2025-04-11 00:35:08,865 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:35:08,Turbine,7.88V,0.357A,2.815W,
+2025-04-11 00:35:13,880 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:35:13,Turbine,12.15V,-0.251A,-3.043W,
+2025-04-11 00:35:18,901 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:35:18,Turbine,12.11V,-0.002A,-0.018W,
+2025-04-11 00:35:23,918 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:35:23,Turbine,12.03V,0.070A,0.846W,
+2025-04-11 00:35:28,936 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:35:28,Turbine,10.67V,-0.347A,-3.707W,
+2025-04-11 00:35:33,955 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:35:33,Turbine,12.10V,-0.106A,-1.279W,
+2025-04-11 00:35:38,970 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:35:38,Turbine,12.12V,0.000A,0.001W,
+2025-04-11 00:35:43,989 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:35:43,Turbine,12.06V,-0.002A,-0.018W,
+2025-04-11 00:35:49,004 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:35:48,Turbine,8.30V,0.146A,1.209W,
+2025-04-11 00:35:54,022 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:35:54,Turbine,9.88V,-0.002A,-0.018W,
+2025-04-11 00:35:59,037 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:35:59,Turbine,10.55V,-0.001A,-0.011W,
+2025-04-11 00:36:04,054 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:36:04,Turbine,12.08V,-0.001A,-0.013W,
+2025-04-11 00:36:09,069 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:36:09,Turbine,12.11V,-0.001A,-0.017W,
+2025-04-11 00:36:14,087 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:36:14,Turbine,12.10V,0.000A,0.000W,
+2025-04-11 00:36:19,103 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:36:19,Turbine,12.10V,-0.002A,-0.019W,
+2025-04-11 00:36:24,118 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:36:24,Turbine,9.22V,-0.172A,-1.582W,
+2025-04-11 00:36:29,136 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:36:29,Turbine,12.09V,-0.002A,-0.022W,
+2025-04-11 00:36:34,152 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:36:34,Turbine,12.12V,0.002A,0.022W,
+2025-04-11 00:36:39,170 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:36:39,Turbine,12.11V,-0.002A,-0.019W,
+2025-04-11 00:36:44,184 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:36:44,Turbine,12.12V,-0.119A,-1.439W,
+2025-04-11 00:36:49,201 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:36:49,Turbine,6.20V,-0.002A,-0.012W,
+2025-04-11 00:36:54,216 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:36:54,Turbine,12.10V,-0.002A,-0.021W,
+2025-04-11 00:36:59,234 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:36:59,Turbine,12.11V,-0.040A,-0.483W,
+2025-04-11 00:37:04,252 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:37:04,Turbine,12.11V,-0.001A,-0.017W,
+2025-04-11 00:37:09,268 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:37:09,Turbine,13.31V,-0.001A,-0.019W,
+2025-04-11 00:37:14,283 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:37:14,Turbine,12.17V,-0.305A,-3.710W,
+2025-04-11 00:37:19,298 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:37:19,Turbine,12.11V,-0.002A,-0.018W,
+2025-04-11 00:37:24,313 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:37:24,Turbine,12.11V,-0.000A,-0.005W,
+2025-04-11 00:37:29,328 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:37:29,Turbine,11.38V,-0.001A,-0.015W,
+2025-04-11 00:37:34,343 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:37:34,Turbine,12.12V,-0.501A,-6.067W,
+2025-04-11 00:37:39,357 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:37:39,Turbine,13.43V,-0.001A,-0.019W,
+2025-04-11 00:37:44,373 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:37:44,Turbine,11.33V,0.039A,0.442W,
+2025-04-11 00:37:49,388 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:37:49,Turbine,12.09V,0.002A,0.022W,
+2025-04-11 00:37:54,403 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:37:54,Turbine,12.10V,0.002A,0.019W,
+2025-04-11 00:37:59,422 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:37:59,Turbine,12.08V,-0.001A,-0.017W,
+2025-04-11 00:38:04,438 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:38:04,Turbine,7.78V,-0.184A,-1.428W,
+2025-04-11 00:38:09,455 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:38:09,Turbine,12.16V,-0.185A,-2.248W,
+2025-04-11 00:38:14,474 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:38:14,Turbine,12.13V,-0.002A,-0.019W,
+2025-04-11 00:38:19,490 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:38:19,Turbine,12.14V,0.001A,0.008W,
+2025-04-11 00:38:24,506 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:38:24,Turbine,12.10V,0.023A,0.283W,
+2025-04-11 00:38:29,521 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:38:29,Turbine,12.10V,-0.171A,-2.066W,
+2025-04-11 00:38:34,537 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:38:34,Turbine,11.86V,0.001A,0.007W,
+2025-04-11 00:38:39,552 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:38:39,Turbine,12.10V,-0.000A,-0.001W,
+2025-04-11 00:38:44,573 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:38:44,Turbine,12.09V,-0.001A,-0.016W,
+2025-04-11 00:38:49,588 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:38:49,Turbine,9.88V,-0.002A,-0.015W,
+2025-04-11 00:38:54,604 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:38:54,Turbine,12.12V,-0.000A,-0.005W,
+2025-04-11 00:38:59,624 - INFO - INA219 sensor connected
+INA219 sensor connected
+2025-04-11 00:38:59,Turbine,9.22V,-0.002A,-0.017W,
