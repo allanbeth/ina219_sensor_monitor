@@ -44,8 +44,8 @@ class SensorManager:
                 sensors = [Sensor(s["name"], s["address"], s["type"]) for s in sensor_data]
                 self.logger.info("Configured Sensor:")
 
-                for sensor in self.sensors:
-                    self.logger.info(str(sensor))
+                for sensor in sensors:
+                    self.logger.info(sensor.name)
                 
             
         except:

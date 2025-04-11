@@ -1,50 +1,20 @@
-2025-04-11 23:27:01,561 - INFO - INA219 sensor connected
-INA219 sensor connected
-2025-04-11 23:29:54,866 - INFO - INA219 sensor connected
-INA219 sensor connected
-2025-04-11 23:30:20,416 - INFO - INA219 sensor connected
-INA219 sensor connected
-2025-04-11 23:33:57,325 - INFO - INA219 sensor connected
-INA219 sensor connected
-2025-04-11 23:37:54,103 - INFO - INA219 sensor connected
-INA219 sensor connected
-2025-04-11 23:37:54,104 - INFO - Configured Sensor:
-Configured Sensor:
-2025-04-11 23:37:54,133 - INFO - I2C addresses found:
-I2C addresses found:
-2025-04-11 23:37:54,134 - INFO - 64
-2025-04-11 23:41:32,663 - INFO - INA219 sensor connected
-INA219 sensor connected
-2025-04-11 23:41:32,664 - INFO - Configured Sensor:
-Configured Sensor:
-2025-04-11 23:41:32,698 - INFO - I2C addresses found:
-I2C addresses found:
-2025-04-11 23:41:32,699 - INFO - 64
-64
-2025-04-11 23:41:32,758 - INFO - Connection to MQTT Broker failed
-Connection to MQTT Broker failed
-2025-04-11 23:41:32,788 - INFO - INA219 sensor connected
-INA219 sensor connected
-2025-04-11 23:41:32,789 - INFO - Configured Sensor:
-Configured Sensor:
-2025-04-11 23:41:32,823 - INFO - I2C addresses found:
-I2C addresses found:
-2025-04-11 23:41:32,824 - INFO - 64
-64
-2025-04-11 23:41:32,864 - INFO - Connection to MQTT Broker failed
-Connection to MQTT Broker failed
-2025-04-11 23:41:32,909 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+2025-04-12 00:23:50,828 - INFO - INA219 sensor connected
+2025-04-12 00:23:50,829 - INFO - Configured Sensor:
+2025-04-12 00:23:50,830 - INFO - Turbine
+2025-04-12 00:23:50,859 - INFO - I2C addresses found:
+2025-04-12 00:23:50,859 - INFO - 64
+2025-04-12 00:23:50,914 - INFO - Connected to MQTT Broker
+2025-04-12 00:23:50,941 - INFO - INA219 sensor connected
+2025-04-12 00:23:50,941 - INFO - Configured Sensor:
+2025-04-12 00:23:50,942 - INFO - Turbine
+2025-04-12 00:23:50,971 - INFO - I2C addresses found:
+2025-04-12 00:23:50,972 - INFO - 64
+2025-04-12 00:23:51,012 - INFO - Connected to MQTT Broker
+2025-04-12 00:23:51,046 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:8082
  * Running on http://192.168.1.115:8082
-2025-04-11 23:41:32,909 - INFO - [33mPress CTRL+C to quit[0m
-2025-04-11 23:42:51,504 - INFO - 192.168.1.114 - - [11/Apr/2025 23:42:51] "GET /socket.io/?EIO=4&transport=polling&t=POd1ITU HTTP/1.1" 200 -
-2025-04-11 23:42:51,551 - INFO - 192.168.1.114 - - [11/Apr/2025 23:42:51] "POST /socket.io/?EIO=4&transport=polling&t=POd1Ie1&sid=EcUWbSQFcmaVXrK7AAAA HTTP/1.1" 200 -
-2025-04-11 23:42:51,590 - INFO - 192.168.1.114 - - [11/Apr/2025 23:42:51] "GET /socket.io/?EIO=4&transport=polling&t=POd1Ie4&sid=EcUWbSQFcmaVXrK7AAAA HTTP/1.1" 200 -
-2025-04-11 23:42:54,739 - INFO - 192.168.1.114 - - [11/Apr/2025 23:42:54] "GET / HTTP/1.1" 200 -
-2025-04-11 23:43:06,924 - INFO - 192.168.1.114 - - [11/Apr/2025 23:43:06] "GET /socket.io/?EIO=4&transport=websocket&sid=EcUWbSQFcmaVXrK7AAAA HTTP/1.1" 200 -
-2025-04-11 23:43:07,000 - INFO - 192.168.1.114 - - [11/Apr/2025 23:43:07] "[33mGET /static/style.css HTTP/1.1[0m" 404 -
-2025-04-11 23:43:07,040 - INFO - 192.168.1.114 - - [11/Apr/2025 23:43:07] "GET /socket.io/?EIO=4&transport=polling&t=POd1MQ0 HTTP/1.1" 200 -
-2025-04-11 23:43:07,130 - INFO - 192.168.1.114 - - [11/Apr/2025 23:43:07] "POST /socket.io/?EIO=4&transport=polling&t=POd1MQt&sid=HrfZAh3CmgRctL7bAAAC HTTP/1.1" 200 -
-2025-04-11 23:43:07,152 - INFO - 192.168.1.114 - - [11/Apr/2025 23:43:07] "GET /socket.io/?EIO=4&transport=polling&t=POd1MQu&sid=HrfZAh3CmgRctL7bAAAC HTTP/1.1" 200 -
-2025-04-11 23:43:07,242 - INFO - 192.168.1.114 - - [11/Apr/2025 23:43:07] "GET /socket.io/?EIO=4&transport=polling&t=POd1MSm&sid=HrfZAh3CmgRctL7bAAAC HTTP/1.1" 200 -
+2025-04-12 00:23:51,047 - INFO - [33mPress CTRL+C to quit[0m
+2025-04-12 00:23:53,285 - INFO - 192.168.1.114 - - [12/Apr/2025 00:23:53] "GET /socket.io/?EIO=4&transport=polling&t=POdAheC HTTP/1.1" 200 -
+2025-04-12 00:23:53,378 - INFO - 192.168.1.114 - - [12/Apr/2025 00:23:53] "GET /socket.io/?EIO=4&transport=polling&t=POdAhfD&sid=pwAREsT7GR3mPkzhAAAA HTTP/1.1" 200 -
+2025-04-12 00:23:53,393 - INFO - 192.168.1.114 - - [12/Apr/2025 00:23:53] "POST /socket.io/?EIO=4&transport=polling&t=POdAhfC&sid=pwAREsT7GR3mPkzhAAAA HTTP/1.1" 200 -

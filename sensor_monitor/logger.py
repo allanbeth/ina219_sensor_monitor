@@ -32,7 +32,7 @@ class sensor_logger:
 
     def info(self, log_entry):
         self.logger.info(log_entry)
-        self.save_entry(log_entry)
+        #self.save_entry(log_entry)
         
     def warning(self, log_entry):
         self.logger.warning(log_entry)
