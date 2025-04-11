@@ -1,11 +1,20 @@
 import paho.mqtt.client as mqtt
-import json
 from sensor_monitor.config import MQTT_BROKER, MQTT_PORT, MQTT_TOPIC, MQTT_DISCOVERY_PREFIX
+from sensor_monitor.logger import sensor_logger
+import json
 
 class MQTTPublisher:
     def __init__(self):
+        self.logger = sensor_logger()
         self.client = mqtt.Client()
-        self.client.connect(MQTT_BROKER, MQTT_PORT, 60)
+
+        try:
+
+            self.client.connect(MQTT_BROKER, MQTT_PORT, 60)
+            self.logger.info("Connected to MQTT Broker: %s", MQTT_BROKER)
+
+        except:
+            self.logger.info("Connection to MQTT Broker failed")
 
     def publish(self, data):
 
@@ -13,18 +22,14 @@ class MQTTPublisher:
             topic = f"{MQTT_TOPIC}/{sensor}"
             payload = json.dumps(readings)
 
-            # Publish the sensor readings
             self.client.publish(topic, payload, retain=True)
 
-            # Optionally publish availability as "online"
             availability_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor}/availability"
             self.client.publish(availability_topic, "online", retain=True)
-
-            print(f"[MQTT] Published to {topic}: {payload}")
             
 
     def send_discovery_config(self, sensor_name):
-        """Publishes Home Assistant MQTT auto-discovery configuration."""
+
         base_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_name}"
         state_topic = f"{MQTT_TOPIC}/{sensor_name}"
 
@@ -55,8 +60,7 @@ class MQTTPublisher:
             self.client.publish(config_topic, json.dumps(payload), retain=True)
 
     def remove_discovery_config(self, sensor_name):
-        """Removes a sensor from Home Assistant MQTT discovery."""
-        base_topic = f"homeassistant/sensor/{sensor_name}"
+
         for measurement in ["voltage", "current", "power"]:
             config_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_name}_{measurement}/config"
-            self.client.publish(config_topic, "", retain=True)  # Send empty payload to remove
+            self.client.publish(config_topic, "", retain=True)

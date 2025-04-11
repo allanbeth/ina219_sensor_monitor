@@ -1,41 +1,81 @@
 from sensor_monitor.sensor import Sensor
 from sensor_monitor.config import SENSOR_FILE
 from sensor_monitor.mqtt import MQTTPublisher
+from sensor_monitor.logger import sensor_logger
+
 
 import json
+import board
 
 class SensorManager:
     def __init__(self):
+        self.logger = sensor_logger()
+        self.i2c = board.I2C()
         self.sensors = self.load_sensors()
         self.mqtt = MQTTPublisher()
-        self.load_mqtt_discovery()   
+        self.load_mqtt_discovery()  
+
+
+    def detect_sensors(self):
+        
+        while not self.i2c.try_lock():
+                pass
+        try:
+            while True:
+                addresses = self.i2c.scan()
+                self.logger.info("I2C addresses found:")
+                for address in addresses:
+                    self.logger.info(str(address))
+                print(
+                    "I2C addresses found:",
+                    [hex(device_address) for device_address in self.i2c.scan()],
+                )
+                return addresses
+        finally:
+            self.i2c.unlock()     
     
     def load_sensors(self):
+
+        sensors = []
+
         try:
-            # read sensor list from json
             with open(SENSOR_FILE, "r") as f:
                 sensor_data = json.load(f)
                 sensors = [Sensor(s["name"], s["address"], s["type"]) for s in sensor_data]
+                self.logger.info("Configured Sensor:")
+
+                for sensor in self.sensors:
+                    self.logger.info(str(sensor))
+                
             
-                return sensors
-        except FileNotFoundError:
-            self.new_sensor()
+        except:
+            pass
+
+        existing_sensors = [s.address for s in sensors]
+        connected_sensors = self.detect_sensors()
+
+        for addr in connected_sensors:
+            if addr not in existing_sensors:
+                default_name = f"Sensor_{addr}"
+                default_type = "solar"
+                sensors.append(Sensor(default_name, addr, default_type))
+
+        self.save_sensors(sensors)
+        return sensors
 
     def load_mqtt_discovery(self):
         try:
-            # Send auto-discovery for each sensor on startup
             for sensor in self.sensors:
                 self.mqtt.send_discovery_config(sensor.name)
                 
-        except FileNotFoundError:
+        except:
             pass
 
     def publish_mqtt (self, data):
         try:
-            # Send auto-discovery for each sensor on startup
             self.mqtt.publish(data)
                 
-        except FileNotFoundError:
+        except:
             pass
         
         
@@ -46,14 +86,12 @@ class SensorManager:
 
 
     def save_sensors(self, sensors=None):
-        # Save sensors to the SENSOR_FILE
         if sensors is None:
             sensors = self.sensors
         with open(SENSOR_FILE, "w") as f:
             json.dump([{"name": s.name, "address": s.address, "type": s.type} for s in sensors], f)
 
     def update_sensor(self, name, new_name, new_type):
-        # Modify an existing sensor's name and type.
         for sensor in self.sensors:
             if sensor.name == name:
                 sensor.name = new_name
@@ -64,7 +102,5 @@ class SensorManager:
         return False
 
     def get_data(self):
-        # Retrieve data from all connected sensors
-
         return {s.name: s.read_data() for s in self.sensors}
     

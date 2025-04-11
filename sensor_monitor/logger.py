@@ -9,7 +9,6 @@ class sensor_logger:
         self.logger = logging.getLogger(__name__)
 
     def log_data(self, name, data):
-        # Logs sensor data to a file with debugging.
         try:           
             log_entry = (f"{time.strftime('%Y-%m-%d %H:%M:%S')},"
                             f"{name},"
@@ -17,11 +16,9 @@ class sensor_logger:
             
             self.save_entry(log_entry)
             
-            #logging.info("Logged data: %s", log_entry)
         except Exception as e:
             logging.error("Error logging data: %s", str(e))
         
-        #time.sleep(2)
 
     def save_entry(self, log_entry):
         with open(LOG_FILE, "a") as log_file:
