@@ -11,7 +11,7 @@ class MQTTPublisher:
         try:
 
             self.client.connect(MQTT_BROKER, MQTT_PORT, 60)
-            self.logger.info("Connected to MQTT Broker: %s", MQTT_BROKER)
+            self.logger.info("Connected to MQTT Broker")
 
         except:
             self.logger.info("Connection to MQTT Broker failed")
