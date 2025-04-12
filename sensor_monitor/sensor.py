@@ -16,7 +16,8 @@ class Sensor:
     def init_sensor(self):
         try:
             self.ina = INA219(self.i2c)
-            self.ina.i2c_device.device_address = 0x40
+            addr = hex(self.address)
+            self.ina.i2c_device.device_address = int(str(addr), 16)
             self.logger.info("INA219 sensor connected")
         except Exception as e:
             self.logger.info("INA219 sensor not detected: %s", str(e))
@@ -26,9 +27,9 @@ class Sensor:
 
     def read_data(self):
         try:
-            voltage = self.ina.bus_voltage if self.ina else 0
-            current = (self.ina.current / 1000) if self.ina else 0  / 1000  # Convert mA to A
-            power = voltage * current
+            voltage = round(self.ina.bus_voltage, 1) if self.ina else 0.0
+            current = round(self.ina.current / 1000,1) if self.ina else 0.0 # Convert mA to A
+            power = round(voltage * current, 2)
             type = self.type
             time_stamp =  datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
             port = self.ina.i2c_device.device_address
