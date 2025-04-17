@@ -1,1 +1,1 @@
-[{"name": "Turbine", "address": 64, "type": "wind", "max_power": 30}]
+[{"name": "Turbine", "address": 64, "type": "wind", "max_power": 30}, {"name": "Solar Panel", "address": 65, "type": "solar", "max_power": 6}, {"name": "Battery", "address": 66, "type": "battery", "max_power": 100}]

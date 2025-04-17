@@ -23,9 +23,6 @@ class SensorManager:
         try:
             while True:
                 addresses = self.i2c.scan()
-                self.logger.info("I2C addresses found:")
-                for address in addresses:
-                    self.logger.info(str(address))
                 print(
                     "I2C addresses found:",
                     [hex(device_address) for device_address in self.i2c.scan()],
@@ -42,7 +39,6 @@ class SensorManager:
             with open(SENSOR_FILE, "r") as f:
                 sensor_data = json.load(f)
                 sensors = [Sensor(s["name"], s["address"], s["type"], s["max_power"]) for s in sensor_data]
-                print(sensors)
                 self.logger.info("Configured Sensor:")
 
                 for sensor in sensors:
