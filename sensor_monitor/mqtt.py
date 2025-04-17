@@ -20,6 +20,7 @@ class MQTTPublisher:
 
         for sensor, readings in data.items():
             topic = f"{MQTT_TOPIC}/{sensor}"
+            readings = {"voltage": readings['data']['voltage'], "current": readings['data']['current'], "power": readings['data']['power']}
             payload = json.dumps(readings)
 
             self.client.publish(topic, payload, retain=True)

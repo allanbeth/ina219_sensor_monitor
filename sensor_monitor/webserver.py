@@ -19,12 +19,19 @@ def index():
 
 @app.route("/edit/<name>", methods=["GET", "POST"])
 def edit_sensor(name):
+    sensor = next((s for s in manager.sensors if s.name == name), None)
     if request.method == "POST":
         new_name = request.form["name"]
         new_type = request.form["type"]
-        manager.update_sensor(name, new_name, new_type)
+        max_power = int(request.form.get("max_power", 100))
+        manager.update_sensor(name, new_name, new_type, max_power)
         return redirect("/")
-    return render_template("edit_sensor.html", sensor_name=name)
+    return render_template(
+        "edit_sensor.html",
+        sensor_name=name,
+        sensor_type=sensor.type if sensor else "",
+        max_power=sensor.max_power if sensor else 100
+    )
 
 def broadcast_sensor_data():
     socketio.emit("sensor_update", sensor_data)

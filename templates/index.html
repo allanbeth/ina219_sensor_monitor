@@ -106,16 +106,21 @@
                         card.className = "sensor-card";
                         card.innerHTML = `
                             <div class="sensor-header">
-                                <span class="sensor-name">${name}</span>
+                                <span class="sensor-name">${name} (${sensor.max_power ?? "0"}W)</span>
                                 <span class="sensor-type ${typeClass}">${sensor.type}</span>
                             </div>
+                            
                             <div class="sensor-data">
-                                <p><strong>Voltage:</strong> ${sensor.voltage ?? "N/A"} V</p>
-                                <p><strong>Current:</strong> ${sensor.current ?? "N/A"} A</p>
-                                <p><strong>Power:</strong> ${sensor.power ?? "N/A"} W</p>
-                                <p><strong>Port:</strong> ${sensor.port ?? "N/A"}</p>
+                                <p><strong>Voltage:</strong> ${sensor.data.voltage ?? "N/A"} V</p>
+                                <p><strong>Current:</strong> ${sensor.data.current ?? "N/A"} A</p>
+                                <p><strong>Power:</strong> ${sensor.data.power ?? "N/A"} W</p>
+                                
+                                
                             </div>
-                            <div class="timestamp">Last Updated: ${sensor.time_stamp}</div>
+                            <div class="output"><meter value="${sensor.data.output}" min="0" max="100"></meter></div>
+                            <div class="timestamp">Last Updated: ${sensor.data.time_stamp}</div>
+                            <p><strong>Address:</strong> ${sensor.address ?? "N/A"}</p>
+                            
                             <a href="/edit/${name}">Edit</a>
                         `;
                         container.appendChild(card);
@@ -146,9 +151,18 @@
                 <p><strong>Voltage:</strong> {{ data.voltage if data.voltage is not none else "N/A" }} V</p>
                 <p><strong>Current:</strong> {{ data.current if data.current is not none else "N/A" }} A</p>
                 <p><strong>Power:</strong> {{ data.power if data.power is not none else "N/A" }} W</p>
-                <p><strong>Port:</strong> {{ data.port }}</p>
+                <p><strong>Address:</strong> {{ data.address }}</p>
+                {% if data.type == 'battery' %}
+                <p><strong>State of Charge:</strong> {{ data.state_of_charge if data.state_of_charge is not none else
+                    "N/A" }}%</p>
+                {% else %}
+                <p><strong>Max Power:</strong> {{ data.max_power if data.max_power is not none else "N/A" }} W</p>
+                {% endif %}
+                
             </div>
+            <div class="output"><meter min="0" max="100">{{ data.output }}</meter></div>
             <div class="timestamp">Last Updated: {{ data.time_stamp }}</div>
+            
             <a href="/edit/{{ name }}">Edit</a>
         </div>
         {% endfor %}

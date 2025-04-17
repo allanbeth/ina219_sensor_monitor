@@ -13,11 +13,9 @@ def run_sensor_loop():
         data = manager.get_data()
         sensor_data.clear()
         sensor_data.update(data)
-        manager.publish_mqtt(data)
-
         broadcast_sensor_data()
 
-        time.sleep(5)
+        time.sleep(1)
 
 if __name__ == "__main__":
     Thread(target=run_sensor_loop).start()

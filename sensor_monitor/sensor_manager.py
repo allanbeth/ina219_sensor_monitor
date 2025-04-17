@@ -41,7 +41,8 @@ class SensorManager:
         try:
             with open(SENSOR_FILE, "r") as f:
                 sensor_data = json.load(f)
-                sensors = [Sensor(s["name"], s["address"], s["type"]) for s in sensor_data]
+                sensors = [Sensor(s["name"], s["address"], s["type"], s["max_power"]) for s in sensor_data]
+                print(sensors)
                 self.logger.info("Configured Sensor:")
 
                 for sensor in sensors:
@@ -58,7 +59,8 @@ class SensorManager:
             if addr not in existing_sensors:
                 default_name = f"Sensor_{addr}"
                 default_type = "solar"
-                sensors.append(Sensor(default_name, addr, default_type))
+                default_max_power = 100
+                sensors.append(Sensor(default_name, addr, default_type, default_max_power))
 
         self.save_sensors(sensors)
         return sensors
@@ -89,18 +91,21 @@ class SensorManager:
         if sensors is None:
             sensors = self.sensors
         with open(SENSOR_FILE, "w") as f:
-            json.dump([{"name": s.name, "address": s.address, "type": s.type} for s in sensors], f)
+            json.dump([{"name": s.name, "address": s.address, "type": s.type, "max_power": s.max_power} for s in sensors], f)
 
-    def update_sensor(self, name, new_name, new_type):
+    def update_sensor(self, name, new_name, new_type, new_max_power):
         for sensor in self.sensors:
             if sensor.name == name:
                 sensor.name = new_name
                 sensor.type = new_type
+                sensor.max_power = new_max_power
                 self.save_sensors()
                 self.mqtt.send_discovery_config(sensor.name)
                 return True
         return False
 
     def get_data(self):
-        return {s.name: s.read_data() for s in self.sensors}
-    
+
+        data = {s.name: {"address": s.address, "type": s.type, "max_power": s.max_power, "data": s.read_data()}  for s in self.sensors}
+        self.mqtt.publish(data)
+        return data

@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Edit Sensor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <h1>Edit Sensor: {{ sensor_name }}</h1>
     <form method="post">
         Name: <input type="text" name="name" required value="{{ sensor_name }}">
         Type: <select name="type">
-            <option value="solar">Solar</option>
-            <option value="wind">Wind</option>
+            <option value="solar" {% if sensor_type=='solar' %}selected{% endif %}>Solar</option>
+            <option value="wind" {% if sensor_type=='wind' %}selected{% endif %}>Wind</option>
+            <option value="battery" {% if sensor_type=='battery' %}selected{% endif %}>Battery</option>
         </select>
+        Max Power: <input type="number" name=="max_power" value="{{ max_power }}"><br>
         <button type="submit">Save Changes</button>
     </form>
 </body>
+
 </html>
