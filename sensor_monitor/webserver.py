@@ -18,7 +18,6 @@ class flaskWrapper:
         self.app = Flask(__name__, template_folder=self.templatePath, static_folder=self.stylePath)
         self.socketio = SocketIO(self.app)
         self.app.route("/", methods=["GET", "POST"])(self.main)
-        self.app.route("/edit/<name>", methods=["GET", "POST"])(self.edit_sensor) 
         self.app.route("/add", methods=["GET", "POST"])(self.add_sensor) 
         self.app.route("/update_sensor", methods=["POST"])(self.update_sensor)
 

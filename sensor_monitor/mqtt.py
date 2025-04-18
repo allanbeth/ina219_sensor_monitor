@@ -19,6 +19,7 @@ class MQTTPublisher:
     def publish(self, data):
 
         for sensor, readings in data.items():
+            sensor = sensor.replace(" ", "_")
             topic = f"{MQTT_TOPIC}/{sensor}"
             readings = readings['data']
 
@@ -31,6 +32,7 @@ class MQTTPublisher:
             
 
     def send_discovery_config(self, sensor_name, sensor_type):
+        sensor_name = sensor_name.replace(" ", "_")
 
         base_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_name}"
         state_topic = f"{MQTT_TOPIC}/{sensor_name}"
