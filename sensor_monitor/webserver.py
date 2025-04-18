@@ -14,33 +14,28 @@ class flaskWrapper:
         self.manager = manager
         self.root = Path(__file__).parents[1]
         self.templatePath = self.root / "templates/"
-        self.app = Flask(__name__, template_folder=self.templatePath)
+        self.stylePath = self.root / "static/"
+        self.app = Flask(__name__, template_folder=self.templatePath, static_folder=self.stylePath)
         self.socketio = SocketIO(self.app)
         self.app.route("/", methods=["GET", "POST"])(self.main)
         self.app.route("/edit/<name>", methods=["GET", "POST"])(self.edit_sensor) 
         self.app.route("/add", methods=["GET", "POST"])(self.add_sensor) 
+        self.app.route("/update_sensor", methods=["POST"])(self.update_sensor)
 
 
 
     def main(self):
         return render_template("index.html", sensors=sensor_data)
+    
+    def update_sensor(self):
+        data = request.get_json()
+        original_name = data["original_name"]
+        new_name = data["name"]
+        max_power = int(data.get("max_power", 100))
 
- 
-    def edit_sensor(self, name):
-        sensor = next((s for s in self.manager.sensors if s.name == name), None)
-        if request.method == "POST":
-            new_name = request.form["name"]
-            new_type = request.form["type"]
-            max_power = int(request.form.get("max_power"))
+        self.manager.update_sensor(original_name, new_name, sensor_data[original_name]["type"], max_power)
+        return jsonify({"status": "success"})
 
-            self.manager.update_sensor(name, new_name, new_type, max_power)
-            return redirect("/")
-        return render_template(
-            "edit_sensor.html",
-            sensor_name=name,
-            sensor_type=sensor.type if sensor else "",
-            max_power=sensor.max_power if sensor else 100
-        )
     
     def add_sensor(self):
         

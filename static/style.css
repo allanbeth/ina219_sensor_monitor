@@ -50,16 +50,25 @@ h1 {
 }
 
 .type-solar {
-    background-color: #ffa500; /* orange */
+    background-color: #ffa500;
 }
 
 .type-wind {
-    background-color: #00aaff; /* blue */
+    background-color: #00aaff;
+}
+
+.type-battery {
+    background-color: #5c6bc0;
 }
 
 .sensor-data p {
     margin: 6px 0;
     font-size: 1em;
+}
+
+.output meter {
+    width: 100%;
+    height: 20px;
 }
 
 .timestamp {
@@ -73,4 +82,118 @@ h1 {
     text-align: center;
     color: #555;
     font-size: 1.2em;
+}
+
+.hidden {
+    display: none;
+}
+
+.edit-form {
+    margin-top: 10px;
+}
+
+.edit-form input {
+    margin: 5px 0;
+    padding: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.edit-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.edit-buttons button {
+    padding: 5px 10px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+
+
+button.save-btn,
+button.back-btn {
+    padding: 5px 10px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button.save-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+button.back-btn {
+    background-color: #ccc;
+    color: black;
+}
+
+
+.output {
+    margin-top: 10px;
+}
+
+.output meter {
+    width: 100%;
+    height: 1.2em;
+}
+
+.fa-cog {
+    color: #666;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.fa-cog:hover {
+    color: #333;
+}
+
+/* ===================== Responsive Layout ===================== */
+
+/* Small phones like iPhones */
+@media (max-width: 599px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .sensor-card {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Tablets (portrait & landscape) */
+@media (min-width: 600px) {
+    .container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .sensor-card {
+        width: 45%;
+        max-width: 320px;
+    }
+}
+
+/* Small desktops */
+@media (min-width: 900px) {
+    .sensor-card {
+        width: 30%;
+        max-width: 340px;
+    }
+}
+
+/* Large desktops */
+@media (min-width: 1200px) {
+    .sensor-card {
+        width: 25%;
+        max-width: 360px;
+    }
 }

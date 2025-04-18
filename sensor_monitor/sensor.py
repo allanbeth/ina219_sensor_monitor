@@ -18,7 +18,7 @@ class Sensor:
             self.ina.i2c_device.device_address = int(str(addr), 16)
             logging.info(f"INA219 sensor connected on address {addr}")
         except Exception as e:
-            logging.info("INA219 sensor not detected: %s", str(e))
+            #logging.info("INA219 sensor not detected: %s", str(e))
             self.ina = None
             
         
@@ -38,5 +38,9 @@ class Sensor:
                 data["output"] = round(output, 2)
             return data
         except Exception as e:
-            logging.info(f"Error reading sensor {self.name}: {e}")
-            return {"voltage": 0, "current": 0, "power": 0}
+            #logging.info(f"Error reading sensor {self.name}: {e}")
+            if self.type == 'battery':
+                data = {"voltage": 0, "current": 0, "power": 0, "time_stamp": "Not Connected", "state_of_charge": 0}
+            else:
+                data = {"voltage": 0, "current": 0, "power": 0, "time_stamp": "Not Connected", "output": "Off"}
+            return data

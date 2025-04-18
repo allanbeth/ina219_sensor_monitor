@@ -16,8 +16,7 @@ class SensorManager:
         self.load_mqtt_discovery()  
 
 
-    def detect_sensors(self):
-        
+    def detect_sensors(self):       
         while not self.i2c.try_lock():
                 pass
         try:
@@ -64,15 +63,14 @@ class SensorManager:
     def load_mqtt_discovery(self):
         try:
             for sensor in self.sensors:
-                self.mqtt.send_discovery_config(sensor.name)
+                self.mqtt.send_discovery_config(sensor.name, sensor.type)
                 
         except:
             pass
 
     def publish_mqtt (self, data):
         try:
-            self.mqtt.publish(data)
-                
+            self.mqtt.publish(data)                
         except:
             pass
         

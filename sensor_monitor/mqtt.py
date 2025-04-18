@@ -20,7 +20,8 @@ class MQTTPublisher:
 
         for sensor, readings in data.items():
             topic = f"{MQTT_TOPIC}/{sensor}"
-            readings = {"voltage": readings['data']['voltage'], "current": readings['data']['current'], "power": readings['data']['power']}
+            readings = readings['data']
+
             payload = json.dumps(readings)
 
             self.client.publish(topic, payload, retain=True)
@@ -29,16 +30,22 @@ class MQTTPublisher:
             self.client.publish(availability_topic, "online", retain=True)
             
 
-    def send_discovery_config(self, sensor_name):
+    def send_discovery_config(self, sensor_name, sensor_type):
 
         base_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_name}"
         state_topic = f"{MQTT_TOPIC}/{sensor_name}"
 
-        for measurement, unit, device_class in [
+        measurements = [
             ("voltage", "V", "voltage"),
             ("current", "A", "current"),
             ("power", "W", "power"),
-        ]:
+        ]
+
+        if sensor_type == "battery":
+            measurements.append(("state_of_charge", "%", "battery"))
+
+        for measurement, unit, device_class in measurements:
+  
             config_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_name}_{measurement}/config"
             
 
@@ -59,6 +66,7 @@ class MQTTPublisher:
             }
 
             self.client.publish(config_topic, json.dumps(payload), retain=True)
+            print(payload)
 
     def remove_discovery_config(self, sensor_name):
 

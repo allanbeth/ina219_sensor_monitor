@@ -5,169 +5,128 @@
     <title>Sensor Monitor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f4f8;
-            margin: 0;
-            padding: 20px;
-        }
+<body>
+    <h1>Sensor Data</h1>
 
-        h1 {
-            text-align: center;
-            color: #333;
-        }
+    <div id="no-sensors" class="no-sensors {% if sensors %}hidden{% endif %}">
+        No sensors detected. Please ensure your INA219 sensors are connected.
+    </div>
 
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .sensor-card {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 15px 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 280px;
-            transition: transform 0.2s ease;
-        }
-
-        .sensor-card:hover {
-            transform: scale(1.03);
-        }
-
-        .sensor-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .sensor-name {
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-
-        .sensor-type {
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 0.9em;
-            color: white;
-        }
-
-        .type-solar {
-            background-color: #ffa500;
-            /* orange */
-        }
-
-        .type-wind {
-            background-color: #00aaff;
-            /* blue */
-        }
-
-        .sensor-data p {
-            margin: 6px 0;
-            font-size: 1em;
-        }
-
-        .timestamp {
-            font-size: 0.8em;
-            color: #666;
-            text-align: right;
-            margin-top: 10px;
-        }
-
-        .no-sensors {
-            text-align: center;
-            color: #555;
-            font-size: 1.2em;
-        }
-    </style>
+    <div class="container" id="sensor-container"></div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const socket = io();
+        const socket = io();
+        let paused = false;
 
+        document.addEventListener("DOMContentLoaded", () => {
             socket.on("sensor_update", function (data) {
+                if (paused) return;
                 const container = document.getElementById("sensor-container");
                 container.innerHTML = "";
 
                 if (Object.keys(data).length === 0) {
-                    document.getElementById("no-sensors").style.display = "block";
+                    document.getElementById("no-sensors").classList.remove("hidden");
                 } else {
-                    document.getElementById("no-sensors").style.display = "none";
+                    document.getElementById("no-sensors").classList.add("hidden");
 
                     for (let [name, sensor] of Object.entries(data)) {
-                        const typeClass = sensor.type === "solar" ? "type-solar" : "type-wind";
+                        const typeClass = sensor.type === "solar" ? "type-solar"
+                            : sensor.type === "wind" ? "type-wind"
+                            : "type-battery";
+
                         const card = document.createElement("div");
                         card.className = "sensor-card";
-                        card.innerHTML = `
+
+                        const maxPower = sensor.max_power ?? "";
+                        const hexAddress = sensor.address ? `0x${parseInt(sensor.address).toString(16).padStart(2, '0')}` : "0x00";
+
+                        let content = `
                             <div class="sensor-header">
-                                <span class="sensor-name">${name} (${sensor.max_power ?? "0"}W)</span>
-                                <span class="sensor-type ${typeClass}">${sensor.type}</span>
+                                <span class="sensor-name">${name}${sensor.max_power ? ` (${sensor.max_power}W)` : ""}</span>
+                                <div class="type-edit-container">
+                                    <span class="sensor-type ${typeClass}">${sensor.type}</span>
+                                    <i class="fa-solid fa-cog" style="cursor:pointer" onclick="enterEditMode('${name}', '${sensor.type}', '${maxPower}', '${hexAddress}')"></i>
+                                </div>
                             </div>
-                            
-                            <div class="sensor-data">
+                            <div class="sensor-data" id="view-${name}">
                                 <p><strong>Voltage:</strong> ${sensor.data.voltage ?? "N/A"} V</p>
-                                <p><strong>Current:</strong> ${sensor.data.current ?? "N/A"} A</p>
+                                <p><strong>Current:</strong> ${sensor.data.current ?? "N/A"} A</p>`;
+
+                        if (sensor.type === "battery") {
+                            content += `
+                                <div class="output">
+                                    <meter value="${sensor.data.state_of_charge ?? 0}" min="0" max="100"></meter>
+                                </div>`;
+                        } else {
+                            content += `
                                 <p><strong>Power:</strong> ${sensor.data.power ?? "N/A"} W</p>
-                                
-                                
+                                <p><strong>Max Power:</strong> ${sensor.max_power ?? "N/A"} W</p>
+                                <div class="output">
+                                    <meter value="${sensor.data.output ?? 0}" min="0" max="100"></meter>
+                                </div>`;
+                        }
+
+                        content += `
+                                <div class="timestamp">Last Updated: ${sensor.data.time_stamp}</div>
                             </div>
-                            <div class="output"><meter value="${sensor.data.output}" min="0" max="100"></meter></div>
-                            <div class="timestamp">Last Updated: ${sensor.data.time_stamp}</div>
-                            <p><strong>Address:</strong> ${sensor.address ?? "N/A"}</p>
-                            
-                            <a href="/edit/${name}">Edit</a>
+                            <div id="edit-${name}" class="edit-form hidden">
+                                <label>Name:</label>
+                                <input type="text" id="name-${name}" value="${name}">
+                                <label>Max Power:</label>
+                                <input type="number" id="maxPower-${name}" value="${maxPower}">
+                                <label>Address:</label>
+                                <input type="text" value="${hexAddress}" readonly>
+                                <div class="edit-buttons">
+                                    <button class="save-btn" onclick="saveSensor('${name}')">Save</button>
+                                    <button class="back-btn" onclick="cancelEdit('${name}')">Back</button>
+                                </div>
+                            </div>
                         `;
+
+                        card.innerHTML = content;
                         container.appendChild(card);
                     }
                 }
             });
         });
+
+        function enterEditMode(name, type, maxPower, address) {
+            paused = true;
+            document.getElementById(`view-${name}`).classList.add("hidden");
+            document.getElementById(`edit-${name}`).classList.remove("hidden");
+        }
+
+        function cancelEdit(name) {
+            document.getElementById(`view-${name}`).classList.remove("hidden");
+            document.getElementById(`edit-${name}`).classList.add("hidden");
+            paused = false;
+        }
+
+        function saveSensor(originalName) {
+            const newName = document.getElementById(`name-${originalName}`).value;
+            const maxPower = document.getElementById(`maxPower-${originalName}`).value;
+
+            fetch("/update_sensor", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    original_name: originalName,
+                    name: newName,
+                    max_power: maxPower
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    paused = false;
+                    socket.emit("sensor_update_request"); // optional: notify for fresh data
+                });
+
+            cancelEdit(originalName);
+        }
     </script>
-</head>
-
-<body>
-    <h1>Sensor Data</h1>
-    <div class="add"><a href="/add">New</a></div>
-
-    <div id="no-sensors" class="no-sensors" style="{% if sensors %}display: none;{% endif %}">
-        No sensors detected. Please ensure your INA219 sensors are connected.
-    </div>
-
-    <div class="container" id="sensor-container">
-        {% for name, data in sensors.items() %}
-        <div class="sensor-card">
-            <div class="sensor-header">
-                <span class="sensor-name">{{ name }}</span>
-                <span class="sensor-type {% if data.type == 'solar' %}type-solar{% else %}type-wind{% endif %}">
-                    {{ data.type }}
-                </span>
-            </div>
-            <div class="sensor-data">
-                <p><strong>Voltage:</strong> {{ data.voltage if data.voltage is not none else "N/A" }} V</p>
-                <p><strong>Current:</strong> {{ data.current if data.current is not none else "N/A" }} A</p>
-                <p><strong>Power:</strong> {{ data.power if data.power is not none else "N/A" }} W</p>
-                <p><strong>Address:</strong> {{ data.address }}</p>
-                {% if data.type == 'battery' %}
-                <p><strong>State of Charge:</strong> {{ data.state_of_charge if data.state_of_charge is not none else
-                    "N/A" }}%</p>
-                {% else %}
-                <p><strong>Max Power:</strong> {{ data.max_power if data.max_power is not none else "N/A" }} W</p>
-                {% endif %}
-                
-            </div>
-            <div class="output"><meter min="0" max="100">{{ data.output }}</meter></div>
-            <div class="timestamp">Last Updated: {{ data.time_stamp }}</div>
-            
-            <a href="/edit/{{ name }}">Edit</a>
-        </div>
-        {% endfor %}
-    </div>
 </body>
 
 </html>
