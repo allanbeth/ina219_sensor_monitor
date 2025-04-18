@@ -66,7 +66,6 @@ class MQTTPublisher:
             }
 
             self.client.publish(config_topic, json.dumps(payload), retain=True)
-            print(payload)
 
     def remove_discovery_config(self, sensor_name):
 
