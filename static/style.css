@@ -92,12 +92,38 @@ h1 {
     margin-top: 10px;
 }
 
-.edit-form input {
-    margin: 5px 0;
-    padding: 6px;
-    width: 100%;
-    box-sizing: border-box;
+.edit-form div {
+    width: 90%;
+    margin: 1px 0;
+    padding: 4px;
 }
+
+.edit-form input {
+    margin: 1px 0;
+    padding: 4px;
+    width: 50%;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+.edit-form label {
+    margin: 1px 0;
+    padding: 4px;
+    width: 50%;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+
+.edit-dropdown {
+    margin: 1px 0;
+    padding: 4px;
+    width: 50%;
+    box-sizing: border-box;
+    border-radius: 6px;
+    border-color: #333;
+}
+
 
 .edit-buttons {
     display: flex;
@@ -110,7 +136,6 @@ h1 {
     font-size: 1em;
     cursor: pointer;
 }
-
 
 
 button.save-btn,
@@ -158,24 +183,19 @@ button.back-btn {
 /* Small phones like iPhones */
 @media (max-width: 599px) {
     .container {
-        flex-direction: column;
-        align-items: center;
+        display: block; 
     }
 
     .sensor-card {
-        width: 100%;
+        width: 90%;
         max-width: 100%;
+        margin: 0 auto 20px auto; 
     }
 }
 
+
 /* Tablets (portrait & landscape) */
 @media (min-width: 600px) {
-    .container {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
     .sensor-card {
         width: 45%;
         max-width: 320px;

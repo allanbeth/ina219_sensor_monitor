@@ -9,68 +9,70 @@ class MQTTPublisher:
         self.client = mqtt.Client()
 
         try:
-
             self.client.connect(MQTT_BROKER, MQTT_PORT, 60)
             self.logger.info("Connected to MQTT Broker")
-
-        except:
-            self.logger.info("Connection to MQTT Broker failed")
+        except Exception as e:
+            self.logger.error(f"Connection to MQTT Broker failed: {e}")
 
     def publish(self, data):
-
         for sensor, readings in data.items():
-            sensor = sensor.replace(" ", "_")
-            topic = f"{MQTT_TOPIC}/{sensor}"
-            readings = readings['data']
+            sensor_clean = sensor.replace(" ", "_")
+            topic = f"{MQTT_TOPIC}/{sensor_clean}"
+            sensor_data = readings.get('data', {})
 
-            payload = json.dumps(readings)
-
+            payload = json.dumps(sensor_data)
             self.client.publish(topic, payload, retain=True)
 
-            availability_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor}/availability"
+            availability_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_clean}/availability"
             self.client.publish(availability_topic, "online", retain=True)
-            
 
     def send_discovery_config(self, sensor_name, sensor_type):
-        sensor_name = sensor_name.replace(" ", "_")
-
-        base_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_name}"
-        state_topic = f"{MQTT_TOPIC}/{sensor_name}"
+        sensor_clean = sensor_name.replace(" ", "_")
+        base_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_clean}"
+        state_topic = f"{MQTT_TOPIC}/{sensor_clean}"
 
         measurements = [
             ("voltage", "V", "voltage"),
             ("current", "A", "current"),
-            ("power", "W", "power"),
         ]
 
-        if sensor_type == "battery":
+        if sensor_type != "battery":
+            measurements.append(("power", "W", "power"))
+        else:
             measurements.append(("state_of_charge", "%", "battery"))
 
         for measurement, unit, device_class in measurements:
-  
-            config_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_name}_{measurement}/config"
-            
-
+            config_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_clean}_{measurement}/config"
             payload = {
-                "name": f"{sensor_name} {measurement.capitalize()}",
+                "name": f"{sensor_name} {measurement.replace('_', ' ').capitalize()}",
                 "state_topic": state_topic,
                 "value_template": f"{{{{ value_json.{measurement} }}}}",
                 "unit_of_measurement": unit,
                 "device_class": device_class,
-                "unique_id": f"{sensor_name}_{measurement}",
+                "unique_id": f"{sensor_clean}_{measurement}",
                 "availability_topic": f"{base_topic}/availability",
                 "device": {
-                    "identifiers": [sensor_name],
+                    "identifiers": [sensor_clean],
                     "name": sensor_name,
                     "manufacturer": "Custom",
                     "model": "INA219 Sensor"
                 }
             }
-
             self.client.publish(config_topic, json.dumps(payload), retain=True)
 
-    def remove_discovery_config(self, sensor_name):
+    def remove_discovery_config(self, sensor_name, sensor_type="generic"):
+        sensor_clean = sensor_name.replace(" ", "_")
 
-        for measurement in ["voltage", "current", "power"]:
-            config_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_name}_{measurement}/config"
+        measurements = ["voltage", "current"]
+        if sensor_type == "battery":
+            measurements.append("state_of_charge")
+        else:
+            measurements.append("power")
+
+        for measurement in measurements:
+            config_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_clean}_{measurement}/config"
             self.client.publish(config_topic, "", retain=True)
+
+    def rename_discovery_config(self, old_name, new_name, sensor_type): 
+        self.remove_discovery_config(old_name, sensor_type)
+        self.send_discovery_config(new_name, sensor_type)
