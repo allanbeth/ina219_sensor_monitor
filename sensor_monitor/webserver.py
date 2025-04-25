@@ -30,10 +30,11 @@ class flaskWrapper:
         data = request.get_json()
         original_name = data["original_name"]
         new_name = data["name"]
-        new_type = data.get("type", sensor_data[original_name]["type"])  # Fallback to current type if not provided
+        new_type = data.get("type", sensor_data[original_name]["type"])
         max_power = int(data.get("max_power", 100))
+        rating = int(data.get("rating", 100))
 
-        self.manager.update_sensor(original_name, new_name, new_type, max_power)
+        self.manager.update_sensor(original_name, new_name, new_type, max_power, rating)
         return jsonify({"status": "success"})
 
 
@@ -45,7 +46,8 @@ class flaskWrapper:
             new_address = request.form["address"]
             new_type = request.form["type"]
             max_power = request.form["max_power"]
-            data = [{"name": new_name, "address": new_address, "type": new_type, "max_power": max_power}]
+            rating = request.form["rating"]
+            data = [{"name": new_name, "address": new_address, "type": new_type, "max_power": max_power, "rating": rating}]
 
             self.manager.add_sensor(data)
 

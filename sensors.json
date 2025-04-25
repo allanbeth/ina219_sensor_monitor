@@ -1,1 +1,1 @@
-[{"name": "Turbine", "address": 64, "type": "wind", "max_power": 30}, {"name": "Battery", "address": 65, "type": "battery", "max_power": 100}, {"name": "Solar Panel", "address": 66, "type": "solar", "max_power": 6}]
+[{"name": "Turbine", "address": 64, "type": "wind", "max_power": 30, "rating": 12}, {"name": "Battery", "address": 65, "type": "battery", "max_power": 100, "rating": 12}, {"name": "Solar Panel", "address": 66, "type": "solar", "max_power": 6, "rating": 12}]

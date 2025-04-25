@@ -9,12 +9,29 @@ h1 {
     text-align: center;
     color: #333;
 }
+.header-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px 0px 20px 0px;
+}
 
 .container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
+}
+
+.header-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 280px;
+    transition: transform 0.2s ease;
+    width:100%;
 }
 
 .sensor-card {

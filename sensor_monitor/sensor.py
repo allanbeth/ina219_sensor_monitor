@@ -5,11 +5,12 @@ import datetime
 import logging
 
 class Sensor:
-    def __init__(self, name, address, sensor_type, max_power):
+    def __init__(self, name, address, sensor_type, max_power, rating):
         self.name = name
         self.type = sensor_type
         self.max_power = max_power
         self.address = address
+        self.rating = rating
         self.i2c = busio.I2C(board.SCL, board.SDA)      
 
         try:

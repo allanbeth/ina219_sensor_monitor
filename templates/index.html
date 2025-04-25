@@ -12,7 +12,11 @@
 </head>
 
 <body>
-    <h1>Sensor Data</h1>
+    <div class="header-container">
+        <div class="header-card">
+    <h1>Energy Monitor</h1>
+</div>
+</div>
 
     <div id="no-sensors" class="no-sensors {% if sensors %}hidden{% endif %}">
         No sensors detected. Please ensure your INA219 sensors are connected.
@@ -44,28 +48,30 @@
                         card.className = "sensor-card";
 
                         const maxPower = sensor.max_power ?? "";
+                        const rating = sensor.rating ?? "";
                         const hexAddress = sensor.address ? `0x${parseInt(sensor.address).toString(16).padStart(2, '0')}` : "0x00";
 
                         let content = `
                             <div class="sensor-header">
-                                <span class="sensor-name">${name}${sensor.max_power ? ` (${sensor.max_power}W)` : ""}</span>
+                                <span class="sensor-name">${name}</span>
                                 <div class="type-edit-container">
-                                    <span class="sensor-type ${typeClass}">${sensor.type}</span>
-                                    <i class="fa-solid fa-cog" style="cursor:pointer" onclick="enterEditMode('${name}', '${sensor.type}', '${maxPower}', '${hexAddress}')"></i>
+                                    <span class="sensor-type ${typeClass}">${sensor.type} ${sensor.rating}V</span>
+                                    <i class="fa-solid fa-cog" style="cursor:pointer" onclick="enterEditMode('${name}', '${sensor.type}', '${maxPower}', '${rating}', '${hexAddress}')"></i>
                                 </div>
                             </div>
                             <div class="sensor-data" id="view-${name}">
                                 <p><strong>Voltage:</strong> ${sensor.data.voltage ?? "N/A"} V</p>
-                                <p><strong>Current:</strong> ${sensor.data.current ?? "N/A"} A</p>`;
+                                <p><strong>Current:</strong> ${sensor.data.current ?? "N/A"} A</p>
+                                <p><strong>Power:</strong> ${sensor.data.power ?? "N/A"} W</p>`;
 
                         if (sensor.type === "battery") {
                             content += `
+                                <p><strong>SoC:</strong> ${sensor.data.state_of_charge ?? 0}%</p>
                                 <div class="output">
                                     <meter value="${sensor.data.state_of_charge ?? 0}" min="0" max="100"></meter>
                                 </div>`;
                         } else {
-                            content += `
-                                <p><strong>Power:</strong> ${sensor.data.power ?? "N/A"} W</p>
+                            content += `                                
                                 <p><strong>Max Power:</strong> ${sensor.max_power ?? "N/A"} W</p>
                                 <div class="output">
                                     <meter value="${sensor.data.output ?? 0}" min="0" max="100"></meter>
@@ -96,7 +102,12 @@
                                 <label>Max Power:</label>
                                 <input type="number" id="maxPower-${name}" value="${maxPower}">
                                 </div>
-                                
+
+                                <div>
+                                <label>Voltage Rating:</label>
+                                <input type="number" id="rating-${name}" value="${rating}">
+                                </div>      
+
                                 <div>
                                 <label>Address: ${hexAddress}</label>
                                 </div>
@@ -131,6 +142,7 @@
             const newName = document.getElementById(`name-${originalName}`).value;
             const newType = document.getElementById(`type-${originalName}`).value;
             const maxPower = document.getElementById(`maxPower-${originalName}`).value;
+            const rating = document.getElementById(`rating-${originalName}`).value;
 
             fetch("/update_sensor", {
                 method: "POST",
@@ -139,7 +151,8 @@
                     original_name: originalName,
                     name: newName,
                     type: newType,
-                    max_power: maxPower
+                    max_power: maxPower,
+                    rating: rating
                 })
             })
                 .then(res => res.json())
