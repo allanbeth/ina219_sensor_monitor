@@ -53,6 +53,15 @@ class flaskWrapper:
 
             return redirect("/")
         return render_template("add_sensor.html")
+    
+    def delete_sensor(self):
+        data = request.get_json()
+        sensor_name = data.get("name")
+        if sensor_name in sensor_data:
+            self.manager.remove_sensor(sensor_name)
+            return jsonify({"status": "success"})
+        else:
+            return jsonify({"status": "error", "message": "Sensor not found"}), 404
 
     def broadcast_sensor_data(self):
         self.socketio.emit("sensor_update", sensor_data)

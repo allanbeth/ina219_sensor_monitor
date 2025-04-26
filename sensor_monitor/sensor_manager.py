@@ -77,7 +77,7 @@ class SensorManager:
         
         
     def new_sensor(self):
-        sensor = [Sensor("New", 64, "solar")]
+        sensor = [Sensor("New", 64, "solar", )]
         self.save_sensors(sensor)
         self.sensors = self.load_sensors()
 
@@ -99,6 +99,24 @@ class SensorManager:
                 self.mqtt.send_discovery_config(sensor.name)
                 return True
         return False
+    
+    def remove_sensor(self, name):
+        sensor_to_remove = None
+        for sensor in self.sensors:
+            if sensor.name == name:
+                sensor_to_remove = sensor
+                break
+
+        if sensor_to_remove:
+            self.sensors.remove(sensor_to_remove)
+            self.save_sensors()
+            self.mqtt.remove_discovery_config(sensor_to_remove.name.replace(" ", "_"))
+            self.logger.info(f"Removed sensor: {sensor_to_remove.name}")
+            return True
+        else:
+            self.logger.warning(f"Tried to remove non-existent sensor: {name}")
+            return False
+
 
     def get_data(self):
 

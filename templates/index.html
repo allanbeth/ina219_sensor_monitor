@@ -115,6 +115,7 @@
                                 <div class="edit-buttons">
                                     <button class="back-btn" onclick="cancelEdit('${name}')">Back</button>
                                     <button class="save-btn" onclick="saveSensor('${name}')">Save</button>
+                                    <button class="delete-btn" data-name="${name}">Delete</button>
                                 </div>
                             </div>
                         `;
@@ -163,6 +164,36 @@
 
             cancelEdit(originalName);
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const sensorName = this.getAttribute('data-name');
+            if (confirm(`Are you sure you want to delete sensor "${sensorName}"?`)) {
+                fetch('/delete_sensor', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: sensorName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Remove the sensor card from the DOM
+                        this.closest('.sensor-card').remove();
+                    } else {
+                        alert('Error deleting sensor: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the sensor.');
+                });
+            }
+        });
+    });
+});
     </script>
 </body>
 

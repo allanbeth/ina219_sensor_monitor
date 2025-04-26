@@ -156,7 +156,8 @@ h1 {
 
 
 button.save-btn,
-button.back-btn {
+button.back-btn,
+button.delete-btn {
     padding: 5px 10px;
     font-size: 0.9em;
     border: none;
@@ -171,7 +172,12 @@ button.save-btn {
 
 button.back-btn {
     background-color: #ccc;
-    color: black;
+    color: rgb(255, 255, 255);
+}
+
+button.delete-btn {
+    background-color: #fa6868;
+    color: rgb(255, 255, 255);
 }
 
 
