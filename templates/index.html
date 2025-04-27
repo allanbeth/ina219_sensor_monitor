@@ -8,15 +8,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <meta name="viewport" content="width=device-width" />
-    
+
 </head>
 
 <body>
     <div class="header-container">
         <div class="header-card">
-    <h1>Energy Monitor</h1>
-</div>
-</div>
+            <h1>Energy Monitor</h1>
+        </div>
+    </div>
 
     <div id="no-sensors" class="no-sensors {% if sensors %}hidden{% endif %}">
         No sensors detected. Please ensure your INA219 sensors are connected.
@@ -42,7 +42,7 @@
                     for (let [name, sensor] of Object.entries(data)) {
                         const typeClass = sensor.type === "solar" ? "type-solar"
                             : sensor.type === "wind" ? "type-wind"
-                            : "type-battery";
+                                : "type-battery";
 
                         const card = document.createElement("div");
                         card.className = "sensor-card";
@@ -165,35 +165,28 @@
             cancelEdit(originalName);
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.delete-btn').forEach(function(button) {
-        button.addEventListener('click', function() {
-            const sensorName = this.getAttribute('data-name');
-            if (confirm(`Are you sure you want to delete sensor "${sensorName}"?`)) {
-                fetch('/delete_sensor', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name: sensorName })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Remove the sensor card from the DOM
-                        this.closest('.sensor-card').remove();
-                    } else {
-                        alert('Error deleting sensor: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while deleting the sensor.');
-                });
+        document.addEventListener('click', function (event) {
+            if (event.target.classList.contains('delete-btn')) {
+                const name = event.target.getAttribute('data-name');
+                if (confirm(`Are you sure you want to delete ${name}?`)) {
+                    fetch('/delete_sensor', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: name })
+                    })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.status === 'success') {
+                                location.reload(); // Refresh page after successful delete
+                            } else {
+                                alert('Failed to delete sensor.');
+                            }
+                        });
+                }
             }
         });
-    });
-});
+
+
     </script>
 </body>
 

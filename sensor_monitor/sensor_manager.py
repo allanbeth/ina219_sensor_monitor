@@ -31,9 +31,7 @@ class SensorManager:
             self.i2c.unlock()     
     
     def load_sensors(self):
-
         sensors = []
-
         try:
             with open(SENSOR_FILE, "r") as f:
                 sensor_data = json.load(f)
@@ -41,9 +39,7 @@ class SensorManager:
                 self.logger.info("Configured Sensor:")
 
                 for sensor in sensors:
-                    self.logger.info(sensor.name)
-                
-            
+                    self.logger.info(sensor.name)     
         except:
             pass
 
@@ -60,21 +56,6 @@ class SensorManager:
 
         self.save_sensors(sensors)
         return sensors
-
-    def load_mqtt_discovery(self):
-        try:
-            for sensor in self.sensors:
-                self.mqtt.send_discovery_config(sensor.name, sensor.type)
-                
-        except:
-            pass
-
-    def publish_mqtt (self, data):
-        try:
-            self.mqtt.publish(data)                
-        except:
-            pass
-        
         
     def new_sensor(self):
         sensor = [Sensor("New", 64, "solar", )]
@@ -117,6 +98,19 @@ class SensorManager:
             self.logger.warning(f"Tried to remove non-existent sensor: {name}")
             return False
 
+    def load_mqtt_discovery(self):
+        try:
+            for sensor in self.sensors:
+                self.mqtt.send_discovery_config(sensor.name, sensor.type)               
+        except:
+            pass
+
+    def publish_mqtt (self, data):
+        try:
+            self.mqtt.publish(data)                
+        except:
+            pass
+        
 
     def get_data(self):
 

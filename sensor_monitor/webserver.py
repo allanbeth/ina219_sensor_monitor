@@ -20,6 +20,7 @@ class flaskWrapper:
         self.app.route("/", methods=["GET", "POST"])(self.main)
         self.app.route("/add", methods=["GET", "POST"])(self.add_sensor) 
         self.app.route("/update_sensor", methods=["POST"])(self.update_sensor)
+        self.app.route("/delete_sensor", methods=["POST"])(self.delete_sensor)
 
 
 
@@ -67,6 +68,5 @@ class flaskWrapper:
         self.socketio.emit("sensor_update", sensor_data)
 
     def run_webserver(self): 
-
 
         self.socketio.run(self.app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT, debug=False, allow_unsafe_werkzeug=True)
