@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
     <title>Sensor Monitor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
     <meta name="viewport" content="width=device-width" />
-
 </head>
 
 <body>
@@ -27,6 +26,7 @@
     <script>
         const socket = io();
         let paused = false;
+        let undoTimers = {};
 
         document.addEventListener("DOMContentLoaded", () => {
             socket.on("sensor_update", function (data) {
@@ -40,12 +40,13 @@
                     document.getElementById("no-sensors").classList.add("hidden");
 
                     for (let [name, sensor] of Object.entries(data)) {
-                        const typeClass = sensor.type === "solar" ? "type-solar"
-                            : sensor.type === "wind" ? "type-wind"
-                                : "type-battery";
+                        const typeClass = sensor.type === "Solar" ? "type-Solar" :
+                                          sensor.type === "Wind" ? "type-Wind" :
+                                          "type-Battery";
 
                         const card = document.createElement("div");
                         card.className = "sensor-card";
+                        card.id = `card-${name}`;
 
                         const maxPower = sensor.max_power ?? "";
                         const rating = sensor.rating ?? "";
@@ -55,67 +56,74 @@
                             <div class="sensor-header">
                                 <span class="sensor-name">${name}</span>
                                 <div class="type-edit-container">
-                                    <span class="sensor-type ${typeClass}">${sensor.type} ${sensor.rating}V</span>
-                                    <i class="fa-solid fa-cog" style="cursor:pointer" onclick="enterEditMode('${name}', '${sensor.type}', '${maxPower}', '${rating}', '${hexAddress}')"></i>
+                                    <span class="sensor-type ${typeClass}">${sensor.type} ${rating}V</span>
+                                    <i class="fa-solid fa-cog" style="cursor:pointer" onclick="enterEditMode('${name}')"></i>
                                 </div>
                             </div>
-                            <div class="sensor-data" id="view-${name}">
+
+                            <div id="view-${name}" class="sensor-data">
                                 <p><strong>Voltage:</strong> ${sensor.data.voltage ?? "N/A"} V</p>
                                 <p><strong>Current:</strong> ${sensor.data.current ?? "N/A"} A</p>
                                 <p><strong>Power:</strong> ${sensor.data.power ?? "N/A"} W</p>`;
 
-                        if (sensor.type === "battery") {
+                        if (sensor.type === "Battery") {
                             content += `
                                 <p><strong>SoC:</strong> ${sensor.data.state_of_charge ?? 0}%</p>
-                                <div class="output">
-                                    <meter value="${sensor.data.state_of_charge ?? 0}" min="0" max="100"></meter>
-                                </div>`;
+                                <p class="output"><meter value="${sensor.data.state_of_charge ?? 0}" min="0" max="100"></meter></p>`;
                         } else {
-                            content += `                                
+                            content += `
                                 <p><strong>Max Power:</strong> ${sensor.max_power ?? "N/A"} W</p>
-                                <div class="output">
-                                    <meter value="${sensor.data.output ?? 0}" min="0" max="100"></meter>
-                                </div>`;
+                                <p class="output"><meter value="${sensor.data.output ?? 0}" min="0" max="100"></meter></p>`;
                         }
 
                         content += `
-                                <div class="timestamp">Last Updated: ${sensor.data.time_stamp}</div>
+                                <div class="timestamp" id="timestamp-${name}">Last Updated: ${sensor.data.time_stamp}</div>
                             </div>
 
                             <div id="edit-${name}" class="edit-form hidden">
                                 <h4>Edit Sensor</h4>
                                 <div>
-                                <label>Name:</label>
-                                <input type="text" id="name-${name}" value="${name}">
+                                    <label>Name:</label>
+                                    <input type="text" id="name-${name}" value="${name}">
                                 </div>
-
                                 <div>
-                                <label>Type:</label>
-                                <select id="type-${name}" class="edit-dropdown">
-                                    <option value="solar" ${sensor.type === "solar" ? "selected" : ""}>Solar</option>
-                                    <option value="wind" ${sensor.type === "wind" ? "selected" : ""}>Wind</option>
-                                    <option value="battery" ${sensor.type === "battery" ? "selected" : ""}>Battery</option>
-                                </select>
+                                    <label>Type:</label>
+                                    <select id="type-${name}" class="edit-dropdown">
+                                        <option value="Solar" ${sensor.type === "Solar" ? "selected" : ""}>Solar</option>
+                                        <option value="Wind" ${sensor.type === "Wind" ? "selected" : ""}>Wind</option>
+                                        <option value="Battery" ${sensor.type === "Battery" ? "selected" : ""}>Battery</option>
+                                    </select>
                                 </div>
-                                
                                 <div>
-                                <label>Max Power:</label>
-                                <input type="number" id="maxPower-${name}" value="${maxPower}">
+                                    <label>Max Power:</label>
+                                    <input type="number" id="maxPower-${name}" value="${maxPower}">
                                 </div>
-
                                 <div>
-                                <label>Voltage Rating:</label>
-                                <input type="number" id="rating-${name}" value="${rating}">
-                                </div>      
-
-                                <div>
-                                <label>Address: ${hexAddress}</label>
+                                    <label>Voltage Rating:</label>
+                                    <input type="number" id="rating-${name}" value="${rating}">
                                 </div>
-                                
+                                <div>
+                                    <label>Address: ${hexAddress}</label>
+                                </div>
                                 <div class="edit-buttons">
                                     <button class="back-btn" onclick="cancelEdit('${name}')">Back</button>
                                     <button class="save-btn" onclick="saveSensor('${name}')">Save</button>
-                                    <button class="delete-btn" data-name="${name}">Delete</button>
+                                    <button class="delete-btn" onclick="showDeleteConfirmation('${name}')">Delete</button>
+                                </div>
+                            </div>
+
+                            <div id="delete-${name}" class="delete-confirmation hidden">
+                                <h3 class="confirm">Confirm delete?</h3>
+                                <div class="edit-buttons">
+                                    <button class="confirm-delete-btn" onclick="startCountdown('${name}')">Yes</button>
+                                    <button class="cancel-delete-btn" onclick="cancelDelete('${name}')">No</button>
+                                </div>
+                            </div>
+
+                            <div id="undo-${name}" class="countdown hidden">
+                                <p>Deleting in <span id="countdown-${name}">5</span> seconds...</p>
+                                <div class="edit-buttons">
+                                    <button class="undo-btn" onclick="undo('${name}')">Undo</button>
                                 </div>
                             </div>
                         `;
@@ -130,11 +138,13 @@
         function enterEditMode(name) {
             paused = true;
             document.getElementById(`view-${name}`).classList.add("hidden");
+            document.getElementById(`timestamp-${name}`).classList.add("hidden");
             document.getElementById(`edit-${name}`).classList.remove("hidden");
         }
 
         function cancelEdit(name) {
             document.getElementById(`view-${name}`).classList.remove("hidden");
+            document.getElementById(`timestamp-${name}`).classList.remove("hidden");
             document.getElementById(`edit-${name}`).classList.add("hidden");
             paused = false;
         }
@@ -156,38 +166,71 @@
                     rating: rating
                 })
             })
-                .then(res => res.json())
-                .then(() => {
-                    paused = false;
-                    socket.emit("sensor_update_request");
-                });
+            .then(res => res.json())
+            .then(() => {
+                paused = false;
+                socket.emit("sensor_update_request");
+            });
 
             cancelEdit(originalName);
         }
 
-        document.addEventListener('click', function (event) {
-            if (event.target.classList.contains('delete-btn')) {
-                const name = event.target.getAttribute('data-name');
-                if (confirm(`Are you sure you want to delete ${name}?`)) {
-                    fetch('/delete_sensor', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name: name })
-                    })
-                        .then(response => response.json())
-                        .then(result => {
-                            if (result.status === 'success') {
-                                location.reload(); // Refresh page after successful delete
-                            } else {
-                                alert('Failed to delete sensor.');
-                            }
-                        });
+        function showDeleteConfirmation(name) {
+            document.getElementById(`edit-${name}`).classList.add("hidden");
+            document.getElementById(`delete-${name}`).classList.remove("hidden");
+        }
+
+        function cancelDelete(name) {
+            document.getElementById(`delete-${name}`).classList.add("hidden");
+            document.getElementById(`edit-${name}`).classList.remove("hidden");
+        }
+
+        function startCountdown(name) {
+            document.getElementById(`delete-${name}`).classList.add("hidden");
+            document.getElementById(`undo-${name}`).classList.remove("hidden");
+
+            let counter = 5;
+            document.getElementById(`countdown-${name}`).textContent = counter;
+
+            undoTimers[name] = setInterval(() => {
+                counter--;
+                if (counter >= 0) {
+                    document.getElementById(`countdown-${name}`).textContent = counter;
                 }
-            }
-        });
+                if (counter <= 0) {
+                    clearInterval(undoTimers[name]);
+                    finalizeDelete(name);
+                }
+            }, 1000);
+        }
 
+        function undo(name) {
+            clearInterval(undoTimers[name]);
+            document.getElementById(`undo-${name}`).classList.add("hidden");
+            document.getElementById(`edit-${name}`).classList.remove("hidden");
+        }
 
+        function finalizeDelete(name) {
+            fetch('/delete_sensor', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const card = document.getElementById(`card-${name}`);
+                    if (card) card.remove();
+
+                    if (document.querySelectorAll('.sensor-card').length === 0) {
+                        document.getElementById('no-sensors').classList.remove('hidden');
+                    }
+                } else {
+                    alert('Failed to delete sensor.');
+                    socket.emit("sensor_update_request");
+                }
+            });
+        }
     </script>
 </body>
-
 </html>

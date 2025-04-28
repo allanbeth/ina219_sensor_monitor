@@ -63,6 +63,7 @@ class flaskWrapper:
             return jsonify({"status": "success"})
         else:
             return jsonify({"status": "error", "message": "Sensor not found"}), 404
+        
 
     def broadcast_sensor_data(self):
         self.socketio.emit("sensor_update", sensor_data)

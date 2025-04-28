@@ -49,7 +49,7 @@ class SensorManager:
         for addr in connected_sensors:
             if addr not in existing_sensors:
                 default_name = f"Sensor_{addr}"
-                default_type = "solar"
+                default_type = "Solar"
                 default_max_power = 100
                 default_rating = 12
                 sensors.append(Sensor(default_name, addr, default_type, default_max_power, default_rating))

@@ -1,3 +1,4 @@
+/* ========== Base Styles ========== */
 body {
     font-family: Arial, sans-serif;
     background-color: #f2f4f8;
@@ -9,14 +10,22 @@ h1 {
     text-align: center;
     color: #333;
 }
+
 .header-container {
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
-    padding: 10px 0px 20px 0px;
+    padding: 10px 0 20px;
 }
 
+.header-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 5px;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ========== Sensor Container and Cards ========== */
 .container {
     display: flex;
     flex-wrap: wrap;
@@ -24,29 +33,21 @@ h1 {
     gap: 20px;
 }
 
-.header-card {
-    background-color: #ffffff;
-    border-radius: 10px;
-    padding: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 280px;
-    transition: transform 0.2s ease;
-    width:100%;
-}
-
 .sensor-card {
     background-color: #fff;
     border-radius: 10px;
     padding: 15px 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 280px;
-    transition: transform 0.2s ease;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, opacity 0.5s ease;
 }
 
 .sensor-card:hover {
     transform: scale(1.03);
 }
 
+/* ========== Sensor Header ========== */
 .sensor-header {
     display: flex;
     justify-content: space-between;
@@ -66,28 +67,35 @@ h1 {
     color: white;
 }
 
-.type-solar {
+/* Sensor Type Colors */
+.type-Solar {
     background-color: #ffa500;
 }
 
-.type-wind {
+.type-Wind {
     background-color: #00aaff;
 }
 
-.type-battery {
+.type-Battery {
     background-color: #5c6bc0;
 }
 
+/* ========== Sensor Data and Output ========== */
 .sensor-data p {
     margin: 6px 0;
     font-size: 1em;
 }
 
-.output meter {
-    width: 100%;
-    height: 20px;
+.output {
+    margin-top: 10px;
 }
 
+.output meter {
+    width: 100%;
+    height: 1.2em;
+}
+
+/* ========== Timestamps and No-Sensor Message ========== */
 .timestamp {
     font-size: 0.8em;
     color: #666;
@@ -105,59 +113,46 @@ h1 {
     display: none;
 }
 
+/* ========== Edit Form ========== */
 .edit-form {
     margin-top: 10px;
 }
 
 .edit-form div {
+    display: flex;
     width: 90%;
     margin: 1px 0;
     padding: 4px;
 }
 
-.edit-form input {
+.edit-form input,
+.edit-form label,
+.edit-dropdown {
+    width: 50%;
     margin: 1px 0;
     padding: 4px;
-    width: 50%;
     box-sizing: border-box;
     border-radius: 6px;
 }
-
-.edit-form label {
-    margin: 1px 0;
-    padding: 4px;
-    width: 50%;
-    box-sizing: border-box;
-    border-radius: 6px;
-}
-
 
 .edit-dropdown {
-    margin: 1px 0;
-    padding: 4px;
-    width: 50%;
-    box-sizing: border-box;
-    border-radius: 6px;
-    border-color: #333;
+    border: 1px solid #333;
 }
 
-
+/* ========== Buttons ========== */
 .edit-buttons {
     display: flex;
     justify-content: space-between;
     margin-top: 10px;
 }
 
-.edit-buttons button {
-    padding: 5px 10px;
-    font-size: 1em;
-    cursor: pointer;
-}
-
-
+.edit-buttons button,
 button.save-btn,
 button.back-btn,
-button.delete-btn {
+button.delete-btn,
+.confirm-delete-btn,
+.cancel-delete-btn,
+.undo-btn {
     padding: 5px 10px;
     font-size: 0.9em;
     border: none;
@@ -165,6 +160,7 @@ button.delete-btn {
     cursor: pointer;
 }
 
+/* Specific Button Colors */
 button.save-btn {
     background-color: #4CAF50;
     color: white;
@@ -172,28 +168,55 @@ button.save-btn {
 
 button.back-btn {
     background-color: #ccc;
-    color: rgb(255, 255, 255);
+    color: white;
 }
 
 button.delete-btn {
     background-color: #fa6868;
-    color: rgb(255, 255, 255);
+    color: white;
 }
 
-
-.output {
-    margin-top: 10px;
+.confirm-delete-btn {
+    background-color: #d9534f;
+    color: white;
 }
 
-.output meter {
-    width: 100%;
-    height: 1.2em;
+.cancel-delete-btn {
+    background-color: #5bc0de;
+    color: white;
 }
 
+.undo-btn {
+    background-color: #5cb85c;
+    color: white;
+    padding: 8px 15px;
+}
+
+/* ========== Delete Confirmation and Countdown ========== */
+.delete-confirmation {
+    text-align: center;
+}
+
+.delete-confirmation p {
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #d9534f;
+}
+
+.countdown {
+    align-items: center;
+
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #d9534f;
+    margin-bottom: 10px;
+}
+
+/* ========== Font Awesome Icon Styling ========== */
 .fa-cog {
     color: #666;
-    cursor: pointer;
     font-size: 1rem;
+    cursor: pointer;
     transition: color 0.2s;
 }
 
@@ -201,23 +224,19 @@ button.delete-btn {
     color: #333;
 }
 
-/* ===================== Responsive Layout ===================== */
-
-/* Small phones like iPhones */
+/* ========== Responsive Layout ========== */
 @media (max-width: 599px) {
     .container {
-        display: block; 
+        display: block;
     }
 
     .sensor-card {
         width: 90%;
         max-width: 100%;
-        margin: 0 auto 20px auto; 
+        margin: 0 auto 20px;
     }
 }
 
-
-/* Tablets (portrait & landscape) */
 @media (min-width: 600px) {
     .sensor-card {
         width: 45%;
@@ -225,7 +244,6 @@ button.delete-btn {
     }
 }
 
-/* Small desktops */
 @media (min-width: 900px) {
     .sensor-card {
         width: 30%;
@@ -233,7 +251,6 @@ button.delete-btn {
     }
 }
 
-/* Large desktops */
 @media (min-width: 1200px) {
     .sensor-card {
         width: 25%;
