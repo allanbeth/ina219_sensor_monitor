@@ -3,6 +3,7 @@ import board
 import busio
 import datetime
 import logging
+import math
 
 class Sensor:
     def __init__(self, name, address, sensor_type, max_power, rating):
@@ -11,6 +12,7 @@ class Sensor:
         self.max_power = max_power
         self.address = address
         self.rating = rating
+        self.buffer = {}
         self.i2c = busio.I2C(board.SCL, board.SDA)      
 
         try:
@@ -22,18 +24,11 @@ class Sensor:
             #logging.info("INA219 sensor not detected: %s", str(e))
             self.ina = None
             
-    def estimate_soc(self,voltage):
-        # Clamp voltage between 11.8V (empty) and 12.6V (full)
+    def estimate_soc(self, voltage):
         voltage = max(11.8, min(12.6, voltage))
-        
-        # Normalize voltage to 0 - 1 range
-        normalized = (voltage - 11.8) / (12.6 - 11.8)
-        
-        # Apply slight curve adjustment (quadratic)
-        soc = normalized ** 1.4  # 1.4 is a curve factor; tweakable
-        
+        x = (voltage - 12.2) * 10  # center around 12.2V
+        soc = 1 / (1 + math.exp(-x))  # sigmoid curve
         return int(soc * 100)
-    
 
     def read_data(self):
         try:

@@ -2,6 +2,7 @@ from sensor_monitor.sensor import Sensor
 from sensor_monitor.config import SENSOR_FILE
 from sensor_monitor.mqtt import MQTTPublisher
 from sensor_monitor.logger import sensor_logger
+from collections import deque
 
 
 import json
