@@ -27,6 +27,22 @@
         const socket = io();
         let paused = false;
         let undoTimers = {};
+        
+        function generateLogHTML(readings) {
+            if (!Array.isArray(readings) || readings.length === 0) {
+                return '<p>No logs available.</p>';
+            }
+
+            return readings.map(reading => `
+                <div class="log-entry">
+                    <p><strong>V:</strong> ${reading.voltage ?? 'N/A'} V | 
+                    <strong>I:</strong> ${reading.current ?? 'N/A'} A | 
+                    <strong>P:</strong> ${reading.power ?? 'N/A'} W | 
+                    <strong>T:</strong> ${reading.time_stamp ?? ''}</p>
+                </div>
+            `).join('');
+        }
+
 
         document.addEventListener("DOMContentLoaded", () => {
             socket.on("sensor_update", function (data) {
@@ -51,6 +67,7 @@
                         const maxPower = sensor.max_power ?? "";
                         const rating = sensor.rating ?? "";
                         const hexAddress = sensor.address ? `0x${parseInt(sensor.address).toString(16).padStart(2, '0')}` : "0x00";
+                        const readings = sensor.data.readings;
 
                         let content = `
                             <div class="sensor-header">
@@ -58,6 +75,7 @@
                                 <div class="type-edit-container">
                                     <span class="sensor-type ${typeClass}">${sensor.type} ${rating}V</span>
                                     <i class="fa-solid fa-cog" style="cursor:pointer" onclick="enterEditMode('${name}')"></i>
+                                    <i class="fa-solid fa-book" style="cursor:pointer" onclick="openLog('${name}')"></i>
                                 </div>
                             </div>
 
@@ -111,6 +129,17 @@
                                     <button class="delete-btn" onclick="showDeleteConfirmation('${name}')">Delete</button>
                                 </div>
                             </div>
+
+                        <div id="log-${name}" class="log_data hidden">
+                            <h3 class="confirm">Logs</h3>
+                            <div class="log-entries" id="log-entries-${name}">
+                                ${generateLogHTML(readings)}
+                            </div>                                              
+                            <div class="edit-buttons">
+                                <button class="back-btn" onclick="closeLog('${name}')">Close</button>
+                            </div>
+                        </div>
+
 
                             <div id="delete-${name}" class="delete-confirmation hidden">
                                 <h3 class="confirm">Confirm delete?</h3>
@@ -173,6 +202,19 @@
             });
 
             cancelEdit(originalName);
+        }
+
+        function openLog(name) {
+            paused = true;
+            document.getElementById(`view-${name}`).classList.add("hidden");
+            document.getElementById(`log-${name}`).classList.remove("hidden");
+            
+        }
+
+        function closeLog(name) {
+            document.getElementById(`log-${name}`).classList.add("hidden");
+            document.getElementById(`view-${name}`).classList.remove("hidden");
+            paused = false;
         }
 
         function showDeleteConfirmation(name) {

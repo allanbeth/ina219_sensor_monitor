@@ -14,6 +14,7 @@ webserver = flaskWrapper(manager)
 def run_sensor_loop():
     while True:
         data = manager.get_data()
+        #print(data)
         sensor_data.clear()
         sensor_data.update(data)
         webserver.broadcast_sensor_data()

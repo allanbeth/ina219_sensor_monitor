@@ -9,3 +9,5 @@ WEB_SERVER_HOST = "0.0.0.0"
 WEB_SERVER_PORT = 8082
 
 SENSOR_FILE = "sensors.json"
+CONFIG_FILE = "config.json"
+
