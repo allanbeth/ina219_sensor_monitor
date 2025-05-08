@@ -11,14 +11,14 @@ import time
 
 class SensorManager:
     def __init__(self):
-        self.logger = sensor_logger()
-        self.i2c = board.I2C()
+        self.i2c = board.I2C()   
         self.config = self.load_config()
         self.poll_intervals = self.config.get("poll_intervals", {})
-        self.average_count = self.config.get("average_count", 1)
+        self.settings = self.config.get("settings", {})
+        self.logger = sensor_logger(self.settings.get("max_log", 5))    
         self.last_poll_times = {}
         self.sensors = self.load_sensors()
-        self.mqtt = MQTTPublisher()
+        self.mqtt = MQTTPublisher(self.logger)
         self.load_mqtt_discovery()  
 
     def load_config(self):
@@ -123,7 +123,13 @@ class SensorManager:
             self.mqtt.publish(data)                
         except:
             pass
+
+    def save_settings(self, settings):
         
+        with open(CONFIG_FILE, "w") as f:
+            self.settings = settings
+            json.dump(self.settings, f)
+       
 
     def get_data(self):
         current_time = time.time()
@@ -133,16 +139,27 @@ class SensorManager:
             sensor_type = s.type
             poll_interval = self.poll_intervals.get(sensor_type, 5)
             last_poll = self.last_poll_times.get(s.name, 0)
-            #sensor_readings = {}
 
             if current_time - last_poll >= poll_interval:
                 sensor_data = s.read_data()
                 self.last_poll_times[s.name] = current_time
-                print((f"Sensor Data: {s.name} - {sensor_data}"))
+                self.logger.info((f"Sensor: {s.name}"))
+                self.logger.info(f"Current Data: {sensor_data['voltage']}, {sensor_data['current']}, {sensor_data['power']}")
+                readings = sensor_data['readings']
+                for reading in readings:
+                    self.logger.info(f"Readings: {reading}")
             else:
-                # Reuse last known data if available or use placeholder
                 if s.readings:
-                    sensor_data = s.readings[-1]
+                    readings =list(s.readings)
+                    sensor_data = {
+                        "voltage": 0,
+                        "current": 0,
+                        "power": 0,
+                        "time_stamp": s.readings[-1]["time_stamp"],
+                        "state_of_charge": 0 if s.type== "Battery" else None,
+                        "output": "Off" if s.type!= "Battery" else None,
+                        "readings": readings
+                    }
                 else:
                     sensor_data = {
                         "voltage": 0,
@@ -150,7 +167,8 @@ class SensorManager:
                         "power": 0,
                         "time_stamp": "Not Updated",
                         "state_of_charge": 0 if s.type== "Battery" else None,
-                        "output": "Off" if s.type!= "Battery" else None
+                        "output": "Off" if s.type!= "Battery" else None,
+                        "readings": []
                     }
 
             data[s.name] = {
@@ -160,8 +178,6 @@ class SensorManager:
                 "rating": s.rating,
                 "data": sensor_data
             }
-
-
 
         if data:
             self.publish_mqtt(data)

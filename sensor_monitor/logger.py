@@ -1,71 +1,42 @@
-import logging, time
+import logging, time, os
 from sensor_monitor.config import LOG_FILE
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', filename=LOG_FILE, filemode='a')
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    filename=LOG_FILE,
+                    filemode='a')
 
 class sensor_logger:
         
-    def __init__(self):
+    def __init__(self, max):
         self.logger = logging.getLogger(__name__)
+        self.max_size = max * 1024 * 1024
 
-    def log_data(self, name, data):
-        try:           
-            log_entry = (f"{time.strftime('%Y-%m-%d %H:%M:%S')},"
-                            f"{name},"
-                    f"{data['voltage']:.2f}V,{data['current']:.3f}A,{data['power']:.3f}W,")
-            
-            self.save_entry(log_entry)
-            
-        except Exception as e:
-            logging.error("Error logging data: %s", str(e))
-        
-
-    def save_entry(self, log_entry):
-        with open(LOG_FILE, "a") as log_file:
-            log_file.write(log_entry + "\n")
-
+    def _check_log_size(self):
+        """Reset the log file if it exceeds MAX_LOG_SIZE."""
+        if os.path.exists(LOG_FILE) and os.path.getsize(LOG_FILE) > self.max_size:
+            with open(LOG_FILE, 'w') as f:
+                pass  # Truncate the file
+            self.logger.info("Log file reset due to size limit.")
 
     def debug(self, log_entry):
+        self._check_log_size()
         self.logger.debug(log_entry)
-        self.save_entry(log_entry)
-        
 
     def info(self, log_entry):
+        self._check_log_size()
+        print(log_entry)
         self.logger.info(log_entry)
-        #self.save_entry(log_entry)
-        
-    def warning(self, log_entry):
-        self.logger.warning(log_entry)
-        self.save_entry(log_entry)
-        
-        
-    def error(self, log_entry):
-        self.logger.error(log_entry)
-        self.save_entry(log_entry)
 
+    def warning(self, log_entry):
+        self._check_log_size()
+        self.logger.warning(log_entry)
+
+    def error(self, log_entry):
+        self._check_log_size()
+        self.logger.error(log_entry)
 
     def critical(self, log_entry):
+        self._check_log_size()
         self.logger.critical(log_entry)
-        self.save_entry(log_entry)
-
-    def resetLog(self):
-        with open(LOG_FILE, "w") as data:
-            pass
-
-        self.info("Log File Reset Successfully")
-
-    def getLog(self, x):
-        fileContent = []
-        with open(LOG_FILE, "r") as data:
-            for line in data:
-                fileContent.append(line)  
-
-        if x == 1:
-            fileContent = fileContent[-100:]
-        logData = {} 
-        fileContent.reverse()
-        logData['data'] = fileContent
-        return logData
-    
- 
-  

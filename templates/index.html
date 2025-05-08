@@ -13,9 +13,38 @@
 <body>
     <div class="header-container">
         <div class="header-card">
-            <h1>Energy Monitor</h1>
+            <h1 style="display: inline-block;">Energy Monitor</h1>
+            <i class="fa-solid fa-gear" style="float: right; cursor: pointer; font-size: 1.2em; margin-top: 8px;" onclick="toggleSettings()"></i>
         </div>
     </div>
+
+    <div id="settings-card" class="sensor-card hidden">
+        <h4>Settings</h4>
+        <div>
+            <label for="max-log">Max Log File Size (MB):</label>
+            <input type="number" id="max-log" min="1" step="10" />
+        </div>
+        <div>
+            <label for="solar-interval">Solar Polling Interval:</label>
+            <input type="number" id="solar-interval" min="1" step="10" />
+        </div>
+        <div>
+            <label for="wind-interval">Wind Polling Interval:</label>
+            <input type="number" id="wind-interval" min="1" step="10" />
+        </div>
+        <div>
+            <label for="battery-interval">Battery Polling Interval:</label>
+            <input type="number" id="battery-interval" min="1" step="10"/>
+        </div>
+        <div>
+            <label for="max-readings">Max No of Readings:</label>
+            <input type="number" id="max-readings" min="1" step="10" />
+        </div>
+        <div class="edit-buttons">
+            <button class="save-btn" onclick="saveSettings()">Save</button>
+            <button class="cancel-btn" onclick="cancelSettings()">Cancel</button>
+        </div>
+    </div>   
 
     <div id="no-sensors" class="no-sensors {% if sensors %}hidden{% endif %}">
         No sensors detected. Please ensure your INA219 sensors are connected.
@@ -67,7 +96,7 @@
                         const maxPower = sensor.max_power ?? "";
                         const rating = sensor.rating ?? "";
                         const hexAddress = sensor.address ? `0x${parseInt(sensor.address).toString(16).padStart(2, '0')}` : "0x00";
-                        const readings = sensor.data.readings;
+                        const logHTML = generateLogHTML(sensor.data.readings ?? []);
 
                         let content = `
                             <div class="sensor-header">
@@ -131,9 +160,9 @@
                             </div>
 
                         <div id="log-${name}" class="log_data hidden">
-                            <h3 class="confirm">Logs</h3>
+                            <h4 class="confirm">Logs</h4>
                             <div class="log-entries" id="log-entries-${name}">
-                                ${generateLogHTML(readings)}
+                                ${logHTML}
                             </div>                                              
                             <div class="edit-buttons">
                                 <button class="back-btn" onclick="closeLog('${name}')">Close</button>
@@ -203,6 +232,54 @@
 
             cancelEdit(originalName);
         }
+
+        function toggleSettings() {
+            paused = true;
+            document.getElementById("settings-card").classList.remove("hidden");
+            document.getElementById("sensor-container").classList.add("hidden");
+            fetch("/get_settings")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("solar-interval").value = data.poll_intervals.Solar ?? "";
+            document.getElementById("wind-interval").value = data.poll_intervals.Wind?? "";
+            document.getElementById("battery-interval").value = data.poll_intervals.Battery ?? "";
+            document.getElementById("max-log").value = data.log.max_log ?? "";
+            document.getElementById("max-readings").value = data.readings.max_readings ?? "";
+
+        });
+}
+
+        
+
+        function cancelSettings() {
+            paused = false;
+            document.getElementById("settings-card").classList.add("hidden");
+            document.getElementById("sensor-container").classList.remove("hidden");
+        }
+
+        function saveSettings() {
+            const maxLog = document.getElementById("max-log").value;
+            const solarInterval = document.getElementById("solar-interval").value;
+            const windInterval = document.getElementById("wind-interval").value;
+            const batteryInterval = document.getElementById("battery-interval").value;
+            const maxReadings = document.getElementById("max-readings").value;
+
+            fetch("/update_settings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    max_log: maxLog,
+                    solar_interval: solarInterval,
+                    wind_interval: windInterval,
+                    battery_interval: batteryInterval,
+                    max_readings: maxReadings,  })
+            })
+            .then(res => res.json())
+            .then(() => {
+                cancelSettings();
+            });
+        }
+
 
         function openLog(name) {
             paused = true;

@@ -43,6 +43,16 @@ h1 {
     transition: transform 0.2s ease, opacity 0.5s ease;
 }
 
+.settings-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px 20px;
+    width: 280px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, opacity 0.5s ease;
+}
+
 .sensor-card:hover {
     transform: scale(1.03);
 }
@@ -78,6 +88,19 @@ h1 {
 
 .type-Battery {
     background-color: #5c6bc0;
+}
+
+/* ========== Logs ========== */
+.log-entry p {
+    padding: 10px 0px 10px 0px;
+    font-size: 0.7em;
+    text-align: center;
+    color: #555;
+}
+
+.log-entries {
+    background-color: lightgrey;
+
 }
 
 /* ========== Sensor Data and Output ========== */

@@ -4,8 +4,8 @@ from sensor_monitor.logger import sensor_logger
 import json
 
 class MQTTPublisher:
-    def __init__(self):
-        self.logger = sensor_logger()
+    def __init__(self, logger):
+        self.logger = logger
         self.client = mqtt.Client()
 
         try:

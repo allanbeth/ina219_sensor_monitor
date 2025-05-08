@@ -35,15 +35,15 @@ class Sensor:
             power = round(voltage * current, 0)
             time_stamp =  datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
             readings = {"voltage": voltage, "current": current, "power": power, "time_stamp": time_stamp}
-            self.readings.append(readings)
-            averaged = self.average_data()
-
-            return averaged
         
         except Exception as e:
             logging.info(f"Error reading sensor {self.name}: {e}")
+            readings = {"voltage": 0, "current": 0, "power": 0, "time_stamp": datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")}
             
+        self.readings.append(readings)
+        averaged = self.average_data()
 
+        return averaged
             
         
     def read_data(self):

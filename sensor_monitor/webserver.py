@@ -10,7 +10,6 @@ import json
 
 class flaskWrapper:
     def __init__(self, manager):
-        #self.sensor_data = sensor_data
         self.manager = manager
         self.root = Path(__file__).parents[1]
         self.templatePath = self.root / "templates/"
@@ -18,9 +17,11 @@ class flaskWrapper:
         self.app = Flask(__name__, template_folder=self.templatePath, static_folder=self.stylePath)
         self.socketio = SocketIO(self.app)
         self.app.route("/", methods=["GET", "POST"])(self.main)
-        self.app.route("/add", methods=["GET", "POST"])(self.add_sensor) 
+        self.app.route('/get_settings', methods=["GET", "POST"])(self.get_settings) 
+        self.app.route('/update_settings', methods=["GET", "POST"])(self.update_settings) 
         self.app.route("/update_sensor", methods=["POST"])(self.update_sensor)
         self.app.route("/delete_sensor", methods=["POST"])(self.delete_sensor)
+        #self.settings = self.manager.get_settings()
 
 
 
@@ -38,22 +39,15 @@ class flaskWrapper:
         self.manager.update_sensor(original_name, new_name, new_type, max_power, rating)
         return jsonify({"status": "success"})
 
-
-    
-    def add_sensor(self):
         
-        if request.method == "POST":
-            new_name = request.form["name"]
-            new_address = request.form["address"]
-            new_type = request.form["type"]
-            max_power = request.form["max_power"]
-            rating = request.form["rating"]
-            data = [{"name": new_name, "address": new_address, "type": new_type, "max_power": max_power, "rating": rating}]
+    def get_settings(self):
+            
+            return self.manager.config
 
-            self.manager.add_sensor(data)
-
-            return redirect("/")
-        return render_template("add_sensor.html")
+    def update_settings(self):
+        data = request.get_json()
+        max_log = data["max_log"]
+        self.manager.save_settings(max_log)
     
     def delete_sensor(self):
         data = request.get_json()
