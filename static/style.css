@@ -6,10 +6,6 @@ body {
     padding: 20px;
 }
 
-h1 {
-    text-align: center;
-    color: #333;
-}
 
 .header-container {
     display: flex;
@@ -25,8 +21,99 @@ h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.header-card h1 {
+    display: inline-block;
+    width: 80%;
+    color: #333;
+    margin-left: 10px;
+}
+
+.header-card i {
+    font-size: 1.4rem;
+    transition: color 0.2s;
+    float: right;
+    margin: 8px 4px 0px 4px;
+}
+
+/* ========== Settings container and Card ========== */
+.settings-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.settings-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px 20px;
+    width: 280px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, opacity 0.5s ease;
+}
+
+.settings-card div {
+    display: flex;
+    width: 90%;
+    margin: 1px 0;
+    padding: 4px;
+}
+
+.settings-header i {
+    text-align: right;
+}
+
+.settings-header h4 {
+    text-align: left;
+}
+
+.settings-card input{
+    width: 20%;
+}
+
+.settings-card label{
+    width: 80%;
+}
+
+.settings-card input,
+.settings-card label {
+    margin: 1px 0;
+    padding: 4px;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+/* ========== About Card ========== */
+
+.about-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.about-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px 20px;
+    width: 280px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, opacity 0.5s ease;
+}
+
+.about-card div {
+    display: flex;
+    width: 90%;
+    margin: 1px 0;
+    padding: 4px;
+}
+
+
+
 /* ========== Sensor Container and Cards ========== */
-.container {
+.sensor-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -43,15 +130,6 @@ h1 {
     transition: transform 0.2s ease, opacity 0.5s ease;
 }
 
-.settings-card {
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 15px 20px;
-    width: 280px;
-    position: relative;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, opacity 0.5s ease;
-}
 
 .sensor-card:hover {
     transform: scale(1.03);
@@ -63,6 +141,12 @@ h1 {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
+}
+
+.sensor-header i {
+    font-size: 1rem;
+    float: right;
+    margin: 4px 2px 0px 1px;
 }
 
 .sensor-name {
@@ -91,17 +175,20 @@ h1 {
 }
 
 /* ========== Logs ========== */
+
+.log-entry{
+    margin: 10px;
+    background-color: #efeeee
+}
+
 .log-entry p {
-    padding: 10px 0px 10px 0px;
-    font-size: 0.7em;
-    text-align: center;
+    padding: 0px 0px 2px 0px;
+    font-size: 0.8em;
+    text-align: left;
     color: #555;
+    margin: 1px 0px 4px 0px;
 }
 
-.log-entries {
-    background-color: lightgrey;
-
-}
 
 /* ========== Sensor Data and Output ========== */
 .sensor-data p {
@@ -191,7 +278,7 @@ button.save-btn {
 
 button.back-btn {
     background-color: #ccc;
-    color: white;
+    color: #555;
 }
 
 button.delete-btn {
@@ -238,12 +325,31 @@ button.delete-btn {
 /* ========== Font Awesome Icon Styling ========== */
 .fa-cog {
     color: #666;
-    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-question {
+    color: #666;
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .fa-cog:hover {
+    color: #333;
+}
+
+.fa-question:hover {
+    color: #333;
+}
+
+.fa-book {
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-book:hover {
     color: #333;
 }
 

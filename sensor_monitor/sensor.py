@@ -35,10 +35,17 @@ class Sensor:
             power = round(voltage * current, 0)
             time_stamp =  datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
             readings = {"voltage": voltage, "current": current, "power": power, "time_stamp": time_stamp}
-        
+            if self.type == "Battery":
+                SoC = self.estimate_soc(voltage)
+                readings["state_of_charge"] = SoC
+            else:
+                output = float(voltage / self.rating) * 100
+                readings["output"] = round(output, 0)       
         except Exception as e:
             logging.info(f"Error reading sensor {self.name}: {e}")
-            readings = {"voltage": 0, "current": 0, "power": 0, "time_stamp": datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")}
+            readings = {"voltage": 0, "current": 0, "power": 0, "time_stamp": datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),"state_of_charge": 0 if self.type == "Battery" else None,
+            "output": 0 if self.type != "Battery" else None,}
+
             
         self.readings.append(readings)
         averaged = self.average_data()
@@ -47,21 +54,7 @@ class Sensor:
             
         
     def read_data(self):
-        try:
-            reading = self.fetch_data()
-            data = {"voltage": reading['voltage'], "current": reading['current'], "power": reading['power'], "time_stamp": reading['time_stamp']}
-            if self.type == 'Battery':
-                soc = self.estimate_soc(data['voltage'])
-                data["state_of_charge"] = soc
-            else:
-                output = float((data['voltage']/self.max_power)*100)
-                data["output"] = round(output, 2)                
-        except Exception as e:
-            if self.type == 'battery':
-                data = {"voltage": 0, "current": 0, "power": 0, "time_stamp": "Not Connected", "state_of_charge": 0}
-            else:
-                data = {"voltage": 0, "current": 0, "power": 0, "time_stamp": "Not Connected", "output": "Off"}
-
+        data = self.fetch_data()
         data["readings"] = list(self.readings)
         return data    
         
@@ -88,11 +81,7 @@ class Sensor:
             "time_stamp": latest_time
         }
 
-        if self.type == "Battery":
-            averaged["state_of_charge"] = self.estimate_soc(averaged["voltage"])
-        else:
-            output = float((averaged["voltage"] / self.rating) * 100)
-            averaged["output"] = round(output, 0)
+
 
         return averaged    
     
@@ -101,3 +90,4 @@ class Sensor:
         x = (voltage - 12.2) * 10  # center around 12.2V
         soc = 1 / (1 + math.exp(-x))  # sigmoid curve
         return int(soc * 100)
+    

@@ -12,10 +12,10 @@ import time
 class SensorManager:
     def __init__(self):
         self.i2c = board.I2C()   
+        self.logger = sensor_logger()  
         self.config = self.load_config()
         self.poll_intervals = self.config.get("poll_intervals", {})
-        self.settings = self.config.get("settings", {})
-        self.logger = sensor_logger(self.settings.get("max_log", 5))    
+        self.settings = self.config.get("log", {})         
         self.last_poll_times = {}
         self.sensors = self.load_sensors()
         self.mqtt = MQTTPublisher(self.logger)
@@ -24,10 +24,33 @@ class SensorManager:
     def load_config(self):
         try:
             with open(CONFIG_FILE, "r") as f:
+                self.logger.info(f"Config file opened Successfully.")
                 return json.load(f)
         except FileNotFoundError:
-            self.logger.warning(f"Config file {CONFIG_FILE} not found, using defaults.")
-            return {}
+            self.logger.warning(f"Config file not found, creating default config.")
+            default_config = {
+                "poll_intervals": {
+                    "Wind": 7,
+                    "Solar": 5,
+                    "Battery": 10
+                    },
+                    "log": {
+                        "max_log": 1
+                    },
+                    "readings": {
+                        "max_readings": 5
+                    }
+                }  
+            try:
+                with open(CONFIG_FILE, "w") as f:
+                    json.dump(default_config, f, indent=4)
+                self.logger.info(f"Created new config file at {CONFIG_FILE}.")
+            except Exception as e:
+                self.logger.error(f"Failed to create config file: {e}")
+
+            self.logger.set_log_size(self.settings.get("max_log", 5))
+            return default_config
+
 
     def detect_sensors(self):       
         while not self.i2c.try_lock():
@@ -35,10 +58,9 @@ class SensorManager:
         try:
             while True:
                 addresses = self.i2c.scan()
-                print(
-                    "I2C addresses found:",
-                    [hex(device_address) for device_address in self.i2c.scan()],
-                )
+                for device_address in self.i2c.scan():
+                    addr = hex(device_address)
+                    self.logger.info(f"I2C addresses found: {addr}")
                 return addresses
         finally:
             self.i2c.unlock()     
@@ -125,11 +147,24 @@ class SensorManager:
             pass
 
     def save_settings(self, settings):
-        
+        new_settings = {
+            "poll_intervals": {
+                "Wind": int(settings['wind_interval']),
+                "Solar": int(settings['solar_interval']),
+                "Battery": int(settings['battery_interval'])
+                },
+                "log": {
+                    "max_log": int(settings['max_log'])
+                },
+                "readings": {
+                    "max_readings": int(settings['max_readings'])
+                }
+            }  
         with open(CONFIG_FILE, "w") as f:
-            self.settings = settings
-            json.dump(self.settings, f)
-       
+            self.config = new_settings
+            json.dump(self.config, f)
+            
+        
 
     def get_data(self):
         current_time = time.time()
@@ -143,23 +178,13 @@ class SensorManager:
             if current_time - last_poll >= poll_interval:
                 sensor_data = s.read_data()
                 self.last_poll_times[s.name] = current_time
-                self.logger.info((f"Sensor: {s.name}"))
-                self.logger.info(f"Current Data: {sensor_data['voltage']}, {sensor_data['current']}, {sensor_data['power']}")
+                self.logger.info(f"{s.name}: {sensor_data['voltage']}, {sensor_data['current']}, {sensor_data['power']}")
                 readings = sensor_data['readings']
                 for reading in readings:
-                    self.logger.info(f"Readings: {reading}")
+                    self.logger.info(f"{s.name}: {reading}")
             else:
                 if s.readings:
-                    readings =list(s.readings)
-                    sensor_data = {
-                        "voltage": 0,
-                        "current": 0,
-                        "power": 0,
-                        "time_stamp": s.readings[-1]["time_stamp"],
-                        "state_of_charge": 0 if s.type== "Battery" else None,
-                        "output": "Off" if s.type!= "Battery" else None,
-                        "readings": readings
-                    }
+                    sensor_data = s.readings[-1]
                 else:
                     sensor_data = {
                         "voltage": 0,
@@ -167,7 +192,7 @@ class SensorManager:
                         "power": 0,
                         "time_stamp": "Not Updated",
                         "state_of_charge": 0 if s.type== "Battery" else None,
-                        "output": "Off" if s.type!= "Battery" else None,
+                        "output": 0 if s.type!= "Battery" else None,
                         "readings": []
                     }
 

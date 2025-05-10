@@ -9,8 +9,11 @@ logging.basicConfig(level=logging.INFO,
 
 class sensor_logger:
         
-    def __init__(self, max):
+    def __init__(self):
         self.logger = logging.getLogger(__name__)
+        self.max_size = 5 * 1024 * 1024
+
+    def set_log_size(self, max):
         self.max_size = max * 1024 * 1024
 
     def _check_log_size(self):

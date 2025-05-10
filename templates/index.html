@@ -13,44 +13,58 @@
 <body>
     <div class="header-container">
         <div class="header-card">
-            <h1 style="display: inline-block;">Energy Monitor</h1>
-            <i class="fa-solid fa-gear" style="float: right; cursor: pointer; font-size: 1.2em; margin-top: 8px;" onclick="toggleSettings()"></i>
+                <h1>Energy Monitor</h1>
+                <i class="fa-solid fa-gear" onclick="settings()"></i>
+                <i class="fa-solid fa-question" onclick="about()"></i>
         </div>
     </div>
 
-    <div id="settings-card" class="sensor-card hidden">
-        <h4>Settings</h4>
-        <div>
-            <label for="max-log">Max Log File Size (MB):</label>
-            <input type="number" id="max-log" min="1" step="10" />
+    <div class="settings-container hidden" id="settings-container">
+        <div id="settings-card" class="settings-card">
+                <h4>Settings</h4>
+            <div>
+                <label for="max-log">Max Log File Size (MB):</label>
+                <input type="number" id="max-log" min="1" step="10" />
+            </div>
+            <div>
+                <label for="solar-interval">Solar Polling Interval:</label>
+                <input type="number" id="solar-interval" min="1" step="10" />
+            </div>
+            <div>
+                <label for="wind-interval">Wind Polling Interval:</label>
+                <input type="number" id="wind-interval" min="1" step="10" />
+            </div>
+            <div>
+                <label for="battery-interval">Battery Polling Interval:</label>
+                <input type="number" id="battery-interval" min="1" step="10" />
+            </div>
+            <div>
+                <label for="max-readings">Max No of Readings:</label>
+                <input type="number" id="max-readings" min="1" step="10" />
+            </div>
+            <div class="edit-buttons">
+                <button class="save-btn" onclick="saveSettings()">Save</button>
+                <button class="cancel-btn" onclick="cancelSettings()">Close</button>
+            </div>
         </div>
-        <div>
-            <label for="solar-interval">Solar Polling Interval:</label>
-            <input type="number" id="solar-interval" min="1" step="10" />
+    </div>
+
+    <div class="about-container hidden" id="about-container">
+        <div id="about-card" class="about-card">
+            <div>
+                <p>about page</p>
+            </div>
+            <div class="about-buttons">
+                <button class="cancel-btn" onclick="cancelAbout()">Cancel</button>
+            </div>
         </div>
-        <div>
-            <label for="wind-interval">Wind Polling Interval:</label>
-            <input type="number" id="wind-interval" min="1" step="10" />
-        </div>
-        <div>
-            <label for="battery-interval">Battery Polling Interval:</label>
-            <input type="number" id="battery-interval" min="1" step="10"/>
-        </div>
-        <div>
-            <label for="max-readings">Max No of Readings:</label>
-            <input type="number" id="max-readings" min="1" step="10" />
-        </div>
-        <div class="edit-buttons">
-            <button class="save-btn" onclick="saveSettings()">Save</button>
-            <button class="cancel-btn" onclick="cancelSettings()">Cancel</button>
-        </div>
-    </div>   
+    </div>
 
     <div id="no-sensors" class="no-sensors {% if sensors %}hidden{% endif %}">
         No sensors detected. Please ensure your INA219 sensors are connected.
     </div>
 
-    <div class="container" id="sensor-container"></div>
+    <div class="sensor-container" id="sensor-container"></div>
 
     <script>
         const socket = io();
@@ -64,10 +78,15 @@
 
             return readings.map(reading => `
                 <div class="log-entry">
-                    <p><strong>V:</strong> ${reading.voltage ?? 'N/A'} V | 
-                    <strong>I:</strong> ${reading.current ?? 'N/A'} A | 
-                    <strong>P:</strong> ${reading.power ?? 'N/A'} W | 
-                    <strong>T:</strong> ${reading.time_stamp ?? ''}</p>
+                    <p>
+                        <strong>${reading.time_stamp ?? ''}</strong>
+                    </p>
+                    <p>
+                        <strong>V:</strong> ${reading.voltage ?? 'N/A'} V | 
+                        <strong>C:</strong> ${reading.current ?? 'N/A'} A | 
+                        <strong>P:</strong> ${reading.power ?? 'N/A'} W | 
+                        <strong>T:</strong> ${reading.output ?? reading.state_of_charge}
+                    </p>
                 </div>
             `).join('');
         }
@@ -100,9 +119,9 @@
 
                         let content = `
                             <div class="sensor-header">
+                                <span class="sensor-type ${typeClass}">${sensor.type} ${rating}V</span>
                                 <span class="sensor-name">${name}</span>
-                                <div class="type-edit-container">
-                                    <span class="sensor-type ${typeClass}">${sensor.type} ${rating}V</span>
+                                <div class="type-edit-container">                                    
                                     <i class="fa-solid fa-cog" style="cursor:pointer" onclick="enterEditMode('${name}')"></i>
                                     <i class="fa-solid fa-book" style="cursor:pointer" onclick="openLog('${name}')"></i>
                                 </div>
@@ -160,7 +179,7 @@
                             </div>
 
                         <div id="log-${name}" class="log_data hidden">
-                            <h4 class="confirm">Logs</h4>
+                            <h4>Logs</h4>
                             <div class="log-entries" id="log-entries-${name}">
                                 ${logHTML}
                             </div>                                              
@@ -233,9 +252,9 @@
             cancelEdit(originalName);
         }
 
-        function toggleSettings() {
+        function settings() {
             paused = true;
-            document.getElementById("settings-card").classList.remove("hidden");
+            document.getElementById("settings-container").classList.remove("hidden");
             document.getElementById("sensor-container").classList.add("hidden");
             fetch("/get_settings")
         .then(res => res.json())
@@ -249,13 +268,24 @@
         });
 }
 
-        
-
         function cancelSettings() {
             paused = false;
-            document.getElementById("settings-card").classList.add("hidden");
+            document.getElementById("settings-container").classList.add("hidden");
             document.getElementById("sensor-container").classList.remove("hidden");
         }
+
+        function about() {
+            paused = true;
+            document.getElementById("sensor-container").classList.add("hidden");
+            document.getElementById("about-container").classList.remove("hidden");
+        }
+
+        function cancelAbout() {
+            paused = false;
+            document.getElementById("about-container").classList.add("hidden");
+            document.getElementById("sensor-container").classList.remove("hidden");
+        }
+
 
         function saveSettings() {
             const maxLog = document.getElementById("max-log").value;
@@ -276,7 +306,10 @@
             })
             .then(res => res.json())
             .then(() => {
-                cancelSettings();
+            document.getElementById("settings-container").classList.add("hidden");
+            document.getElementById("sensor-container").classList.remove("hidden");
+            paused = false;
+            socket.emit("sensor_update_request");
             });
         }
 

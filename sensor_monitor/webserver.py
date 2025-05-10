@@ -46,8 +46,7 @@ class flaskWrapper:
 
     def update_settings(self):
         data = request.get_json()
-        max_log = data["max_log"]
-        self.manager.save_settings(max_log)
+        self.manager.save_settings(data)
     
     def delete_sensor(self):
         data = request.get_json()
