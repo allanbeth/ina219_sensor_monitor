@@ -81,6 +81,13 @@ class Sensor:
             "time_stamp": latest_time
         }
 
+        if self.type == "Battery":
+            total_SoC = sum(r["state_of_charge"] for r in self.readings)
+            averaged['state_of_charge'] = total_SoC
+        else:
+            total_output = sum(r["output"] for r in self.readings)
+            averaged['output'] = total_output
+
 
 
         return averaged    
