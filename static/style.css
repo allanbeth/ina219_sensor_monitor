@@ -51,6 +51,7 @@ body {
     position: relative;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, opacity 0.5s ease;
+    height: 280px;
 }
 
 .settings-card div {
@@ -66,6 +67,7 @@ body {
 
 .settings-header h4 {
     text-align: left;
+    margin: 8px 0px 4px 0px;
 }
 
 .settings-card input{
@@ -101,6 +103,7 @@ body {
     position: relative;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, opacity 0.5s ease;
+    height: 280px;
 }
 
 .about-card div {
@@ -128,6 +131,7 @@ body {
     position: relative;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, opacity 0.5s ease;
+    height: 280px;
 }
 
 
@@ -189,11 +193,29 @@ body {
     margin: 1px 0px 4px 0px;
 }
 
+.log-data {
+    overflow: visible;    
+}
+
+.log-entries {
+    overflow-y: auto;
+    max-height: 150px;
+}
+
 
 /* ========== Sensor Data and Output ========== */
+.sensor-data {
+    position: relative;
+    height: 90%;
+}
+
+.sensor-data h4 {
+    margin: 20px 0px 20px 0px;
+}
+
 .sensor-data p {
-    margin: 6px 0;
-    font-size: 1em;
+    margin-top: 8px;
+    font-size: 0.9em;
 }
 
 .output {
@@ -211,6 +233,9 @@ body {
     color: #666;
     text-align: right;
     margin-top: 10px;
+    position:absolute;
+    bottom: 8px;
+    width:100%;
 }
 
 .no-sensors {
@@ -226,17 +251,29 @@ body {
 /* ========== Edit Form ========== */
 .edit-form {
     margin-top: 10px;
+    overflow: visible; 
+    position: relative;
+    height: 90%;
 }
 
-.edit-form div {
+.edit-form h4 {
+    margin: 4px 0px 4px 0px;
+}
+
+.edit-data {
+    overflow-y: auto;
+    max-height: 160px;
+}
+
+.edit-entry {
     display: flex;
     width: 90%;
     margin: 1px 0;
     padding: 4px;
 }
 
-.edit-form input,
-.edit-form label,
+.edit-data input,
+.edit-data label,
 .edit-dropdown {
     width: 50%;
     margin: 1px 0;
@@ -254,6 +291,9 @@ body {
     display: flex;
     justify-content: space-between;
     margin-top: 10px;
+    position:absolute;
+    bottom: 2px;
+    width:100%;
 }
 
 .edit-buttons button,
@@ -305,6 +345,8 @@ button.delete-btn {
 /* ========== Delete Confirmation and Countdown ========== */
 .delete-confirmation {
     text-align: center;
+    position: relative;
+    height: 90%;
 }
 
 .delete-confirmation p {

@@ -15,7 +15,8 @@ class SensorManager:
         self.logger = sensor_logger()  
         self.config = self.load_config()
         self.poll_intervals = self.config.get("poll_intervals", {})
-        self.settings = self.config.get("log", {})         
+        self.settings = self.config.get("log", {}) 
+        self.max_readings = self.config.get("readings", {})         
         self.last_poll_times = {}
         self.sensors = self.load_sensors()
         self.mqtt = MQTTPublisher(self.logger)
@@ -70,7 +71,7 @@ class SensorManager:
         try:
             with open(SENSOR_FILE, "r") as f:
                 sensor_data = json.load(f)
-                sensors = [Sensor(s["name"], s["address"], s["type"], s["max_power"], s["rating"]) for s in sensor_data]
+                sensors = [Sensor(s["name"], s["address"], s["type"], s["max_power"], s["rating"], self.max_readings['max_readings']) for s in sensor_data]
                 self.logger.info("Configured Sensor:")
 
                 for sensor in sensors:
@@ -87,7 +88,7 @@ class SensorManager:
                 default_type = "Solar"
                 default_max_power = 100
                 default_rating = 12
-                sensors.append(Sensor(default_name, addr, default_type, default_max_power, default_rating))
+                sensors.append(Sensor(default_name, addr, default_type, default_max_power, default_rating, self.max_readings['max_readings']))
 
         self.save_sensors(sensors)
         return sensors
@@ -175,6 +176,7 @@ class SensorManager:
             poll_interval = self.poll_intervals.get(sensor_type, 5)
             last_poll = self.last_poll_times.get(s.name, 0)
 
+
             if current_time - last_poll >= poll_interval:
                 sensor_data = s.read_data()
                 self.last_poll_times[s.name] = current_time
@@ -184,7 +186,7 @@ class SensorManager:
                     self.logger.info(f"{s.name}: {reading}")
             else:
                 if s.readings:
-                    sensor_data = s.readings[-1]
+                    sensor_data = s.current_data()
                 else:
                     sensor_data = {
                         "voltage": 0,

@@ -24,23 +24,23 @@
                 <h4>Settings</h4>
             <div>
                 <label for="max-log">Max Log File Size (MB):</label>
-                <input type="number" id="max-log" min="1" step="10" />
+                <input type="number" id="max-log" min="1" step="1" />
             </div>
             <div>
-                <label for="solar-interval">Solar Polling Interval:</label>
-                <input type="number" id="solar-interval" min="1" step="10" />
+                <label for="solar-interval">Solar Polling Interval (sec):</label>
+                <input type="number" id="solar-interval" min="1" step="1" />
             </div>
             <div>
-                <label for="wind-interval">Wind Polling Interval:</label>
-                <input type="number" id="wind-interval" min="1" step="10" />
+                <label for="wind-interval">Wind Polling Interval (sec):</label>
+                <input type="number" id="wind-interval" min="1" step="1" />
             </div>
             <div>
-                <label for="battery-interval">Battery Polling Interval:</label>
-                <input type="number" id="battery-interval" min="1" step="10" />
+                <label for="battery-interval">Battery Polling Interval (sec):</label>
+                <input type="number" id="battery-interval" min="1" step="1" />
             </div>
             <div>
                 <label for="max-readings">Max No of Readings:</label>
-                <input type="number" id="max-readings" min="1" step="10" />
+                <input type="number" id="max-readings" min="1" step="1" />
             </div>
             <div class="edit-buttons">
                 <button class="save-btn" onclick="saveSettings()">Save</button>
@@ -71,25 +71,7 @@
         let paused = false;
         let undoTimers = {};
         
-        function generateLogHTML(readings) {
-            if (!Array.isArray(readings) || readings.length === 0) {
-                return '<p>No logs available.</p>';
-            }
 
-            return readings.map(reading => `
-                <div class="log-entry">
-                    <p>
-                        <strong>${reading.time_stamp ?? ''}</strong>
-                    </p>
-                    <p>
-                        <strong>V:</strong> ${reading.voltage ?? 'N/A'} V | 
-                        <strong>C:</strong> ${reading.current ?? 'N/A'} A | 
-                        <strong>P:</strong> ${reading.power ?? 'N/A'} W | 
-                        <strong>T:</strong> ${reading.output ?? reading.state_of_charge}
-                    </p>
-                </div>
-            `).join('');
-        }
 
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -128,18 +110,19 @@
                             </div>
 
                             <div id="view-${name}" class="sensor-data">
+                                <h4>Data Readings</h4>
                                 <p><strong>Voltage:</strong> ${sensor.data.voltage ?? "N/A"} V</p>
                                 <p><strong>Current:</strong> ${sensor.data.current ?? "N/A"} A</p>
                                 <p><strong>Power:</strong> ${sensor.data.power ?? "N/A"} W</p>`;
 
                         if (sensor.type === "Battery") {
                             content += `
-                                <p><strong>SoC:</strong> ${sensor.data.state_of_charge ?? 0}%</p>
+                                <p><strong>SoC %:</strong> ${sensor.data.state_of_charge ?? 0}%</p>
                                 <p class="output"><meter value="${sensor.data.state_of_charge ?? 0}" min="0" max="100"></meter></p>`;
                         } else {
                             content += `
                                 <p><strong>Max Power:</strong> ${sensor.max_power ?? "N/A"} W</p>
-                                <p class="output"><meter value="${sensor.data.output ?? 0}" min="0" max="100"></meter></p>`;
+                                <p class="output"><strong>Output %:</strong> <meter value="${sensor.data.output ?? 0}" min="0" max="100"></meter></p>`;
                         }
 
                         content += `
@@ -147,29 +130,28 @@
                             </div>
 
                             <div id="edit-${name}" class="edit-form hidden">
-                                <h4>Edit Sensor</h4>
-                                <div>
-                                    <label>Name:</label>
-                                    <input type="text" id="name-${name}" value="${name}">
-                                </div>
-                                <div>
-                                    <label>Type:</label>
-                                    <select id="type-${name}" class="edit-dropdown">
-                                        <option value="Solar" ${sensor.type === "Solar" ? "selected" : ""}>Solar</option>
-                                        <option value="Wind" ${sensor.type === "Wind" ? "selected" : ""}>Wind</option>
-                                        <option value="Battery" ${sensor.type === "Battery" ? "selected" : ""}>Battery</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label>Max Power:</label>
-                                    <input type="number" id="maxPower-${name}" value="${maxPower}">
-                                </div>
-                                <div>
-                                    <label>Voltage Rating:</label>
-                                    <input type="number" id="rating-${name}" value="${rating}">
-                                </div>
-                                <div>
-                                    <label>Address: ${hexAddress}</label>
+                                <h4>Edit Sensor - ${hexAddress}</h4>
+                                <div class="edit-data">
+                                    <div class="edit-entry">
+                                        <label>Name:</label>
+                                        <input type="text" id="name-${name}" value="${name}">
+                                    </div>
+                                    <div class="edit-entry">
+                                        <label>Type:</label>
+                                        <select id="type-${name}" class="edit-dropdown">
+                                            <option value="Solar" ${sensor.type === "Solar" ? "selected" : ""}>Solar</option>
+                                            <option value="Wind" ${sensor.type === "Wind" ? "selected" : ""}>Wind</option>
+                                            <option value="Battery" ${sensor.type === "Battery" ? "selected" : ""}>Battery</option>
+                                        </select>
+                                    </div>
+                                    <div class="edit-entry">
+                                        <label>Max Power:</label>
+                                        <input type="number" id="maxPower-${name}" value="${maxPower}">
+                                    </div>
+                                    <div class="edit-entry">
+                                        <label>Voltage Rating:</label>
+                                        <input type="number" id="rating-${name}" value="${rating}">
+                                    </div>
                                 </div>
                                 <div class="edit-buttons">
                                     <button class="back-btn" onclick="cancelEdit('${name}')">Back</button>
@@ -211,6 +193,26 @@
                 }
             });
         });
+
+        function generateLogHTML(readings) {
+            if (!Array.isArray(readings) || readings.length === 0) {
+                return '<p>No logs available.</p>';
+            }
+
+            return readings.map(reading => `
+                <div class="log-entry">
+                    <p>
+                        <strong>${reading.time_stamp ?? ''}</strong>
+                    </p>
+                    <p>
+                        <strong>V:</strong> ${reading.voltage ?? 'N/A'} V | 
+                        <strong>C:</strong> ${reading.current ?? 'N/A'} A | 
+                        <strong>P:</strong> ${reading.power ?? 'N/A'} W | 
+                        <strong>T:</strong> ${reading.output ?? reading.state_of_charge}
+                    </p>
+                </div>
+            `).join('');
+        }
 
         function enterEditMode(name) {
             paused = true;

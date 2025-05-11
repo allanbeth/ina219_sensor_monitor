@@ -7,13 +7,13 @@ import logging
 import math
 
 class Sensor:
-    def __init__(self, name, address, sensor_type, max_power, rating):
+    def __init__(self, name, address, sensor_type, max_power, rating, max_readings):
         self.name = name
         self.type = sensor_type
         self.max_power = max_power
         self.address = address
         self.rating = rating
-        self.max_readings = 5
+        self.max_readings = max_readings
         self.readings = deque(maxlen=self.max_readings)
         self.i2c = busio.I2C(board.SCL, board.SDA)      
 
@@ -48,9 +48,9 @@ class Sensor:
 
             
         self.readings.append(readings)
-        averaged = self.average_data()
+        data = self.average_data()
 
-        return averaged
+        return data
             
         
     def read_data(self):
@@ -91,3 +91,12 @@ class Sensor:
         soc = 1 / (1 + math.exp(-x))  # sigmoid curve
         return int(soc * 100)
     
+    def current_data(self):
+        data = {"voltage": self.readings[-1]['voltage'], "current": self.readings[-1]['current'], "power": self.readings[-1]['power'], "time_stamp": self.readings[-1]['time_stamp']}
+        if self.type == "Battery":
+            data["state_of_charge"] = self.readings[-1]['state_of_charge']
+        else:
+            data["output"] = self.readings[-1]['output']
+        
+        data["readings"] = list(self.readings)
+        return data  
