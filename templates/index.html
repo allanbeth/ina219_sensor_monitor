@@ -17,6 +17,7 @@
                 <h1>Energy Monitor</h1>
             <div class="header-btns" id="header-btns">
                 <i class="fa-solid fa-gear" onclick="settings()"></i>
+                <i class="fa-solid fa-book" onclick="fullLog()"></i>
                 <i class="fa-solid fa-question" onclick="about()"></i>
             </div>
         </div>
@@ -66,7 +67,23 @@
                 <button class="cancel-btn" onclick="cancelAbout()">Close</button>
             </div>
         </div>
+        </div>
     </div>
+
+    <div class="log-file-container hidden" id="log-file-container">
+        <div id="log-file-card" class="log-file-card">
+            <h4>Logs</h4>
+            <div class="log-file-data" id="log-file-data">
+                <div class="log-file-entries" id="log-file-entries">
+                    Loading...
+                </div>                                              
+                <div class="edit-buttons">
+                    <button class="back-btn" onclick="closeFullLog()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
     <div id="no-sensors" class="no-sensors {% if sensors %}hidden{% endif %}">
         No sensors detected. Please ensure your INA219 sensors are connected.
@@ -222,6 +239,8 @@
             `).join('');
         }
 
+
+
         function enterEditMode(name) {
             paused = true;
             document.getElementById(`view-${name}`).classList.add("hidden");
@@ -338,6 +357,70 @@
             });
         }
 
+        function escapeHTML(str) {
+    return str.replace(/[&<>"']/g, match => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[match]));
+}
+
+function fullLog() {
+    paused = true;
+
+    // Toggle visibility
+    document.getElementById("log-file-container").classList.remove("hidden");
+    document.getElementById("sensor-container").classList.add("hidden");
+    document.getElementById("header-btns").classList.add("hidden");
+
+    // Clear previous content and add a loading message
+    const logContainer = document.getElementById("log-file-entries");
+    logContainer.innerHTML = "<p>Loading logs...</p>";
+
+    fetch("/get_log_file")
+        .then(res => res.json())
+        .then(data => {
+            const logEntries = data.logs ?? [];
+
+            if (logEntries.length === 0) {
+                logContainer.innerHTML = "<p>No log data found.</p>";
+                return;
+            }
+
+            const logFileHTML = logEntries.map(entry => `
+                <div class="log-file-entry">
+                    <p>${escapeHTML(entry.logs.trim())}</p>
+                </div>
+            `).join('');
+
+            // Add a refresh button
+            const refreshBtn = `
+                <div style="text-align:right; margin-bottom: 10px;">
+                    <button onclick="fullLog()">🔄 Refresh</button>
+                </div>
+            `;
+
+            logContainer.innerHTML = refreshBtn + logFileHTML;
+
+            // Optional: scroll to bottom
+            logContainer.scrollTop = logContainer.scrollHeight;
+        })
+        .catch(error => {
+            logContainer.innerHTML = "<p>Failed to load logs.</p>";
+            console.error("Log fetch error:", error);
+        });
+}
+
+
+
+        function closeFullLog() {
+            paused = false;
+            document.getElementById("log-file-container").classList.add("hidden");
+            document.getElementById("sensor-container").classList.remove("hidden");
+            document.getElementById("header-btns").classList.remove("hidden");
+        }
 
         function openLog(name) {
             paused = true;

@@ -1,12 +1,12 @@
 # sensor_monitor/webserver.py
 
-from flask import Flask, render_template, request, redirect, send_file, abort
+from flask import Flask, render_template, request, redirect, send_file, abort, send_from_directory
 from flask_socketio import SocketIO, emit
 #from sensor_monitor.sensor_manager import SensorManager
 from sensor_monitor.config import WEB_SERVER_HOST, WEB_SERVER_PORT
 from sensor_monitor.live_data import sensor_data
 from pathlib import Path
-import json
+import json, os
 
 class flaskWrapper:
     def __init__(self, manager):
@@ -15,6 +15,7 @@ class flaskWrapper:
         self.templatePath = self.root / "templates/"
         self.stylePath = self.root / "static/"
         self.readmePath = self.root / "README.md"
+        self.logFilePath = self.root / "sensor_monitor.log"
         self.app = Flask(__name__, template_folder=self.templatePath, static_folder=self.stylePath)
         self.socketio = SocketIO(self.app)
         self.app.route("/", methods=["GET", "POST"])(self.main)
@@ -22,7 +23,7 @@ class flaskWrapper:
         self.app.route('/update_settings', methods=["GET", "POST"])(self.update_settings) 
         self.app.route("/update_sensor", methods=["POST"])(self.update_sensor)
         self.app.route("/delete_sensor", methods=["POST"])(self.delete_sensor)
-        self.app.route("/readme", methods=["GET"])(self.serve_readme)
+        self.app.route("/get_log_file", methods=["GET", "POST"])(self.get_log_file)
 
 
     def main(self):
@@ -62,6 +63,21 @@ class flaskWrapper:
             return send_file(self.readmePath, mimetype="text/markdown")
         else:
             return abort(404, "README.md not found")
+        
+ 
+    def get_log_file(self):
+        if not self.logFilePath:
+            return jsonify({"logs": []})
+            
+        try:
+            with open(self.logFilePath, "r") as f:
+                lines = f.readlines()
+
+            # Return last N lines (e.g., 100)
+            logs = [{"logs": line.strip()} for line in lines[-100:]]
+            return jsonify({"logs": logs})
+        except Exception as e:
+            return jsonify({"error": str(e), "logs": []}), 500
 
     def broadcast_sensor_data(self):
         self.socketio.emit("sensor_update", sensor_data)
