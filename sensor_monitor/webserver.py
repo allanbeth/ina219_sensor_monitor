@@ -1,8 +1,8 @@
 # sensor_monitor/webserver.py
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, send_file, abort
 from flask_socketio import SocketIO, emit
-from sensor_monitor.sensor_manager import SensorManager
+#from sensor_monitor.sensor_manager import SensorManager
 from sensor_monitor.config import WEB_SERVER_HOST, WEB_SERVER_PORT
 from sensor_monitor.live_data import sensor_data
 from pathlib import Path
@@ -14,6 +14,7 @@ class flaskWrapper:
         self.root = Path(__file__).parents[1]
         self.templatePath = self.root / "templates/"
         self.stylePath = self.root / "static/"
+        self.readmePath = self.root / "README.md"
         self.app = Flask(__name__, template_folder=self.templatePath, static_folder=self.stylePath)
         self.socketio = SocketIO(self.app)
         self.app.route("/", methods=["GET", "POST"])(self.main)
@@ -21,8 +22,7 @@ class flaskWrapper:
         self.app.route('/update_settings', methods=["GET", "POST"])(self.update_settings) 
         self.app.route("/update_sensor", methods=["POST"])(self.update_sensor)
         self.app.route("/delete_sensor", methods=["POST"])(self.delete_sensor)
-        #self.settings = self.manager.get_settings()
-
+        self.app.route("/readme", methods=["GET"])(self.serve_readme)
 
 
     def main(self):
@@ -57,6 +57,11 @@ class flaskWrapper:
         else:
             return jsonify({"status": "error", "message": "Sensor not found"}), 404
         
+    def serve_readme(self):
+        if self.readmePath.exists():
+            return send_file(self.readmePath, mimetype="text/markdown")
+        else:
+            return abort(404, "README.md not found")
 
     def broadcast_sensor_data(self):
         self.socketio.emit("sensor_update", sensor_data)

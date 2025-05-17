@@ -11,17 +11,19 @@ class sensor_logger:
         
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.max_size = 5 * 1024 * 1024
+        self.max_log_size = 1000 * 1024 * 1024
 
     def set_log_size(self, max):
-        self.max_size = max * 1024 * 1024
+        self.info(f"Log file Size Value - {max}")
+        self.max_log_size = max * 1024 * 1024
+        self.info(f"Log file Size Set - {self.max_log_size}")
 
     def _check_log_size(self):
         """Reset the log file if it exceeds MAX_LOG_SIZE."""
-        if os.path.exists(LOG_FILE) and os.path.getsize(LOG_FILE) > self.max_size:
+        if os.path.exists(LOG_FILE) and os.path.getsize(LOG_FILE) > self.max_log_size:
             with open(LOG_FILE, 'w') as f:
                 pass  # Truncate the file
-            self.logger.info("Log file reset due to size limit.")
+            self.info("Log file reset due to size limit.")
 
     def debug(self, log_entry):
         self._check_log_size()

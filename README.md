@@ -1,88 +1,127 @@
-INA219 Sensor Monitor
+# INA219 Sensor Monitor
+
 A Python-based web application designed to monitor real-time data from an INA219 energy sensor connected to a Raspberry Pi. It provides a user-friendly web interface to visualize voltage, current, and power readings.
 
-Features
-Real-time monitoring of voltage, current, and power from the INA219 sensor.
+---
 
-Web interface built with Flask for easy access and visualization.
+## Features
 
-Configurable sensor settings via a JSON file.
+- Real-time monitoring of voltage, current, and power from the INA219 sensor.
+- Web interface built with Flask for easy access and visualization.
+- Configurable sensor settings via a JSON file.
+- Systemd service file included for running the application as a background service on boot.
 
-Systemd service file included for running the application as a background service on boot.
+---
 
-Prerequisites
-Raspberry Pi with I2C enabled.
+## Prerequisites
 
-INA219 sensor connected via I2C.
+- Raspberry Pi with I2C enabled.
+- INA219 sensor connected via I2C.
+- Python 3 installed on the Raspberry Pi.
 
-Python 3 installed on the Raspberry Pi.
+---
 
-Installation
-Clone the repository:
+## Installation
 
-git clone https://github.com/allanbeth/sensor_monitor.git
-cd sensor_monitor
+### 1. Clone the Repository
 
+```bash
+$ git clone https://github.com/allanbeth/sensor_monitor.git
+$ cd sensor_monitor
+```
 
-Install required Python packages:
+### 2. Install Required Python Packages
 
-pip install -r requirements.txt
-Enable I2C on Raspberry Pi:
+```bash
+$ pip install -r requirements.txt
+```
+
+### 3. Enable I2C on Raspberry Pi
 
 Ensure that I2C is enabled by running:
 
-sudo raspi-config
-Navigate to Interfacing Options > I2C and enable it.
+```bash
+$ sudo raspi-config
+```
 
-Configure sensor settings:
+Navigate to:
 
-Edit the sensors.json file to match your sensor configuration. This file contains settings such as sensor address and calibration values.
+```
+Interfacing Options > I2C
+```
 
-Usage
-Run the application:
+Enable it and reboot if necessary.
 
-python main.py
-By default, the Flask application will start on http://0.0.0.0:5000/. You can access it via your browser using the Raspberry Pi's IP address.
+### 4. Configure Sensor Settings
 
-Access the web interface:
+Connected sensors will be detected automatically and saved to `sensors.json`.  
+This file contains settings such as sensor address and calibration values.
+
+---
+
+## Usage
+
+### Run the Application
+
+```bash
+$ python main.py
+```
+
+By default, the Flask application will start on:
+
+```
+http://0.0.0.0:5000/
+```
+
+You can access it via your browser using the Raspberry Pi's IP address.
+
+### Access the Web Interface
 
 Open your web browser and navigate to:
 
+```
 http://<raspberry_pi_ip_address>:5000/
-Replace <raspberry_pi_ip_address> with the actual IP address of your Raspberry Pi.
+```
 
-Running as a Service
-To run the application as a background service that starts on boot:
+Replace `<raspberry_pi_ip_address>` with the actual IP address of your Raspberry Pi.
 
-Copy the service file:
+---
 
-sudo cp sensor_monitor.service /etc/systemd/system/
+## Running as a Service
 
+### 1. Copy the Service File
 
-Reload systemd and enable the service:
+```bash
+$ sudo cp sensor_monitor.service /etc/systemd/system/
+```
 
-sudo systemctl daemon-reload
-sudo systemctl enable sensor_monitor.service
+### 2. Reload systemd and Enable the Service
 
-Start the service:
+```bash
+$ sudo systemctl daemon-reload
+$ sudo systemctl enable sensor_monitor.service
+```
 
-sudo systemctl start sensor_monitor.service
+### 3. Start the Service
 
+```bash
+$ sudo systemctl start sensor_monitor.service
+```
 
-Check service status:
+### 4. Check Service Status
 
-sudo systemctl status sensor_monitor.service
+```bash
+$ sudo systemctl status sensor_monitor.service
+```
 
+---
 
+## Dependencies
 
-Dependencies
 The application relies on the following Python packages:
 
-Flask
+- `Flask`
+- `smbus2`
+- `ina219`
 
-smbus2
-
-INA219
-
-These are specified in the requirements.txt file.
-
+These are specified in the `requirements.txt` file.

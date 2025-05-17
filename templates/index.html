@@ -6,6 +6,7 @@
     <title>Sensor Monitor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <meta name="viewport" content="width=device-width" />
 </head>
@@ -14,33 +15,37 @@
     <div class="header-container">
         <div class="header-card">
                 <h1>Energy Monitor</h1>
+            <div class="header-btns" id="header-btns">
                 <i class="fa-solid fa-gear" onclick="settings()"></i>
                 <i class="fa-solid fa-question" onclick="about()"></i>
+            </div>
         </div>
     </div>
 
     <div class="settings-container hidden" id="settings-container">
         <div id="settings-card" class="settings-card">
                 <h4>Settings</h4>
-            <div>
-                <label for="max-log">Max Log File Size (MB):</label>
-                <input type="number" id="max-log" min="1" step="1" />
-            </div>
-            <div>
-                <label for="solar-interval">Solar Polling Interval (sec):</label>
-                <input type="number" id="solar-interval" min="1" step="1" />
-            </div>
-            <div>
-                <label for="wind-interval">Wind Polling Interval (sec):</label>
-                <input type="number" id="wind-interval" min="1" step="1" />
-            </div>
-            <div>
-                <label for="battery-interval">Battery Polling Interval (sec):</label>
-                <input type="number" id="battery-interval" min="1" step="1" />
-            </div>
-            <div>
-                <label for="max-readings">Max No of Readings:</label>
-                <input type="number" id="max-readings" min="1" step="1" />
+            <div class="settings-data">
+                <div class="settings-entry">
+                    <label for="max-log">Max Log File Size (MB):</label>
+                    <input type="number" id="max-log" min="1" step="1" />
+                </div>
+                <div class="settings-entry">
+                    <label for="solar-interval">Solar Polling Interval (sec):</label>
+                    <input type="number" id="solar-interval" min="1" step="1" />
+                </div>
+                <div class="settings-entry">
+                    <label for="wind-interval">Wind Polling Interval (sec):</label>
+                    <input type="number" id="wind-interval" min="1" step="1" />
+                </div>
+                <div class="settings-entry">
+                    <label for="battery-interval">Battery Polling Interval (sec):</label>
+                    <input type="number" id="battery-interval" min="1" step="1" />
+                </div>
+                <div class="settings-entry">
+                    <label for="max-readings">Max No of Readings:</label>
+                    <input type="number" id="max-readings" min="1" step="1" />
+                </div>
             </div>
             <div class="edit-buttons">
                 <button class="save-btn" onclick="saveSettings()">Save</button>
@@ -51,11 +56,14 @@
 
     <div class="about-container hidden" id="about-container">
         <div id="about-card" class="about-card">
-            <div>
-                <p>about page</p>
+            <h4>About</h4>
+            <div class="about-info">
+                <div class="about-content" id="about-content">
+                    Loading README...
+                </div>
             </div>
-            <div class="about-buttons">
-                <button class="cancel-btn" onclick="cancelAbout()">Cancel</button>
+            <div class="edit-buttons">
+                <button class="cancel-btn" onclick="cancelAbout()">Close</button>
             </div>
         </div>
     </div>
@@ -103,7 +111,7 @@
                             <div class="sensor-header">
                                 <span class="sensor-type ${typeClass}">${sensor.type} ${rating}V</span>
                                 <span class="sensor-name">${name}</span>
-                                <div class="type-edit-container">                                    
+                                <div class="type-edit-container" id="btns-${name}">                                    
                                     <i class="fa-solid fa-cog" style="cursor:pointer" onclick="enterEditMode('${name}')"></i>
                                     <i class="fa-solid fa-book" style="cursor:pointer" onclick="openLog('${name}')"></i>
                                 </div>
@@ -160,7 +168,7 @@
                                 </div>
                             </div>
 
-                        <div id="log-${name}" class="log_data hidden">
+                        <div id="log-${name}" class="log-data hidden">
                             <h4>Logs</h4>
                             <div class="log-entries" id="log-entries-${name}">
                                 ${logHTML}
@@ -217,12 +225,14 @@
         function enterEditMode(name) {
             paused = true;
             document.getElementById(`view-${name}`).classList.add("hidden");
+            document.getElementById(`btns-${name}`).classList.add("hidden");
             document.getElementById(`timestamp-${name}`).classList.add("hidden");
             document.getElementById(`edit-${name}`).classList.remove("hidden");
         }
 
         function cancelEdit(name) {
             document.getElementById(`view-${name}`).classList.remove("hidden");
+            document.getElementById(`btns-${name}`).classList.remove("hidden");
             document.getElementById(`timestamp-${name}`).classList.remove("hidden");
             document.getElementById(`edit-${name}`).classList.add("hidden");
             paused = false;
@@ -258,34 +268,47 @@
             paused = true;
             document.getElementById("settings-container").classList.remove("hidden");
             document.getElementById("sensor-container").classList.add("hidden");
+            document.getElementById("header-btns").classList.add("hidden");
             fetch("/get_settings")
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById("solar-interval").value = data.poll_intervals.Solar ?? "";
-            document.getElementById("wind-interval").value = data.poll_intervals.Wind?? "";
-            document.getElementById("battery-interval").value = data.poll_intervals.Battery ?? "";
-            document.getElementById("max-log").value = data.log.max_log ?? "";
-            document.getElementById("max-readings").value = data.readings.max_readings ?? "";
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("solar-interval").value = data.poll_intervals.Solar ?? "";
+                    document.getElementById("wind-interval").value = data.poll_intervals.Wind?? "";
+                    document.getElementById("battery-interval").value = data.poll_intervals.Battery ?? "";
+                    document.getElementById("max-log").value = data.max_log ?? "";
+                    document.getElementById("max-readings").value = data.max_readings ?? "";
 
-        });
+                });
 }
 
         function cancelSettings() {
             paused = false;
             document.getElementById("settings-container").classList.add("hidden");
             document.getElementById("sensor-container").classList.remove("hidden");
+            document.getElementById("header-btns").classList.remove("hidden");
         }
 
         function about() {
             paused = true;
             document.getElementById("sensor-container").classList.add("hidden");
+            document.getElementById("header-btns").classList.add("hidden");
             document.getElementById("about-container").classList.remove("hidden");
+            fetch("/readme")
+                .then(res => res.text())
+                .then(markdown => {
+                    document.getElementById("about-content").innerHTML = marked.parse(markdown);
+                })
+                .catch(error => {
+                    document.getElementById("about-content").innerText = "Failed to load README.";
+                    console.error("Error loading README:", error);
+                });
         }
 
         function cancelAbout() {
             paused = false;
             document.getElementById("about-container").classList.add("hidden");
             document.getElementById("sensor-container").classList.remove("hidden");
+            document.getElementById("header-btns").classList.remove("hidden");
         }
 
 
@@ -319,6 +342,7 @@
         function openLog(name) {
             paused = true;
             document.getElementById(`view-${name}`).classList.add("hidden");
+            document.getElementById(`btns-${name}`).classList.add("hidden");
             document.getElementById(`log-${name}`).classList.remove("hidden");
             
         }
@@ -326,6 +350,7 @@
         function closeLog(name) {
             document.getElementById(`log-${name}`).classList.add("hidden");
             document.getElementById(`view-${name}`).classList.remove("hidden");
+            document.getElementById(`btns-${name}`).classList.remove("hidden");
             paused = false;
         }
 

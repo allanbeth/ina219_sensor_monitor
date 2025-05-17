@@ -14,9 +14,8 @@ class SensorManager:
         self.i2c = board.I2C()   
         self.logger = sensor_logger()  
         self.config = self.load_config()
-        self.poll_intervals = self.config.get("poll_intervals", {})
-        self.settings = self.config.get("log", {}) 
-        self.max_readings = self.config.get("readings", {})         
+        #print(f"CONFIG - {self.config}")
+        self.set_config()        
         self.last_poll_times = {}
         self.sensors = self.load_sensors()
         self.mqtt = MQTTPublisher(self.logger)
@@ -35,22 +34,24 @@ class SensorManager:
                     "Solar": 5,
                     "Battery": 10
                     },
-                    "log": {
-                        "max_log": 1
-                    },
-                    "readings": {
-                        "max_readings": 5
-                    }
+                    "max_log": 5,
+                    "max_readings": 5
                 }  
             try:
                 with open(CONFIG_FILE, "w") as f:
                     json.dump(default_config, f, indent=4)
                 self.logger.info(f"Created new config file at {CONFIG_FILE}.")
+
             except Exception as e:
                 self.logger.error(f"Failed to create config file: {e}")
-
-            self.logger.set_log_size(self.settings.get("max_log", 5))
+            
+            #self.logger.set_log_size(self.config["max_log"])
             return default_config
+
+    def set_config(self):
+        self.poll_intervals = self.config.get("poll_intervals", {})
+        self.logger.info(f"Poll Intervals - {self.poll_intervals}")
+        self.logger.set_log_size(self.config["max_log"])
 
 
     def detect_sensors(self):       
@@ -71,7 +72,7 @@ class SensorManager:
         try:
             with open(SENSOR_FILE, "r") as f:
                 sensor_data = json.load(f)
-                sensors = [Sensor(s["name"], s["address"], s["type"], s["max_power"], s["rating"], self.max_readings['max_readings']) for s in sensor_data]
+                sensors = [Sensor(s["name"], s["address"], s["type"], s["max_power"], s["rating"], self.config['max_readings']) for s in sensor_data]
                 self.logger.info("Configured Sensor:")
 
                 for sensor in sensors:
@@ -88,7 +89,7 @@ class SensorManager:
                 default_type = "Solar"
                 default_max_power = 100
                 default_rating = 12
-                sensors.append(Sensor(default_name, addr, default_type, default_max_power, default_rating, self.max_readings['max_readings']))
+                sensors.append(Sensor(default_name, addr, default_type, default_max_power, default_rating, self.config['max_readings']))
 
         self.save_sensors(sensors)
         return sensors
@@ -154,12 +155,8 @@ class SensorManager:
                 "Solar": int(settings['solar_interval']),
                 "Battery": int(settings['battery_interval'])
                 },
-                "log": {
-                    "max_log": int(settings['max_log'])
-                },
-                "readings": {
-                    "max_readings": int(settings['max_readings'])
-                }
+                "max_log": int(settings['max_log']),
+                "max_readings": int(settings['max_readings'])
             }  
         with open(CONFIG_FILE, "w") as f:
             self.config = new_settings
@@ -173,14 +170,14 @@ class SensorManager:
 
         for s in self.sensors:
             sensor_type = s.type
-            poll_interval = self.poll_intervals.get(sensor_type, 5)
+            poll_interval = self.poll_intervals[sensor_type]
             last_poll = self.last_poll_times.get(s.name, 0)
 
 
             if current_time - last_poll >= poll_interval:
                 sensor_data = s.read_data()
                 self.last_poll_times[s.name] = current_time
-                self.logger.info(f"{s.name}: {sensor_data['voltage']}, {sensor_data['current']}, {sensor_data['power']}")
+                self.logger.info(f"New Reading - {s.name}: {sensor_data['voltage']}V, {sensor_data['current']}A, {sensor_data['power']}W")
                 readings = sensor_data['readings']
                 for reading in readings:
                     self.logger.info(f"{s.name}: {reading}")
