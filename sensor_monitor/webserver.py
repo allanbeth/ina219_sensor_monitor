@@ -1,8 +1,7 @@
 # sensor_monitor/webserver.py
 
-from flask import Flask, render_template, request, redirect, send_file, abort, send_from_directory
+from flask import Flask, render_template, request, redirect, send_file, abort, send_from_directory, jsonify
 from flask_socketio import SocketIO, emit
-#from sensor_monitor.sensor_manager import SensorManager
 from sensor_monitor.config import WEB_SERVER_HOST, WEB_SERVER_PORT
 from sensor_monitor.live_data import sensor_data
 from pathlib import Path
@@ -24,6 +23,7 @@ class flaskWrapper:
         self.app.route("/update_sensor", methods=["POST"])(self.update_sensor)
         self.app.route("/delete_sensor", methods=["POST"])(self.delete_sensor)
         self.app.route("/get_log_file", methods=["GET", "POST"])(self.get_log_file)
+        self.app.route("/readme", methods=["GET", "POST"])(self.serve_readme)
 
 
     def main(self):
@@ -66,7 +66,7 @@ class flaskWrapper:
         
  
     def get_log_file(self):
-        if not self.logFilePath:
+        if not self.logFilePath.exists():
             return jsonify({"logs": []})
             
         try:

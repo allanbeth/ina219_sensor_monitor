@@ -79,6 +79,7 @@
                 </div>                                              
                 <div class="edit-buttons">
                     <button class="back-btn" onclick="closeFullLog()">Close</button>
+                    <button class="refresh-btn" onclick="fullLog()">Refresh</button>
                 </div>
             </div>
         </div>
@@ -129,25 +130,43 @@
                                 <span class="sensor-type ${typeClass}">${sensor.type} ${rating}V</span>
                                 <span class="sensor-name">${name}</span>
                                 <div class="type-edit-container" id="btns-${name}">                                    
-                                    <i class="fa-solid fa-cog" style="cursor:pointer" onclick="enterEditMode('${name}')"></i>
+                                    <i class="fa-solid fa-gear" style="cursor:pointer" onclick="enterEditMode('${name}')"></i>
                                     <i class="fa-solid fa-book" style="cursor:pointer" onclick="openLog('${name}')"></i>
                                 </div>
                             </div>
 
                             <div id="view-${name}" class="sensor-data">
-                                <h4>Data Readings</h4>
-                                <p><strong>Voltage:</strong> ${sensor.data.voltage ?? "N/A"} V</p>
-                                <p><strong>Current:</strong> ${sensor.data.current ?? "N/A"} A</p>
-                                <p><strong>Power:</strong> ${sensor.data.power ?? "N/A"} W</p>`;
+                                <div class="sensor-readings">
+                                <div class="data-tile">
+                                    <span class="icon"> <i class="fa-solid fa-wave-square"></i></span>
+                                    <p class="voltage">${sensor.data.voltage ?? "N/A"} V</p>
+                                </div>
+                                <div class="data-tile">
+                                    <span class="icon"> <i class="fa-solid fa-industry"></i></span>
+                                    <p class="current">${sensor.data.current ?? "N/A"} A</p>
+                                    
+                                </div>
+                                <div class="data-tile">
+                                    <span class="icon"> <i class="fa-solid fa-bolt"></i></span>
+                                    <p class="power">${sensor.data.power ?? "N/A"} W</p>
+                            
+                                </div>`;
 
                         if (sensor.type === "Battery") {
                             content += `
-                                <p><strong>SoC %:</strong> ${sensor.data.state_of_charge ?? 0}%</p>
-                                <p class="output"><meter value="${sensor.data.state_of_charge ?? 0}" min="0" max="100"></meter></p>`;
+                            <div class="data-tile">
+                                <span class="icon"> <i class="fa-solid fa-battery"></i></span>
+                                <p class="soc">${sensor.data.state_of_charge ?? 0}%</p>
+                                <p><meter value="${sensor.data.state_of_charge ?? 0}" min="0" max="100"></meter></p>
+                                </div>`;
                         } else {
                             content += `
-                                <p><strong>Max Power:</strong> ${sensor.max_power ?? "N/A"} W</p>
-                                <p class="output"><strong>Output %:</strong> <meter value="${sensor.data.output ?? 0}" min="0" max="100"></meter></p>`;
+                            <div class="data-tile">
+                                <span class="icon"> <i class="fa-solid fa-plug"></i></span>
+                                <p class="output">${sensor.max_power ?? 0} W</p>
+                                <p><meter value="${sensor.data.output ?? 0}" min="0" max="100"></meter></p>
+                                </div>
+                                </div>`;
                         }
 
                         content += `
@@ -358,60 +377,63 @@
         }
 
         function escapeHTML(str) {
-    return str.replace(/[&<>"']/g, match => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-    }[match]));
-}
+            return str.replace(/[&<>"']/g, match => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[match]));
+        }
 
-function fullLog() {
-    paused = true;
+        function fullLog() {
+            paused = true;
 
-    // Toggle visibility
-    document.getElementById("log-file-container").classList.remove("hidden");
-    document.getElementById("sensor-container").classList.add("hidden");
-    document.getElementById("header-btns").classList.add("hidden");
+            document.getElementById("log-file-container").classList.remove("hidden");
+            document.getElementById("sensor-container").classList.add("hidden");
+            document.getElementById("header-btns").classList.add("hidden");
 
-    // Clear previous content and add a loading message
-    const logContainer = document.getElementById("log-file-entries");
-    logContainer.innerHTML = "<p>Loading logs...</p>";
+            const logContainer = document.getElementById("log-file-entries");
+            logContainer.innerHTML = "<p>Loading logs...</p>";
 
-    fetch("/get_log_file")
-        .then(res => res.json())
-        .then(data => {
-            const logEntries = data.logs ?? [];
+            fetch("/get_log_file")
+                .then(res => res.json())
+                .then(data => {
+                    const logEntries = data.logs ?? [];
 
-            if (logEntries.length === 0) {
-                logContainer.innerHTML = "<p>No log data found.</p>";
-                return;
-            }
+                    if (logEntries.length === 0) {
+                        logContainer.innerHTML = "<p>No log data found.</p>";
+                        return;
+                    }
 
-            const logFileHTML = logEntries.map(entry => `
-                <div class="log-file-entry">
-                    <p>${escapeHTML(entry.logs.trim())}</p>
-                </div>
-            `).join('');
+                    const logFileHTML = logEntries.map(entry => {
+                        // Extract log type and message using a regex
+                        // Expected format: "2025-05-17 12:34:56,789 INFO Some log message"
+                        const logText = entry.logs.trim();
+                        const match = logText.match(/^\s*[\d\-:, ]+\s+([A-Z]+)\s+(.*)$/);
+                        
+                        if (match) {
+                            const logType = match[1];
+                            const logMessage = match[2];
+                            return `
+                                <div class="log-file-entry">
+                                    <p><strong style="color:green;">${escapeHTML(logType)}</strong> ${escapeHTML(logMessage)}</p>
+                                </div>
+                            `;
+                        } else {
+                            // Fallback if parsing fails
+                            return `<div class="log-file-entry"><p>${escapeHTML(logText)}</p></div>`;
+                        }
+                    }).join('');
 
-            // Add a refresh button
-            const refreshBtn = `
-                <div style="text-align:right; margin-bottom: 10px;">
-                    <button onclick="fullLog()">🔄 Refresh</button>
-                </div>
-            `;
+                    logContainer.innerHTML = logFileHTML;
+                })
+                .catch(error => {
+                    logContainer.innerHTML = "<p>Failed to load logs.</p>";
+                    console.error("Log fetch error:", error);
+                });
+        }
 
-            logContainer.innerHTML = refreshBtn + logFileHTML;
-
-            // Optional: scroll to bottom
-            logContainer.scrollTop = logContainer.scrollHeight;
-        })
-        .catch(error => {
-            logContainer.innerHTML = "<p>Failed to load logs.</p>";
-            console.error("Log fetch error:", error);
-        });
-}
 
 
 

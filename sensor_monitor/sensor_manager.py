@@ -14,7 +14,6 @@ class SensorManager:
         self.i2c = board.I2C()   
         self.logger = sensor_logger()  
         self.config = self.load_config()
-        #print(f"CONFIG - {self.config}")
         self.set_config()        
         self.last_poll_times = {}
         self.sensors = self.load_sensors()
@@ -45,12 +44,10 @@ class SensorManager:
             except Exception as e:
                 self.logger.error(f"Failed to create config file: {e}")
             
-            #self.logger.set_log_size(self.config["max_log"])
             return default_config
 
     def set_config(self):
         self.poll_intervals = self.config.get("poll_intervals", {})
-        self.logger.info(f"Poll Intervals - {self.poll_intervals}")
         self.logger.set_log_size(self.config["max_log"])
 
 
@@ -178,9 +175,6 @@ class SensorManager:
                 sensor_data = s.read_data()
                 self.last_poll_times[s.name] = current_time
                 self.logger.info(f"New Reading - {s.name}: {sensor_data['voltage']}V, {sensor_data['current']}A, {sensor_data['power']}W")
-                readings = sensor_data['readings']
-                for reading in readings:
-                    self.logger.info(f"{s.name}: {reading}")
             else:
                 if s.readings:
                     sensor_data = s.current_data()

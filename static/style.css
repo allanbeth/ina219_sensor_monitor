@@ -132,7 +132,43 @@ body {
     font-size: 0.6em;
 }
 
+/* ========== Log File Container and Cards ========== */
 
+.log-file-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.log-file-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px 20px;
+    width: 280px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, opacity 0.5s ease;
+    height: 280px;
+}
+
+.log-file-card h4 {
+    text-align: left;
+    margin: 8px 0px 4px 0px;
+}
+
+.log-file-entries {
+    margin: 1px 0;
+    padding: 4px;
+    width: 100%;
+    overflow: visible;
+    overflow-y: auto;
+    max-height: 180px;
+}
+
+.log-file-entry {
+    font-size: 0.6em;
+}
 
 /* ========== Sensor Container and Cards ========== */
 .sensor-container {
@@ -152,7 +188,6 @@ body {
     transition: transform 0.2s ease, opacity 0.5s ease;
     height: 280px;
 }
-
 
 .sensor-card:hover {
     transform: scale(1.03);
@@ -197,6 +232,8 @@ body {
     background-color: #5c6bc0;
 }
 
+
+
 /* ========== Logs ========== */
 
 .log-entry{
@@ -227,26 +264,67 @@ body {
 }
 
 
+
+
 /* ========== Sensor Data and Output ========== */
 .sensor-data {
     position: relative;
     height: 90%;
 }
 
-.sensor-data h4 {
-    margin: 20px 0px 20px 0px;
+.sensor-readings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-row-gap: 10px;
+    grid-column-gap: 2px;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.data-tile {
+    aspect-ratio: 1;
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 5px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, opacity 0.5s ease;
+    height: 90px;
+    width: 140px;
+    text-align: center;
+
 }
 
 .sensor-data p {
-    margin-top: 8px;
-    font-size: 0.9em;
+    font-size: 1.5em;
+    margin: 10px 0px 2px 0px;
+}
+
+.icon {
+    text-align: center;
+}
+
+.voltage {
+    margin: 10px 0px 15px 0px;
+}
+
+.current {
+    margin: 10px 0px 15px 0px;
+}
+
+.power {
+    margin: 10px 0px 15px 0px;
 }
 
 .output {
-    margin-top: 10px;
+    margin: 10px 0px 15px 0px;
 }
 
-.output meter {
+.soc {
+    margin: 10px 0px 15px 0px;
+}
+
+meter {
     width: 100%;
     height: 1.2em;
 }
@@ -326,7 +404,8 @@ button.back-btn,
 button.delete-btn,
 .confirm-delete-btn,
 .cancel-delete-btn,
-.undo-btn {
+.undo-btn,
+button.refresh-btn {
     padding: 5px 10px;
     font-size: 0.9em;
     border: none;
@@ -336,6 +415,11 @@ button.delete-btn,
 
 /* Specific Button Colors */
 button.save-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+button.refresh-btn {
     background-color: #4CAF50;
     color: white;
 }
@@ -389,7 +473,7 @@ button.delete-btn {
 }
 
 /* ========== Font Awesome Icon Styling ========== */
-.fa-cog {
+.fa-gear {
     color: #666;
     cursor: pointer;
     transition: color 0.2s;
@@ -401,7 +485,7 @@ button.delete-btn {
     transition: color 0.2s;
 }
 
-.fa-cog:hover {
+.fa-gear:hover {
     color: #333;
 }
 
@@ -425,7 +509,10 @@ button.delete-btn {
         display: block;
     }
 
-    .sensor-card {
+    .sensor-card,
+    .about-card,
+    .settings-card,
+    .log-file-card {
         width: 90%;
         max-width: 100%;
         margin: 0 auto 20px;
@@ -433,21 +520,30 @@ button.delete-btn {
 }
 
 @media (min-width: 600px) {
-    .sensor-card {
+    .sensor-card,
+    .about-card,
+    .settings-card,
+    .log-file-card {
         width: 45%;
         max-width: 320px;
     }
 }
 
 @media (min-width: 900px) {
-    .sensor-card {
+    .sensor-card,
+    .about-card,
+    .settings-card,
+    .log-file-card {
         width: 30%;
         max-width: 340px;
     }
 }
 
 @media (min-width: 1200px) {
-    .sensor-card {
+    .sensor-card,
+    .about-card,
+    .settings-card,
+    .log-file-card {
         width: 25%;
         max-width: 360px;
     }
