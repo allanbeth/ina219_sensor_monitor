@@ -1,54 +1,32 @@
+# sensor_monitor/sensor_manager.py
+
 from sensor_monitor.sensor import Sensor
-from sensor_monitor.config import SENSOR_FILE, CONFIG_FILE
+from sensor_monitor.config_manager import SENSOR_FILE
 from sensor_monitor.mqtt import MQTTPublisher
 from sensor_monitor.logger import sensor_logger
-
-
 
 import json
 import board
 import time
 
 class SensorManager:
-    def __init__(self):
-        self.i2c = board.I2C()   
+    def __init__(self, config):
+        self.config = config
         self.logger = sensor_logger()  
-        self.config = self.load_config()
-        self.set_config()        
-        self.last_poll_times = {}
-        self.sensors = self.load_sensors()
-        self.mqtt = MQTTPublisher(self.logger)
+        self.set_config() 
+        self.i2c = board.I2C()  
+        self.sensors = self.load_sensors()        
+        self.mqtt = MQTTPublisher(self.logger, self.mqtt_config)
         self.load_mqtt_discovery()  
 
-    def load_config(self):
-        try:
-            with open(CONFIG_FILE, "r") as f:
-                self.logger.info(f"Config file opened Successfully.")
-                return json.load(f)
-        except FileNotFoundError:
-            self.logger.warning(f"Config file not found, creating default config.")
-            default_config = {
-                "poll_intervals": {
-                    "Wind": 7,
-                    "Solar": 5,
-                    "Battery": 10
-                    },
-                    "max_log": 5,
-                    "max_readings": 5
-                }  
-            try:
-                with open(CONFIG_FILE, "w") as f:
-                    json.dump(default_config, f, indent=4)
-                self.logger.info(f"Created new config file at {CONFIG_FILE}.")
-
-            except Exception as e:
-                self.logger.error(f"Failed to create config file: {e}")
-            
-            return default_config
-
     def set_config(self):
-        self.poll_intervals = self.config.get("poll_intervals", {})
-        self.logger.set_log_size(self.config["max_log"])
+        self.poll_intervals = self.config.config_data.get("poll_intervals", {})
+        self.logger.set_log_size(self.config.config_data["max_log"])  
+        self.last_poll_times = {}
+        self.mqtt_config = {
+            "mqtt_broker": self.config.config_data['mqtt_broker'],
+            "mqtt_port": self.config.config_data['mqtt_port']
+        }
 
 
     def detect_sensors(self):       
@@ -69,7 +47,7 @@ class SensorManager:
         try:
             with open(SENSOR_FILE, "r") as f:
                 sensor_data = json.load(f)
-                sensors = [Sensor(s["name"], s["address"], s["type"], s["max_power"], s["rating"], self.config['max_readings']) for s in sensor_data]
+                sensors = [Sensor(s["name"], s["address"], s["type"], s["max_power"], s["rating"], self.config.config_data['max_readings']) for s in sensor_data]
                 self.logger.info("Configured Sensor:")
 
                 for sensor in sensors:
@@ -86,7 +64,7 @@ class SensorManager:
                 default_type = "Solar"
                 default_max_power = 100
                 default_rating = 12
-                sensors.append(Sensor(default_name, addr, default_type, default_max_power, default_rating, self.config['max_readings']))
+                sensors.append(Sensor(default_name, addr, default_type, default_max_power, default_rating, self.config.config_data['max_readings']))
 
         self.save_sensors(sensors)
         return sensors
@@ -144,23 +122,7 @@ class SensorManager:
             self.mqtt.publish(data)                
         except:
             pass
-
-    def save_settings(self, settings):
-        new_settings = {
-            "poll_intervals": {
-                "Wind": int(settings['wind_interval']),
-                "Solar": int(settings['solar_interval']),
-                "Battery": int(settings['battery_interval'])
-                },
-                "max_log": int(settings['max_log']),
-                "max_readings": int(settings['max_readings'])
-            }  
-        with open(CONFIG_FILE, "w") as f:
-            self.config = new_settings
-            json.dump(self.config, f)
             
-        
-
     def get_data(self):
         current_time = time.time()
         data = {}

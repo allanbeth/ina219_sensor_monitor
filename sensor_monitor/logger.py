@@ -1,5 +1,7 @@
+# sensor_monitor/logger.py
+
 import logging, time, os
-from sensor_monitor.config import LOG_FILE
+from sensor_monitor.config_manager import LOG_FILE
 
 
 logging.basicConfig(level=logging.INFO,

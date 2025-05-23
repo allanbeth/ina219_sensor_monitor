@@ -1,15 +1,19 @@
+# sensor_monitor/mqtt.py
+
 import paho.mqtt.client as mqtt
-from sensor_monitor.config import MQTT_BROKER, MQTT_PORT, MQTT_TOPIC, MQTT_DISCOVERY_PREFIX
-from sensor_monitor.logger import sensor_logger
+from sensor_monitor.config_manager import MQTT_TOPIC, MQTT_DISCOVERY_PREFIX
+#from sensor_monitor.logger import sensor_logger
 import json
 
 class MQTTPublisher:
-    def __init__(self, logger):
+    def __init__(self, logger, mqtt_config):
+        self.mqtt_broker = mqtt_config['mqtt_broker']
+        self.mqtt_port = mqtt_config['mqtt_port']
         self.logger = logger
         self.client = mqtt.Client()
 
         try:
-            self.client.connect(MQTT_BROKER, MQTT_PORT, 60)
+            self.client.connect(self.mqtt_broker, self.mqtt_port, 60)
             self.logger.info("Connected to MQTT Broker")
         except Exception as e:
             self.logger.error(f"Connection to MQTT Broker failed: {e}")

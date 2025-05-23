@@ -1,12 +1,14 @@
 # main.py
 
-import time, json
+from sensor_monitor.config_manager import ConfigManager
 from sensor_monitor.sensor_manager import SensorManager
 from sensor_monitor.webserver import flaskWrapper
 from sensor_monitor.live_data import sensor_data
 from threading import Thread
+import time
 
-manager = SensorManager()
+config = ConfigManager()
+manager = SensorManager(config)
 webserver = flaskWrapper(manager)
 
 

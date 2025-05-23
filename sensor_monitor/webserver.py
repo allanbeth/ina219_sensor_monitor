@@ -2,7 +2,7 @@
 
 from flask import Flask, render_template, request, redirect, send_file, abort, send_from_directory, jsonify
 from flask_socketio import SocketIO, emit
-from sensor_monitor.config import WEB_SERVER_HOST, WEB_SERVER_PORT
+#from sensor_monitor.config import WEB_SERVER_HOST, WEB_SERVER_PORT
 from sensor_monitor.live_data import sensor_data
 from pathlib import Path
 import json, os
@@ -43,11 +43,11 @@ class flaskWrapper:
         
     def get_settings(self):
             
-            return self.manager.config
+            return self.manager.config.config_data
 
     def update_settings(self):
         data = request.get_json()
-        self.manager.save_settings(data)
+        self.manager.config.save_config(data)
     
     def delete_sensor(self):
         data = request.get_json()
@@ -84,4 +84,4 @@ class flaskWrapper:
 
     def run_webserver(self): 
 
-        self.socketio.run(self.app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT, debug=False, allow_unsafe_werkzeug=True)
+        self.socketio.run(self.app, host=self.manager.config.config_data['webserver_host'], port=self.manager.config.config_data['webserver_port'], debug=False, allow_unsafe_werkzeug=True)

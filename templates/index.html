@@ -31,21 +31,41 @@
                     <label for="max-log">Max Log File Size (MB):</label>
                     <input type="number" id="max-log" min="1" step="1" />
                 </div>
+                <h5>Polling Intervals</h5>
                 <div class="settings-entry">
-                    <label for="solar-interval">Solar Polling Interval (sec):</label>
+                    <label for="solar-interval">SolarInterval (sec):</label>
                     <input type="number" id="solar-interval" min="1" step="1" />
                 </div>
                 <div class="settings-entry">
-                    <label for="wind-interval">Wind Polling Interval (sec):</label>
+                    <label for="wind-interval">Wind Interval (sec):</label>
                     <input type="number" id="wind-interval" min="1" step="1" />
                 </div>
                 <div class="settings-entry">
-                    <label for="battery-interval">Battery Polling Interval (sec):</label>
+                    <label for="battery-interval">Battery Interval (sec):</label>
                     <input type="number" id="battery-interval" min="1" step="1" />
                 </div>
+                <h5>Readings</h5>
                 <div class="settings-entry">
                     <label for="max-readings">Max No of Readings:</label>
                     <input type="number" id="max-readings" min="1" step="1" />
+                </div>
+                <h5>MQTT</h5>
+                <div class="settings-entry">
+                    <label for="mqtt-broker">MQTT Broker:</label>
+                    <input type="text" id="mqtt-broker"/>
+                </div>
+                <div class="settings-entry">
+                    <label for="mqtt-port">MQTT Port:</label>
+                    <input type="text" id="mqtt-port"/>
+                </div>
+                <h5>Web Server</h5>
+                <div class="settings-entry">
+                    <label for="webserver-host">Webserver Host:</label>
+                    <input type="text" id="webserver-host"/>
+                </div>
+                <div class="settings-entry">
+                    <label for="webserver-port">Webserver Port:</label>
+                    <input type="text" id="webserver-port"/>
                 </div>
             </div>
             <div class="edit-buttons">
@@ -158,6 +178,7 @@
                                 <span class="icon"> <i class="fa-solid fa-battery"></i></span>
                                 <p class="soc">${sensor.data.state_of_charge ?? 0}%</p>
                                 <p><meter value="${sensor.data.state_of_charge ?? 0}" min="0" max="100"></meter></p>
+                                </div>
                                 </div>`;
                         } else {
                             content += `
@@ -172,7 +193,7 @@
                         content += `
                                 <div class="timestamp" id="timestamp-${name}">Last Updated: ${sensor.data.time_stamp}</div>
                             </div>
-
+                                
                             <div id="edit-${name}" class="edit-form hidden">
                                 <h4>Edit Sensor - ${hexAddress}</h4>
                                 <div class="edit-data">
@@ -315,6 +336,10 @@
                     document.getElementById("battery-interval").value = data.poll_intervals.Battery ?? "";
                     document.getElementById("max-log").value = data.max_log ?? "";
                     document.getElementById("max-readings").value = data.max_readings ?? "";
+                    document.getElementById("mqtt-broker").value = data.mqtt_broker ?? "";
+                    document.getElementById("mqtt-port").value = data.mqtt_port ?? "";
+                    document.getElementById("webserver-host").value = data.webserver_host ?? "";
+                    document.getElementById("webserver-port").value = data.webserver_port ?? "";
 
                 });
 }
@@ -356,6 +381,10 @@
             const windInterval = document.getElementById("wind-interval").value;
             const batteryInterval = document.getElementById("battery-interval").value;
             const maxReadings = document.getElementById("max-readings").value;
+            const mqttBroker = document.getElementById("mqtt-broker").value;
+            const mqttPort = document.getElementById("mqtt-port").value;
+            const webserverHost = document.getElementById("webserver-host").value;
+            const webserverPort = document.getElementById("webserver-port").value;
 
             fetch("/update_settings", {
                 method: "POST",
@@ -365,15 +394,17 @@
                     solar_interval: solarInterval,
                     wind_interval: windInterval,
                     battery_interval: batteryInterval,
-                    max_readings: maxReadings,  })
+                    max_readings: maxReadings,
+                    mqtt_broker: mqttBroker,
+                    mqtt_port: mqttPort,
+                    webserver_host: webserverHost,
+                    webserver_port: webserverPort,})
             })
             .then(res => res.json())
             .then(() => {
-            document.getElementById("settings-container").classList.add("hidden");
-            document.getElementById("sensor-container").classList.remove("hidden");
-            paused = false;
             socket.emit("sensor_update_request");
             });
+            cancelSettings()
         }
 
         function escapeHTML(str) {
@@ -503,18 +534,15 @@
             .then(response => response.json())
             .then(result => {
                 if (result.status === 'success') {
-                    const card = document.getElementById(`card-${name}`);
-                    if (card) card.remove();
-
-                    if (document.querySelectorAll('.sensor-card').length === 0) {
-                        document.getElementById('no-sensors').classList.remove('hidden');
-                    }
+                    location.reload();
+                    document.getElementById(`view-${name}`).classList.add("hidden");
+                    socket.emit("sensor_update_request"); 
                 } else {
                     alert('Failed to delete sensor.');
-                    socket.emit("sensor_update_request");
                 }
             });
         }
+        
     </script>
 </body>
 </html>

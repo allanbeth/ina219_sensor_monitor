@@ -1,3 +1,5 @@
+# sensor_monitor/sensor.py
+
 from adafruit_ina219 import INA219
 from collections import deque
 import board
@@ -23,7 +25,7 @@ class Sensor:
             self.ina.i2c_device.device_address = int(str(addr), 16)
             logging.info(f"INA219 sensor connected on address {addr}")
         except Exception as e:
-            #logging.info("INA219 sensor not detected: %s", str(e))
+            logging.info("INA219 sensor not detected: %s", str(e))
             self.ina = None
 
            
