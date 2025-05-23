@@ -34,7 +34,8 @@ class ConfigManager:
                     "mqtt_broker": "localhost",
                     "mqtt_port": 1883,
                     "webserver_host": "0.0.0.0",
-                    "webserver_port": 5000
+                    "webserver_port": 5000,
+                    "gpio_address": "localhost"
                 }  
             try:
                 with open(CONFIG_FILE, "w") as f:
@@ -60,7 +61,8 @@ class ConfigManager:
             "mqtt_broker": config['mqtt_broker'],
             "mqtt_port": config['mqtt_port'],
             "webserver_host": config['webserver_host'],
-            "webserver_port": config['webserver_port']
+            "webserver_port": config['webserver_port'],
+            "gpio_address": config['gpio_address']
         }
 
         try:
