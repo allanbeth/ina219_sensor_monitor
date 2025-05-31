@@ -9,7 +9,7 @@ import logging
 import math
 
 class Sensor:
-    def __init__(self, name, address, sensor_type, max_power, rating, max_readings):
+    def __init__(self, name, address, sensor_type, max_power, rating, max_readings, i2c=None):
         self.name = name
         self.type = sensor_type
         self.max_power = max_power
@@ -17,7 +17,7 @@ class Sensor:
         self.rating = rating
         self.max_readings = max_readings
         self.readings = deque(maxlen=self.max_readings)
-        self.i2c = busio.I2C(board.SCL, board.SDA)      
+        self.i2c = i2c or busio.I2C(board.SCL, board.SDA)     
 
         try:
             self.ina = INA219(self.i2c)

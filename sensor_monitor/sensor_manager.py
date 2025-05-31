@@ -5,6 +5,7 @@ from sensor_monitor.config_manager import SENSOR_FILE
 from sensor_monitor.mqtt import MQTTPublisher
 from sensor_monitor.logger import sensor_logger
 
+import pigpio
 import json
 import board
 import time
@@ -14,7 +15,19 @@ class SensorManager:
         self.config = config
         self.logger = sensor_logger()  
         self.set_config() 
-        self.i2c = board.I2C()  
+
+        if self.config.config_data.get("remote_gpio") == 1:
+            gpio_address = self.config.config_data.get("gpio_address")
+            self.logger.info(f"Establishing remote GPIO connection at {gpio_address}")
+            self.pi = pigpio.pi(gpio_address)
+            if not self.pi.connected:
+                raise RuntimeError(f"Could not connect to remote GPIO at {gpio_address}")
+            self.i2c = self.pi.i2c_open(1, 0x40)  # Dummy open; actual access per address later
+        else:
+            self.pi = None
+            self.logger.info(f"Establishing local GPIO Connection")
+            self.i2c = board.I2C()
+        
         self.mqtt = MQTTPublisher(self.logger, self.mqtt_config)
         self.sensors = self.load_sensors()        
         self.load_mqtt_discovery()  
@@ -37,7 +50,7 @@ class SensorManager:
                 addresses = self.i2c.scan()
                 for device_address in self.i2c.scan():
                     addr = hex(device_address)
-                    self.logger.info(f"I2C addresses found: {addr}")
+                    self.logger.info(f"I2C connected Sensor: {addr}")
                 return addresses
         finally:
             self.i2c.unlock()     
@@ -47,11 +60,11 @@ class SensorManager:
         try:
             with open(SENSOR_FILE, "r") as f:
                 sensor_data = json.load(f)
-                sensors = [Sensor(s["name"], s["address"], s["type"], s["max_power"], s["rating"], self.config.config_data['max_readings']) for s in sensor_data]
+                sensors = [Sensor(s["name"], s["address"], s["type"], s["max_power"], s["rating"], self.config.config_data['max_readings'],self.i2c) for s in sensor_data]
                 self.logger.info("Configured Sensor:")
 
                 for sensor in sensors:
-                    self.logger.info(sensor.name)     
+                    self.logger.info(f"Connected to {sensor.name} Sucessfully")     
         except:
             pass
 
@@ -64,7 +77,7 @@ class SensorManager:
                 default_type = "Solar"
                 default_max_power = 100
                 default_rating = 12
-                sensors.append(Sensor(default_name, addr, default_type, default_max_power, default_rating, self.config.config_data['max_readings']))
+                sensors.append(Sensor(default_name, addr, default_type, default_max_power, default_rating, self.config.config_data['max_readings'],self.i2c))
 
         self.save_sensors(sensors)
         self.load_mqtt_discovery()
