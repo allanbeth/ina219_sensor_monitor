@@ -35,6 +35,7 @@ class ConfigManager:
                     "mqtt_port": 1883,
                     "webserver_host": "0.0.0.0",
                     "webserver_port": 5000,
+                    "remote_gpio": 0,
                     "gpio_address": "localhost"
                 }  
             try:

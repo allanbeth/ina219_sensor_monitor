@@ -69,9 +69,13 @@
                 </div>
                 <h5>GPIO</h5>
                 <div class="settings-entry">
-                    <label for="gpio_address">GPIO Address:</label>
-                    <input type="text" id="gpio_address"/>
+                    <label for="remote-gpio">Remote GPIO:</label>
+                    <input type="checkbox" id="remote-gpio"/>
                 </div>
+                <div class="settings-entry">
+                    <label for="gpio-address">GPIO Address:</label>
+                    <input type="text" id="gpio-address"/>
+                </div>                
             </div>
             <div class="edit-buttons">
                 <button class="save-btn" onclick="saveSettings()">Save</button>
@@ -237,6 +241,7 @@
                             </div>                                              
                             <div class="edit-buttons">
                                 <button class="back-btn" onclick="closeLog('${name}')">Close</button>
+                                <button class="refresh-btn" onclick="refreshLog()">Refresh</button>
                             </div>
                         </div>
 
@@ -269,7 +274,7 @@
                 return '<p>No logs available.</p>';
             }
 
-            return readings.map(reading => `
+            return readings.slice().reverse().map(reading => `
                 <div class="log-entry">
                     <p>
                         <strong>${reading.time_stamp ?? ''}</strong>
@@ -345,6 +350,7 @@
                     document.getElementById("mqtt-port").value = data.mqtt_port ?? "";
                     document.getElementById("webserver-host").value = data.webserver_host ?? "";
                     document.getElementById("webserver-port").value = data.webserver_port ?? "";
+                    document.getElementById("remote-gpio").checked = data.remote_gpio == 1;
                     document.getElementById("gpio_address").value = data.gpio_address ?? "";
 
                 });
@@ -391,6 +397,7 @@
             const mqttPort = document.getElementById("mqtt-port").value;
             const webserverHost = document.getElementById("webserver-host").value;
             const webserverPort = document.getElementById("webserver-port").value;
+            const remoteGpio = document.getElementById("remote-gpio").checked ? 1 : 0; 
             const gpioAddress = document.getElementById("gpio_address").value;
 
             fetch("/update_settings", {
@@ -406,6 +413,7 @@
                     mqtt_port: mqttPort,
                     webserver_host: webserverHost,
                     webserver_port: webserverPort,
+                    remote_gpio: remoteGpio,
                     gpio_address: gpioAddress,})
             })
             .then(res => res.json())
@@ -488,6 +496,11 @@
             document.getElementById(`view-${name}`).classList.add("hidden");
             document.getElementById(`btns-${name}`).classList.add("hidden");
             document.getElementById(`log-${name}`).classList.remove("hidden");
+            
+        }
+
+        function refreshLog(name) {
+            socket.emit("sensor_update_request");         
             
         }
 

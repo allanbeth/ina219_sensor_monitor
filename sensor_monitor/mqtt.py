@@ -1,16 +1,16 @@
 # sensor_monitor/mqtt.py
 
-import paho.mqtt.client as mqtt
 from sensor_monitor.config_manager import MQTT_TOPIC, MQTT_DISCOVERY_PREFIX
-#from sensor_monitor.logger import sensor_logger
+import paho.mqtt.client as mqtt
 import json
 
 class MQTTPublisher:
     def __init__(self, logger, mqtt_config):
         self.mqtt_broker = mqtt_config['mqtt_broker']
-        self.mqtt_port = mqtt_config['mqtt_port']
+        self.mqtt_port = int(mqtt_config['mqtt_port'])
         self.logger = logger
         self.client = mqtt.Client()
+        self.client.loop_start()
 
         try:
             self.client.connect(self.mqtt_broker, self.mqtt_port, 60)
@@ -18,17 +18,20 @@ class MQTTPublisher:
         except Exception as e:
             self.logger.error(f"Connection to MQTT Broker failed: {e}")
 
-    def publish(self, data):
-        for sensor, readings in data.items():
-            sensor_clean = sensor.replace(" ", "_")
-            topic = f"{MQTT_TOPIC}/{sensor_clean}"
-            sensor_data = readings.get('data', {})
+    def publish_new_data(self, sensor, readings):
+        
+        sensor_clean = sensor.replace(" ", "_")
+        topic = f"{MQTT_TOPIC}/{sensor_clean}"
+        sensor_data = readings.get('data', {})
+        del sensor_data['readings']
 
-            payload = json.dumps(sensor_data)
-            self.client.publish(topic, payload, retain=True)
+        payload = json.dumps(sensor_data)
+        self.client.publish(topic, payload, retain=True)
+        self.logger.info(f'MQTT Published - {topic}: {payload}')
 
-            availability_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_clean}/availability"
-            self.client.publish(availability_topic, "online", retain=True)
+        availability_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_clean}/availability"
+        self.client.publish(availability_topic, "online", retain=True)
+
 
     def send_discovery_config(self, sensor_name, sensor_type):
         sensor_clean = sensor_name.replace(" ", "_")
@@ -68,7 +71,7 @@ class MQTTPublisher:
         sensor_clean = sensor_name.replace(" ", "_")
 
         measurements = ["voltage", "current"]
-        if sensor_type == "battery":
+        if sensor_type == "Battery":
             measurements.append("state_of_charge")
         else:
             measurements.append("power")

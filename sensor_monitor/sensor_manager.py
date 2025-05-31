@@ -15,8 +15,8 @@ class SensorManager:
         self.logger = sensor_logger()  
         self.set_config() 
         self.i2c = board.I2C()  
-        self.sensors = self.load_sensors()        
         self.mqtt = MQTTPublisher(self.logger, self.mqtt_config)
+        self.sensors = self.load_sensors()        
         self.load_mqtt_discovery()  
 
     def set_config(self):
@@ -67,6 +67,7 @@ class SensorManager:
                 sensors.append(Sensor(default_name, addr, default_type, default_max_power, default_rating, self.config.config_data['max_readings']))
 
         self.save_sensors(sensors)
+        self.load_mqtt_discovery()
         return sensors
         
     def new_sensor(self):
@@ -89,7 +90,7 @@ class SensorManager:
                 sensor.max_power = new_max_power
                 sensor.rating = new_rating
                 self.save_sensors()
-                self.mqtt.send_discovery_config(sensor.name)
+                self.mqtt.send_discovery_config(sensor.name, sensor.type)
                 return True
         return False
     
@@ -103,7 +104,7 @@ class SensorManager:
         if sensor_to_remove:
             self.sensors.remove(sensor_to_remove)
             self.save_sensors()
-            self.mqtt.remove_discovery_config(sensor_to_remove.name.replace(" ", "_"))
+            self.mqtt.remove_discovery_config(sensor_to_remove.name, sensor_to_remove.type)
             self.logger.info(f"Removed sensor: {sensor_to_remove.name}")
             return True
         else:
@@ -114,14 +115,8 @@ class SensorManager:
         try:
             for sensor in self.sensors:
                 self.mqtt.send_discovery_config(sensor.name, sensor.type)               
-        except:
-            pass
-
-    def publish_mqtt (self, data):
-        try:
-            self.mqtt.publish(data)                
-        except:
-            pass
+        except Exception as e:
+            self.logger.error(f"MQTT publish failed: {e}")
             
     def get_data(self):
         current_time = time.time()
@@ -137,29 +132,41 @@ class SensorManager:
                 sensor_data = s.read_data()
                 self.last_poll_times[s.name] = current_time
                 self.logger.info(f"New Reading - {s.name}: {sensor_data['voltage']}V, {sensor_data['current']}A, {sensor_data['power']}W")
+                data[s.name] = {
+                    "address": s.address,
+                    "type": s.type,
+                    "max_power": s.max_power,
+                    "rating": s.rating,
+                    "data": sensor_data
+                }
+                self.mqtt.publish_new_data(s.name, data[s.name])
             else:
                 if s.readings:
                     sensor_data = s.current_data()
+                    data[s.name] = {
+                        "address": s.address,
+                        "type": s.type,
+                        "max_power": s.max_power,
+                        "rating": s.rating,
+                        "data": sensor_data
+                    }
                 else:
                     sensor_data = {
                         "voltage": 0,
                         "current": 0,
                         "power": 0,
                         "time_stamp": "Not Updated",
-                        "state_of_charge": 0 if s.type== "Battery" else None,
-                        "output": 0 if s.type!= "Battery" else None,
+                        "state_of_charge": 0 if s.type == "Battery" else None,
+                        "output": 0 if s.type != "Battery" else None,
                         "readings": []
                     }
 
-            data[s.name] = {
-                "address": s.address,
-                "type": s.type,
-                "max_power": s.max_power,
-                "rating": s.rating,
-                "data": sensor_data
-            }
-
-        if data:
-            self.publish_mqtt(data)
+                    data[s.name] = {
+                        "address": s.address,
+                        "type": s.type,
+                        "max_power": s.max_power,
+                        "rating": s.rating,
+                        "data": sensor_data
+                    }
 
         return data

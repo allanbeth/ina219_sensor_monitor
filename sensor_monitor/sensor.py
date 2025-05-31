@@ -35,7 +35,7 @@ class Sensor:
             voltage = round(self.ina.bus_voltage, 1) if self.ina else 0.0
             current = round(self.ina.current / 1000,0) if self.ina else 0.0 # Convert mA to A
             power = round(voltage * current, 0)
-            time_stamp =  datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
+            time_stamp =  datetime.datetime.now().strftime("%I:%M:%S%p on %B %d, %Y")
             readings = {"voltage": voltage, "current": current, "power": power, "time_stamp": time_stamp}
             if self.type == "Battery":
                 SoC = self.estimate_soc(voltage)
@@ -82,15 +82,13 @@ class Sensor:
             "power": round(total_power / n, 0),
             "time_stamp": latest_time
         }
-
+        
         if self.type == "Battery":
             total_SoC = sum(r["state_of_charge"] for r in self.readings)
-            averaged['state_of_charge'] = total_SoC
+            averaged['state_of_charge'] = round(total_SoC / n, 0)
         else:
             total_output = sum(r["output"] for r in self.readings)
-            averaged['output'] = total_output
-
-
+            averaged['output'] = round(total_output / n, 0)
 
         return averaged    
     

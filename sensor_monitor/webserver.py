@@ -74,7 +74,7 @@ class flaskWrapper:
                 lines = f.readlines()
 
             # Return last N lines (e.g., 100)
-            logs = [{"logs": line.strip()} for line in lines[-100:]]
+            logs = [{"logs": line.strip()} for line in lines[-100:]][::-1]
             return jsonify({"logs": logs})
         except Exception as e:
             return jsonify({"error": str(e), "logs": []}), 500
