@@ -3,3 +3,4 @@ flask-socketio
 paho-mqtt
 smbus2
 adafruit-circuitpython-ina219
+pigpio
