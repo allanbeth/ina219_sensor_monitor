@@ -366,7 +366,7 @@
                     document.getElementById("webserver-host").value = data.webserver_host ?? "";
                     document.getElementById("webserver-port").value = data.webserver_port ?? "";
                     document.getElementById("remote-gpio").checked = data.remote_gpio == 1;
-                    document.getElementById("gpio_address").value = data.gpio_address ?? "";
+                    document.getElementById("gpio-address").value = data.gpio_address ?? "";
 
                 });
 }
@@ -413,7 +413,7 @@
             const webserverHost = document.getElementById("webserver-host").value;
             const webserverPort = document.getElementById("webserver-port").value;
             const remoteGpio = document.getElementById("remote-gpio").checked ? 1 : 0; 
-            const gpioAddress = document.getElementById("gpio_address").value;
+            const gpioAddress = document.getElementById("gpio-address").value;
 
             fetch("/update_settings", {
                 method: "POST",
@@ -590,7 +590,7 @@
         function restartConfirmation() {
             paused = true;
             const resetMsg = document.getElementById("restart-content");
-            resetMsg.innerHTML = '<h4>Are you sure you want to restart the program?</h4>';
+            resetMsg.innerHTML = '<h5>Are you sure you want to restart the program?</h5>';
 
             document.getElementById("restart-container").classList.remove("hidden");
             document.getElementById("sensor-container").classList.add("hidden");
@@ -599,17 +599,17 @@
 
         function restartProgram() {         
             const restartMsg = document.getElementById("restart-content");
-            restartMsg.innerHTML = "<h4>Restarting...</h4>";
+            restartMsg.innerHTML = "<h5>Restarting...</h5>";
             const closeBtn = document.getElementById("restart-btns")
             closeBtn.innerHTML = '<button class="cancel-btn" onclick="closeRestart()">Done</button>'; 
 
             fetch("/restart", { method: "POST" })
                 .then(res => {
                     if (res.ok) {
-                        restartMsg.innerHTML = "<h4>Sucessfully Restarted</h4>";
+                        restartMsg.innerHTML = "<h5>Sucessfully Restarted</h5>";
                         
                     } else {
-                        restartMsg.innerHTML = "<h4>Failed To Restart</h4><p>Check logs for errors.</p>";     
+                        restartMsg.innerHTML = "<h5>Failed To Restart</h5><p>Check logs for errors.</p>";     
                     }
                 
                 });
@@ -620,7 +620,7 @@
             const restartMsg = document.getElementById("restart-content");
             const restartBtns = document.getElementById("restart-btns")
             document.getElementById("restart-container").classList.add("hidden");
-            restartMsg.innerHTML = '<h3>Are you sure you want to restart the program?</h3>'; 
+            restartMsg.innerHTML = '<h5>Are you sure you want to restart the program?</h5>'; 
             restartBtns.innerHTML = '<button class="cancel-btn" onclick="cancelRestart()">Cancel</button><button class="save-btn" onclick="restartProgram()">Confirm</button>';
             document.getElementById("sensor-container").classList.remove("hidden");
             document.getElementById("header-btns").classList.remove("hidden");

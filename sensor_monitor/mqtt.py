@@ -43,7 +43,7 @@ class MQTTPublisher:
             ("current", "A", "current"),
         ]
 
-        if sensor_type != "battery":
+        if sensor_type != "Battery":
             measurements.append(("power", "W", "power"))
         else:
             measurements.append(("state_of_charge", "%", "battery"))
