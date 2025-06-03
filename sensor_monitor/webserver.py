@@ -5,7 +5,7 @@ from flask_socketio import SocketIO, emit
 #from sensor_monitor.config import WEB_SERVER_HOST, WEB_SERVER_PORT
 from sensor_monitor.live_data import sensor_data
 from pathlib import Path
-import json, os
+import json, os, sys, subprocess
 
 class flaskWrapper:
     def __init__(self, manager):
@@ -24,9 +24,11 @@ class flaskWrapper:
         self.app.route("/delete_sensor", methods=["POST"])(self.delete_sensor)
         self.app.route("/get_log_file", methods=["GET", "POST"])(self.get_log_file)
         self.app.route("/readme", methods=["GET", "POST"])(self.serve_readme)
+        self.app.route("/restart", methods=["POST"])(self.restart_program)
 
 
     def main(self):
+        self.manager.logger.info(f"Loading index.html")
         return render_template("index.html", sensors=sensor_data)
     
     def update_sensor(self):
@@ -42,6 +44,7 @@ class flaskWrapper:
 
         
     def get_settings(self):
+            self.manager.logger.info(f"Requesting config data")
             
             return self.manager.config.config_data
 
@@ -70,17 +73,29 @@ class flaskWrapper:
             return jsonify({"logs": []})
             
         try:
+            self.manager.logger.info(f"Retrieving Logs")
             with open(self.logFilePath, "r") as f:
                 lines = f.readlines()
 
             # Return last N lines (e.g., 100)
             logs = [{"logs": line.strip()} for line in lines[-100:]][::-1]
+            self.manager.logger.info(f"Loaded logs")
             return jsonify({"logs": logs})
         except Exception as e:
             return jsonify({"error": str(e), "logs": []}), 500
 
     def broadcast_sensor_data(self):
         self.socketio.emit("sensor_update", sensor_data)
+
+    def restart_program(self):
+        try:
+            self.manager.logger.info(f"Restarting.....")
+            subprocess.Popen(["sudo", "systemctl", "restart", "sensor_monitor.service"])
+            self.manager.logger.info(f"Restarted Sucessfully ")
+            return jsonify({"status": "restarting"}), 200
+        except Exception as e:
+            self.manager.logger.info(f"Failed to restart")
+            return jsonify({"status": "error", "message": str(e)}), 500
 
     def run_webserver(self): 
 

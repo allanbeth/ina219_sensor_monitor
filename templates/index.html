@@ -19,6 +19,7 @@
                 <i class="fa-solid fa-gear" onclick="settings()"></i>
                 <i class="fa-solid fa-book" onclick="fullLog()"></i>
                 <i class="fa-solid fa-question" onclick="about()"></i>
+                <i class="fa-solid fa-rotate" onclick="restartConfirmation()"></i>
             </div>
         </div>
     </div>
@@ -96,8 +97,22 @@
                 <button class="cancel-btn" onclick="cancelAbout()">Close</button>
             </div>
         </div>
+    </div>
+
+    <div class="restart-container hidden" id="restart-container">
+        <div id="restart-card" class="restart-card">
+            <h4>Restart</h4>
+            <div class="restart-info">
+                <div class="restart-content" id="restart-content">   
+                </div>
+            </div>
+            <div class="edit-buttons" id="restart-btns">
+                <button class="cancel-btn" onclick="cancelRestart()">Cancel</button>
+                <button class="save-btn" onclick="restartProgram()">Confirm</button>
+            </div>
         </div>
     </div>
+
 
     <div class="log-file-container hidden" id="log-file-container">
         <div id="log-file-card" class="log-file-card">
@@ -460,11 +475,12 @@
                         const match = logText.match(/^\s*[\d\-:, ]+\s+([A-Z]+)\s+(.*)$/);
                         
                         if (match) {
+                            
                             const logType = match[1];
                             const logMessage = match[2];
                             return `
                                 <div class="log-file-entry">
-                                    <p><strong style="color:green;">${escapeHTML(logType)}</strong> ${escapeHTML(logMessage)}</p>
+                                    <p><strong style="color:green;"> ${escapeHTML(logType)}</strong> ${escapeHTML(logMessage)}</p>
                                 </div>
                             `;
                         } else {
@@ -562,6 +578,53 @@
                     alert('Failed to delete sensor.');
                 }
             });
+        }
+
+        function cancelRestart() {
+            document.getElementById("restart-container").classList.add("hidden");
+            document.getElementById("sensor-container").classList.remove("hidden");
+            document.getElementById("header-btns").classList.remove("hidden");
+            paused = false;
+        }
+
+        function restartConfirmation() {
+            paused = true;
+            const resetMsg = document.getElementById("restart-content");
+            resetMsg.innerHTML = '<h4>Are you sure you want to restart the program?</h4>';
+
+            document.getElementById("restart-container").classList.remove("hidden");
+            document.getElementById("sensor-container").classList.add("hidden");
+            document.getElementById("header-btns").classList.add("hidden");
+        }
+
+        function restartProgram() {         
+            const restartMsg = document.getElementById("restart-content");
+            restartMsg.innerHTML = "<h4>Restarting...</h4>";
+            const closeBtn = document.getElementById("restart-btns")
+            closeBtn.innerHTML = '<button class="cancel-btn" onclick="closeRestart()">Done</button>'; 
+
+            fetch("/restart", { method: "POST" })
+                .then(res => {
+                    if (res.ok) {
+                        restartMsg.innerHTML = "<h4>Sucessfully Restarted</h4>";
+                        
+                    } else {
+                        restartMsg.innerHTML = "<h4>Failed To Restart</h4><p>Check logs for errors.</p>";     
+                    }
+                
+                });
+        
+        }
+
+        function closeRestart() {
+            const restartMsg = document.getElementById("restart-content");
+            const restartBtns = document.getElementById("restart-btns")
+            document.getElementById("restart-container").classList.add("hidden");
+            restartMsg.innerHTML = '<h3>Are you sure you want to restart the program?</h3>'; 
+            restartBtns.innerHTML = '<button class="cancel-btn" onclick="cancelRestart()">Cancel</button><button class="save-btn" onclick="restartProgram()">Confirm</button>';
+            document.getElementById("sensor-container").classList.remove("hidden");
+            document.getElementById("header-btns").classList.remove("hidden");
+            paused = false;
         }
         
     </script>
