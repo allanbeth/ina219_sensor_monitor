@@ -22,7 +22,7 @@ class MQTTPublisher:
         
         sensor_clean = sensor.replace(" ", "_")
         topic = f"{MQTT_TOPIC}/{sensor_clean}"
-        sensor_data = readings.get('data', {})
+        sensor_data = readings
         del sensor_data['readings']
 
         payload = json.dumps(sensor_data)

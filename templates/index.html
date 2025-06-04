@@ -138,6 +138,7 @@
 
     <script>
         const socket = io();
+        
         let paused = false;
         let undoTimers = {};
         
@@ -146,6 +147,7 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             socket.on("sensor_update", function (data) {
+                
                 if (paused) return;
                 const container = document.getElementById("sensor-container");
                 container.innerHTML = "";
@@ -156,6 +158,7 @@
                     document.getElementById("no-sensors").classList.add("hidden");
 
                     for (let [name, sensor] of Object.entries(data)) {
+                        console.log("WebSocket update received", data);
                         const typeClass = sensor.type === "Solar" ? "type-Solar" :
                                           sensor.type === "Wind" ? "type-Wind" :
                                           "type-Battery";
@@ -512,11 +515,6 @@
             document.getElementById(`view-${name}`).classList.add("hidden");
             document.getElementById(`btns-${name}`).classList.add("hidden");
             document.getElementById(`log-${name}`).classList.remove("hidden");
-            
-        }
-
-        function refreshLog(name) {
-            socket.emit("sensor_update_request");         
             
         }
 

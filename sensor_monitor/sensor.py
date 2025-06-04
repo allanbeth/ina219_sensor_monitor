@@ -36,21 +36,25 @@ class Sensor:
             current = round(self.ina.current / 1000,0) if self.ina else 0.0 # Convert mA to A
             power = round(voltage * current, 0)
             time_stamp =  datetime.datetime.now().strftime("%I:%M:%S%p on %B %d, %Y")
-            readings = {"voltage": voltage, "current": current, "power": power, "time_stamp": time_stamp}
+            new_readings = {"voltage": voltage, "current": current, "power": power, "time_stamp": time_stamp}
             if self.type == "Battery":
                 SoC = self.estimate_soc(voltage)
-                readings["state_of_charge"] = SoC
+                new_readings["state_of_charge"] = SoC
             else:
                 output = float(voltage / self.rating) * 100
-                readings["output"] = round(output, 0)       
+                new_readings["output"] = round(output, 0)       
+
+            self.readings.append(new_readings)
+            data = self.average_data(time_stamp)
+
+
         except Exception as e:
             logging.info(f"Error reading sensor {self.name}: {e}")
             readings = {"voltage": 0, "current": 0, "power": 0, "time_stamp": datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),"state_of_charge": 0 if self.type == "Battery" else None,
             "output": 0 if self.type != "Battery" else None,}
-
-            
-        self.readings.append(readings)
-        data = self.average_data()
+           
+        
+        
 
         return data
             
@@ -60,7 +64,7 @@ class Sensor:
         data["readings"] = list(self.readings)
         return data    
         
-    def average_data(self):
+    def average_data(self, time_stamp):
         if not self.readings:
             return {
                 "voltage": 0,
@@ -74,13 +78,14 @@ class Sensor:
         total_voltage = sum(r["voltage"] for r in self.readings)
         total_current = sum(r["current"] for r in self.readings)
         total_power = sum(r["power"] for r in self.readings)
-        latest_time = self.readings[-1]["time_stamp"]
+        
 
+        
         averaged = {
             "voltage": round(total_voltage / n, 1),
             "current": round(total_current / n, 0),
             "power": round(total_power / n, 0),
-            "time_stamp": latest_time
+            "time_stamp": time_stamp
         }
         
         if self.type == "Battery":
@@ -90,6 +95,8 @@ class Sensor:
             total_output = sum(r["output"] for r in self.readings)
             averaged['output'] = round(total_output / n, 0)
 
+        
+        
         return averaged    
     
     def estimate_soc(self, voltage):

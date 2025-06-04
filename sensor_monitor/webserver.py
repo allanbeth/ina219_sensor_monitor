@@ -8,8 +8,10 @@ from pathlib import Path
 import json, os, sys, subprocess
 
 class flaskWrapper:
-    def __init__(self, manager):
-        self.manager = manager
+    def __init__(self, logger, config_manager, sensor_config):
+        self.logger = logger
+        self.config_manager = config_manager
+        self.sensor_config = sensor_config
         self.root = Path(__file__).parents[1]
         self.templatePath = self.root / "templates/"
         self.stylePath = self.root / "static/"
@@ -28,7 +30,7 @@ class flaskWrapper:
 
 
     def main(self):
-        self.manager.logger.info(f"Loading index.html")
+        self.logger.info(f"Loading index.html")
         return render_template("index.html", sensors=sensor_data)
     
     def update_sensor(self):
@@ -39,24 +41,24 @@ class flaskWrapper:
         max_power = int(data.get("max_power", 100))
         rating = int(data.get("rating", 100))
 
-        self.manager.update_sensor(original_name, new_name, new_type, max_power, rating)
+        self.sensor_config.update_sensor(original_name, new_name, new_type, max_power, rating)
         return jsonify({"status": "success"})
 
         
     def get_settings(self):
-            self.manager.logger.info(f"Requesting config data")
+            self.logger.info(f"Requesting config data")
             
-            return self.manager.config.config_data
+            return self.config_manager.config_data
 
     def update_settings(self):
         data = request.get_json()
-        self.manager.config.save_config(data)
+        self.config_manager.save_config(data)
     
     def delete_sensor(self):
         data = request.get_json()
         sensor_name = data.get("name")
         if sensor_name in sensor_data:
-            self.manager.remove_sensor(sensor_name)
+            self.sensor_config.remove_sensor(sensor_name)
             return jsonify({"status": "success"})
         else:
             return jsonify({"status": "error", "message": "Sensor not found"}), 404
@@ -73,13 +75,13 @@ class flaskWrapper:
             return jsonify({"logs": []})
             
         try:
-            self.manager.logger.info(f"Retrieving Logs")
+            self.logger.info(f"Retrieving Logs")
             with open(self.logFilePath, "r") as f:
                 lines = f.readlines()
 
             # Return last N lines (e.g., 100)
             logs = [{"logs": line.strip()} for line in lines[-100:]][::-1]
-            self.manager.logger.info(f"Loaded logs")
+            self.logger.info(f"Loaded logs")
             return jsonify({"logs": logs})
         except Exception as e:
             return jsonify({"error": str(e), "logs": []}), 500
@@ -89,14 +91,14 @@ class flaskWrapper:
 
     def restart_program(self):
         try:
-            self.manager.logger.info(f"Restarting.....")
+            self.logger.info(f"Restarting.....")
             subprocess.Popen(["sudo", "systemctl", "restart", "sensor_monitor.service"])
-            self.manager.logger.info(f"Restarted Sucessfully ")
+            self.logger.info(f"Restarted Sucessfully ")
             return jsonify({"status": "restarting"}), 200
         except Exception as e:
-            self.manager.logger.info(f"Failed to restart")
+            self.logger.info(f"Failed to restart")
             return jsonify({"status": "error", "message": str(e)}), 500
 
     def run_webserver(self): 
 
-        self.socketio.run(self.app, host=self.manager.config.config_data['webserver_host'], port=self.manager.config.config_data['webserver_port'], debug=False, allow_unsafe_werkzeug=True)
+        self.socketio.run(self.app, host=self.config_manager.config_data['webserver_host'], port=self.config_manager.config_data['webserver_port'], debug=False, allow_unsafe_werkzeug=True)
