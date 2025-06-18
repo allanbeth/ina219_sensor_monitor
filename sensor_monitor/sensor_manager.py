@@ -13,8 +13,8 @@ import board
 import time
 
 class sensor_config:
-    def __init__(self, sensors):
-        self.sensors = sensors
+    def __init__(self):
+        self.sensors = []
 
     def save_sensors(self, sensors=None):
         if sensors is None:
@@ -60,7 +60,7 @@ class SensorManager:
         self.logger = sensor_logger()  
         self.set_config()
         
-         
+        self.sensor_config = sensor_config()
 
         if self.config.config_data.get("remote_gpio") == 1:
             gpio_address = self.config.config_data.get("gpio_address")
@@ -76,6 +76,7 @@ class SensorManager:
         
         self.mqtt = MQTTPublisher(self.logger, self.mqtt_config)
         self.sensors = self.load_sensors()      
+        self.sensor_config.sensors = self.sensors
         
         self.webserver = flaskWrapper(self.logger, self.config, self.sensor_config)  
         self.load_mqtt_discovery()  
@@ -131,7 +132,7 @@ class SensorManager:
                 default_rating = 12
                 sensors.append(Sensor(default_name, addr, default_type, default_max_power, default_rating, self.config.config_data['max_readings'],self.i2c))
 
-        self.sensor_config = sensor_config(sensors)
+        
         self.sensor_config.save_sensors(sensors)
         self.load_mqtt_discovery()
         return sensors

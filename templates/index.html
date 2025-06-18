@@ -137,7 +137,7 @@
     <div class="sensor-container" id="sensor-container"></div>
 
     <script>
-        const socket = io();
+        const socket = io({reconnection:true});
         
         let paused = false;
         let undoTimers = {};
@@ -147,6 +147,8 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             socket.on("sensor_update", function (data) {
+                console.log("Socket Connected:", socket.id);
+                socket.emit("sensor_update_request");
                 
                 if (paused) return;
                 const container = document.getElementById("sensor-container");

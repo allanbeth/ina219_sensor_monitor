@@ -18,7 +18,7 @@ class flaskWrapper:
         self.readmePath = self.root / "README.md"
         self.logFilePath = self.root / "sensor_monitor.log"
         self.app = Flask(__name__, template_folder=self.templatePath, static_folder=self.stylePath)
-        self.socketio = SocketIO(self.app)
+        self.socketio = SocketIO(self.app, ping_timeout=60,ping_interval=25)
         self.app.route("/", methods=["GET", "POST"])(self.main)
         self.app.route('/get_settings', methods=["GET", "POST"])(self.get_settings) 
         self.app.route('/update_settings', methods=["GET", "POST"])(self.update_settings) 
@@ -31,6 +31,8 @@ class flaskWrapper:
 
     def main(self):
         self.logger.info(f"Loading index.html")
+        self.broadcast_sensor_data()
+
         return render_template("index.html", sensors=sensor_data)
     
     def update_sensor(self):
@@ -101,4 +103,4 @@ class flaskWrapper:
 
     def run_webserver(self): 
 
-        self.socketio.run(self.app, host=self.config_manager.config_data['webserver_host'], port=self.config_manager.config_data['webserver_port'], debug=False, allow_unsafe_werkzeug=True)
+        self.socketio.run(self.app, host=self.config_manager.config_data['webserver_host'], port=self.config_manager.config_data['webserver_port'], debug=False, allow_unsafe_werkzeug=True, use_reloader=False)
