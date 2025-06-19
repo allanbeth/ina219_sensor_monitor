@@ -9,7 +9,7 @@ import logging
 import math
 
 class Sensor:
-    def __init__(self, name, address, sensor_type, max_power, rating, max_readings, i2c=None):
+    def __init__(self, name, address, sensor_type, max_power, rating, max_readings, i2c=None, pi=None):
         self.name = name
         self.type = sensor_type
         self.max_power = max_power
@@ -17,23 +17,36 @@ class Sensor:
         self.rating = rating
         self.max_readings = max_readings
         self.readings = deque(maxlen=self.max_readings)
-        self.i2c = i2c or busio.I2C(board.SCL, board.SDA)     
+        #self.i2c = i2c or busio.I2C(board.SCL, board.SDA)     
+        self.pi = pi
+        self.i2c = i2c
+        self.ina = None
 
-        try:
-            self.ina = INA219(self.i2c)
-            addr = hex(self.address)
-            self.ina.i2c_device.device_address = int(str(addr), 16)
-            logging.info(f"INA219 sensor connected on address {addr}")
-        except Exception as e:
-            logging.info("INA219 sensor not detected: %s", str(e))
-            self.ina = None
+        if self.pi:
+            self.handle = self.pi.i2c_open(1, self.address)
+            logging.info(f"Sensor {self.name}: Remote I2C handle {self.handle} opened at address {hex(self.address)}")
+        else:
+            try:
+                self.i2c = i2c or busio.I2C(board.SCL, board.SDA)
+                self.ina = INA219(self.i2c)
+                addr = hex(self.address)
+                self.ina.i2c_device.device_address = int(str(addr), 16)
+                logging.info(f"INA219 sensor connected on address {addr}")
+            except Exception as e:
+                logging.info("INA219 sensor not detected: %s", str(e))
+                self.ina = None
 
            
 
     def fetch_data(self):
         try:
-            voltage = round(self.ina.bus_voltage, 1) if self.ina else 0.0
-            current = round(self.ina.current / 1000,0) if self.ina else 0.0 # Convert mA to A
+            if self.pi:  # Remote GPIO mode (basic estimation)
+                voltage = self.read_register_16(0x02) * 0.001  # Bus voltage (LSB = 4mV)
+                current = self.read_register_16(0x04) * 0.001
+            else:
+                voltage = round(self.ina.bus_voltage, 1) if self.ina else 0.0
+                current = round(self.ina.current / 1000,0) if self.ina else 0.0 # Convert mA to A
+
             power = round(voltage * current, 0)
             time_stamp =  datetime.datetime.now().strftime("%I:%M:%S%p on %B %d, %Y")
             new_readings = {"voltage": voltage, "current": current, "power": power, "time_stamp": time_stamp}
@@ -53,9 +66,6 @@ class Sensor:
             readings = {"voltage": 0, "current": 0, "power": 0, "time_stamp": datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),"state_of_charge": 0 if self.type == "Battery" else None,
             "output": 0 if self.type != "Battery" else None,}
            
-        
-        
-
         return data
             
         
@@ -95,8 +105,6 @@ class Sensor:
             total_output = sum(r["output"] for r in self.readings)
             averaged['output'] = round(total_output / n, 0)
 
-        
-        
         return averaged    
     
     def estimate_soc(self, voltage):
@@ -114,3 +122,15 @@ class Sensor:
         
         data["readings"] = list(self.readings)
         return data  
+    
+    def read_register_16(self, reg):
+        """Read a 16-bit register using pigpio."""
+        if not self.pi:
+            return 0
+        try:
+            (count, data) = self.pi.i2c_read_word_data(self.handle, reg)
+            # Convert little endian
+            return (data & 0xFF) << 8 | (data >> 8)
+        except Exception as e:
+            logging.error(f"Failed to read reg {reg} from {self.name}: {e}")
+            return 0
