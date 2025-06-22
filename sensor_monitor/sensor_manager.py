@@ -73,10 +73,10 @@ class SensorManager:
             self.logger.info(f"Establishing local GPIO Connection")
             self.i2c = board.I2C()
         
-        self.mqtt = MQTTPublisher(self.logger, self.mqtt_config)
+        
         self.sensors = self.load_sensors()      
         self.sensor_config.sensors = self.sensors
-        
+        self.mqtt = MQTTPublisher(self.logger, self.mqtt_config)
         self.webserver = flaskWrapper(self.logger, self.config, self.sensor_config)  
         self.load_mqtt_discovery()  
 
@@ -141,10 +141,6 @@ class SensorManager:
         self.sensor_config.save_sensors(sensors)
         self.load_mqtt_discovery()
         return sensors
-        
-
-
-
     
 
     def load_mqtt_discovery(self):

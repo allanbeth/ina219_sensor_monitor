@@ -1,5 +1,3 @@
-# sensor_monitor/sensor.py
-
 from adafruit_ina219 import INA219
 from collections import deque
 import board
@@ -7,6 +5,9 @@ import busio
 import datetime
 import logging
 import math
+
+CALIBRATION_REGISTER = 0x05
+DEFAULT_CALIBRATION = 4191
 
 class Sensor:
     def __init__(self, name, address, sensor_type, max_power, rating, max_readings, i2c=None, pi=None):
@@ -17,7 +18,6 @@ class Sensor:
         self.rating = rating
         self.max_readings = max_readings
         self.readings = deque(maxlen=self.max_readings)
-        #self.i2c = i2c or busio.I2C(board.SCL, board.SDA)     
         self.pi = pi
         self.i2c = i2c
         self.ina = None
@@ -25,112 +25,119 @@ class Sensor:
         if self.pi:
             self.handle = self.pi.i2c_open(1, self.address)
             logging.info(f"Sensor {self.name}: Remote I2C handle {self.handle} opened at address {hex(self.address)}")
+            self.calibrate()  # Calibrate when using remote GPIO
         else:
             try:
                 self.i2c = i2c or busio.I2C(board.SCL, board.SDA)
                 self.ina = INA219(self.i2c)
-                addr = hex(self.address)
-                self.ina.i2c_device.device_address = int(str(addr), 16)
-                logging.info(f"INA219 sensor connected on address {addr}")
+                self.ina.i2c_device.device_address = self.address
+                logging.info(f"INA219 sensor connected on address {hex(self.address)}")
             except Exception as e:
                 logging.info("INA219 sensor not detected: %s", str(e))
                 self.ina = None
 
-           
+    def calibrate(self, value=DEFAULT_CALIBRATION):
+        try:
+            if self.pi and hasattr(self, 'handle'):
+                # Write value as big-endian (high byte first)
+                self.pi.i2c_write_word_data(self.handle, CALIBRATION_REGISTER, value)
+                logging.info(f"Calibrated {self.name} with value {value}")
+        except Exception as e:
+            logging.error(f"Calibration failed for {self.name}: {e}")
 
     def fetch_data(self):
         try:
-            if self.pi:  # Remote GPIO mode (basic estimation)
-                voltage = self.read_register_16(0x02) * 0.001  # Bus voltage (LSB = 4mV)
-                current = self.read_register_16(0x04) * 0.001
+            if self.pi:
+                raw_voltage = self.read_register_16(0x02)
+                voltage = round((raw_voltage >> 3) * 0.004, 2)  # LSB = 4mV, right shift 3 bits
+                raw_current = self.read_register_16(0x04)
+                CURRENT_LSB = 3.2 / 32767  # ≈ 0.0000977
+                current = round(raw_current * CURRENT_LSB, 2)
             else:
                 voltage = round(self.ina.bus_voltage, 1) if self.ina else 0.0
-                current = round(self.ina.current / 1000,0) if self.ina else 0.0 # Convert mA to A
+                current = round(self.ina.current / 1000, 0) if self.ina else 0.0
 
             power = round(voltage * current, 0)
-            time_stamp =  datetime.datetime.now().strftime("%I:%M:%S%p on %B %d, %Y")
+            time_stamp = datetime.datetime.now().strftime("%I:%M:%S%p on %B %d, %Y")
             new_readings = {"voltage": voltage, "current": current, "power": power, "time_stamp": time_stamp}
+
             if self.type == "Battery":
-                SoC = self.estimate_soc(voltage)
-                new_readings["state_of_charge"] = SoC
+                new_readings["state_of_charge"] = self.estimate_soc(voltage)
             else:
                 output = float(voltage / self.rating) * 100
-                new_readings["output"] = round(output, 0)       
+                new_readings["output"] = round(output, 0)
 
             self.readings.append(new_readings)
             data = self.average_data(time_stamp)
-
-
         except Exception as e:
             logging.info(f"Error reading sensor {self.name}: {e}")
-            readings = {"voltage": 0, "current": 0, "power": 0, "time_stamp": datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),"state_of_charge": 0 if self.type == "Battery" else None,
-            "output": 0 if self.type != "Battery" else None,}
-           
+            data = {
+                "voltage": 0, "current": 0, "power": 0,
+                "time_stamp": datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                "state_of_charge": 0 if self.type == "Battery" else None,
+                "output": 0 if self.type != "Battery" else None
+            }
         return data
-            
-        
+
     def read_data(self):
         data = self.fetch_data()
         data["readings"] = list(self.readings)
-        return data    
-        
+        return data
+
     def average_data(self, time_stamp):
         if not self.readings:
             return {
-                "voltage": 0,
-                "current": 0,
-                "power": 0,
+                "voltage": 0, "current": 0, "power": 0,
                 "time_stamp": "No Data",
                 "state_of_charge" if self.type == "Battery" else "output": 0
             }
 
         n = len(self.readings)
-        total_voltage = sum(r["voltage"] for r in self.readings)
-        total_current = sum(r["current"] for r in self.readings)
-        total_power = sum(r["power"] for r in self.readings)
-        
-
-        
         averaged = {
-            "voltage": round(total_voltage / n, 1),
-            "current": round(total_current / n, 0),
-            "power": round(total_power / n, 0),
+            "voltage": round(sum(r["voltage"] for r in self.readings) / n, 1),
+            "current": round(sum(r["current"] for r in self.readings) / n, 0),
+            "power": round(sum(r["power"] for r in self.readings) / n, 0),
             "time_stamp": time_stamp
         }
-        
-        if self.type == "Battery":
-            total_SoC = sum(r["state_of_charge"] for r in self.readings)
-            averaged['state_of_charge'] = round(total_SoC / n, 0)
-        else:
-            total_output = sum(r["output"] for r in self.readings)
-            averaged['output'] = round(total_output / n, 0)
 
-        return averaged    
-    
+        if self.type == "Battery":
+            averaged["state_of_charge"] = round(sum(r["state_of_charge"] for r in self.readings) / n, 0)
+        else:
+            averaged["output"] = round(sum(r["output"] for r in self.readings) / n, 0)
+
+        return averaged
+
+    def current_data(self):
+        latest = self.readings[-1] if self.readings else {}
+        data = {
+            "voltage": latest.get('voltage', 0),
+            "current": latest.get('current', 0),
+            "power": latest.get('power', 0),
+            "time_stamp": latest.get('time_stamp', 'No Data'),
+            "readings": list(self.readings)
+        }
+        if self.type == "Battery":
+            data["state_of_charge"] = latest.get("state_of_charge", 0)
+        else:
+            data["output"] = latest.get("output", 0)
+        return data
+
     def estimate_soc(self, voltage):
         voltage = max(11.8, min(12.6, voltage))
-        x = (voltage - 12.2) * 10  # center around 12.2V
-        soc = 1 / (1 + math.exp(-x))  # sigmoid curve
+        x = (voltage - 12.2) * 10
+        soc = 1 / (1 + math.exp(-x))
         return int(soc * 100)
-    
-    def current_data(self):
-        data = {"voltage": self.readings[-1]['voltage'], "current": self.readings[-1]['current'], "power": self.readings[-1]['power'], "time_stamp": self.readings[-1]['time_stamp']}
-        if self.type == "Battery":
-            data["state_of_charge"] = self.readings[-1]['state_of_charge']
-        else:
-            data["output"] = self.readings[-1]['output']
-        
-        data["readings"] = list(self.readings)
-        return data  
-    
+
     def read_register_16(self, reg):
-        """Read a 16-bit register using pigpio."""
         if not self.pi:
             return 0
         try:
-            (count, data) = self.pi.i2c_read_word_data(self.handle, reg)
-            # Convert little endian
-            return (data & 0xFF) << 8 | (data >> 8)
+            data = self.pi.i2c_read_word_data(self.handle, reg)
+            value = ((data & 0xFF) << 8) | ((data >> 8) & 0xFF)
+            # Convert to signed 16-bit
+            if value & 0x8000:
+                value -= 0x10000
+            return value
         except Exception as e:
-            logging.error(f"Failed to read reg {reg} from {self.name}: {e}")
+            logging.error(f"Failed to read register {reg} from {self.name}: {e}")
             return 0

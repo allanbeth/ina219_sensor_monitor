@@ -63,6 +63,7 @@ class ConfigManager:
             "mqtt_port": config['mqtt_port'],
             "webserver_host": config['webserver_host'],
             "webserver_port": config['webserver_port'],
+            "remote_gpio": int(config['remote_gpio']),
             "gpio_address": config['gpio_address']
         }
 
