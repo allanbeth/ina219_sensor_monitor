@@ -1,127 +1,186 @@
-# INA219 Sensor Monitor
+# Sensor Monitor
 
-A Python-based web application designed to monitor real-time data from an INA219 energy sensor connected to a Raspberry Pi. It provides a user-friendly web interface to visualize voltage, current, and power readings.
-
----
-
-## Features
-
-- Real-time monitoring of voltage, current, and power from the INA219 sensor.
-- Web interface built with Flask for easy access and visualization.
-- Configurable sensor settings via a JSON file.
-- Systemd service file included for running the application as a background service on boot.
+A Python-based sensor monitoring system for reading INA219 power sensors via I²C using local or remote GPIO, with a real-time web interface, MQTT support, and Home Assistant auto-discovery.
 
 ---
 
-## Prerequisites
+## 🚀 Features
 
-- Raspberry Pi with I2C enabled.
-- INA219 sensor connected via I2C.
-- Python 3 installed on the Raspberry Pi.
-
----
-
-## Installation
-
-### 1. Clone the Repository
-
-```bash
-$ git clone https://github.com/allanbeth/sensor_monitor.git
-$ cd sensor_monitor
-```
-
-### 2. Install Required Python Packages
-
-```bash
-$ pip install -r requirements.txt
-```
-
-### 3. Enable I2C on Raspberry Pi
-
-Ensure that I2C is enabled by running:
-
-```bash
-$ sudo raspi-config
-```
-
-Navigate to:
-
-```
-Interfacing Options > I2C
-```
-
-Enable it and reboot if necessary.
-
-### 4. Configure Sensor Settings
-
-Connected sensors will be detected automatically and saved to `sensors.json`.  
-This file contains settings such as sensor address and calibration values.
+- Reads voltage, current, power, and state of charge (for batteries) from INA219 sensors.
+- Web interface with real-time updates, configuration panel, logs, and sensor editing.
+- Publishes data to MQTT with Home Assistant discovery support.
+- Remote GPIO support using `pigpio` for controlling I²C-connected sensors on another device.
+- Automatically detects and registers sensors on I²C bus.
+- Supports restart via the web UI when managed by `systemd`.
 
 ---
 
-## Usage
+## 📦 Installation
 
-### Run the Application
+### Prerequisites
 
-```bash
-$ python main.py
-```
+- Python 3.7 or later
+- Raspberry Pi OS or Linux with I²C enabled
+- MQTT broker (e.g. Mosquitto)
+- `pigpiod` running (if using remote GPIO)
 
-By default, the Flask application will start on:
-
-```
-http://0.0.0.0:5000/
-```
-
-You can access it via your browser using the Raspberry Pi's IP address.
-
-### Access the Web Interface
-
-Open your web browser and navigate to:
-
-```
-http://<raspberry_pi_ip_address>:5000/
-```
-
-Replace `<raspberry_pi_ip_address>` with the actual IP address of your Raspberry Pi.
-
----
-
-## Running as a Service
-
-### 1. Copy the Service File
+### Install Dependencies
 
 ```bash
-$ sudo cp sensor_monitor.service /etc/systemd/system/
+sudo apt update
+sudo apt install -y pigpio python3-pigpio
+pip install -r requirements.txt
 ```
 
-### 2. Reload systemd and Enable the Service
+### Enable and Start pigpio Daemon (for local GPIO)
 
 ```bash
-$ sudo systemctl daemon-reload
-$ sudo systemctl enable sensor_monitor.service
-```
-
-### 3. Start the Service
-
-```bash
-$ sudo systemctl start sensor_monitor.service
-```
-
-### 4. Check Service Status
-
-```bash
-$ sudo systemctl status sensor_monitor.service
+sudo systemctl enable pigpiod
+sudo systemctl start pigpiod
 ```
 
 ---
 
-## Dependencies
+## ⚙️ Configuration
 
-The application relies on the following Python packages:
+When the app starts, it will create a `config.json` file if one does not exist.
 
-- `Flask`
-- `smbus2`
-- `ina219`
+### Example: `config.json`
 
-These are specified in the `requirements.txt` file.
+```json
+{
+  "poll_intervals": {
+    "Wind": 7,
+    "Solar": 5,
+    "Battery": 10
+  },
+  "max_log": 5,
+  "max_readings": 5,
+  "mqtt_broker": "localhost",
+  "mqtt_port": 1883,
+  "webserver_host": "0.0.0.0",
+  "webserver_port": 5000,
+  "gpio_address": "192.168.1.10",
+  "remote_gpio": 0
+}
+```
+
+### Configuration Options
+
+| Key               | Description                                                  |
+|------------------|--------------------------------------------------------------|
+| `poll_intervals` | Per-sensor-type interval in seconds                          |
+| `max_log`        | Maximum log file size in MB                                  |
+| `max_readings`   | Number of past readings to keep per sensor                   |
+| `mqtt_broker`    | MQTT broker IP or hostname                                   |
+| `mqtt_port`      | MQTT port number (usually 1883)                              |
+| `webserver_host` | IP to bind the web server to                                 |
+| `webserver_port` | Port to serve the web UI on                                  |
+| `gpio_address`   | Remote GPIO IP (only used if `remote_gpio` is 1)             |
+| `remote_gpio`    | Use remote GPIO (`1` for remote via pigpio, `0` for local)   |
+
+---
+
+## 🌐 Web Interface
+
+Launch the server and access it at:
+
+```
+http://<host>:<webserver_port>
+```
+
+### UI Features
+
+- **Sensor Cards**: Show real-time voltage, current, power, and charge.
+- **Edit Panel**: Rename sensors, adjust type, rating, and max power.
+- **Settings Panel**: Adjust polling, MQTT, GPIO, and other config options.
+- **Logs**: View the most recent log entries.
+- **Restart**: Button to trigger service restart when running via `systemd`.
+
+---
+
+## 🏡 Home Assistant Integration (via MQTT)
+
+### Auto-Discovery
+
+Home Assistant will auto-discover sensors published using MQTT when discovery is enabled.
+
+- **State Topic**:  
+  ```
+  sensor_monitor/<sensor_name>
+  ```
+
+- **Discovery Config Topic**:  
+  ```
+  homeassistant/sensor/<sensor_name>_<measurement>/config
+  ```
+
+- **Measurements**: `voltage`, `current`, `power`, and `state_of_charge` (if battery)
+
+Each sensor publishes availability and data as retained MQTT topics for reliable recovery.
+
+---
+
+## 🔁 Restarting the App
+
+When running under `systemd`, the web UI allows restarting the service with a button.
+
+### Example `systemd` Service File
+
+```ini
+[Unit]
+Description=Sensor Monitor Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /path/to/main.py
+WorkingDirectory=/path/to
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable the service:
+
+```bash
+sudo systemctl daemon-reexec
+sudo systemctl enable sensor_monitor.service
+sudo systemctl start sensor_monitor.service
+```
+
+---
+
+## 🧪 Development & Debugging
+
+Run manually with:
+
+```bash
+python3 main.py
+```
+
+To view logs:
+
+```bash
+tail -f sensor_monitor.log
+```
+
+To debug the web UI, open the browser DevTools and check the Console tab.
+
+---
+
+## 🛠 Contributing
+
+Feel free to open issues or PRs!
+
+1. Fork this repository
+2. Create a new feature branch
+3. Commit and push your changes
+4. Submit a pull request
+
+---
+
+## 📄 License
+
+MIT License © 2025 Allan Beth
