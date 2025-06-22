@@ -1,0 +1,14 @@
+{
+    "poll_intervals": {
+        "Wind": 7,
+        "Solar": 5,
+        "Battery": 10
+    },
+    "max_log": 5,
+    "max_readings": 30,
+    "mqtt_broker": "192.168.1.82",
+    "mqtt_port": "1883",
+    "webserver_host": "0.0.0.0",
+    "webserver_port": "8082",
+    "gpio_address": "localhost"
+}
