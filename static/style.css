@@ -33,7 +33,7 @@ body {
 }
 
 .header-card i {
-    font-size: 1.4rem;
+    font-size: 1.6em;
     transition: color 0.2s;
     margin: 0px 3px 0px 3px;
 }
@@ -207,12 +207,16 @@ body {
 .sensor-card {
     background-color: #d2d2d2;
     border-radius: 10px;
-    padding: 15px 20px;
-    width: 280px;
+    padding: 10px;
+    width: 245px;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, opacity 0.5s ease;
-    height: 280px;
+    height: 245px;
+    margin-top: 5px;
 }
 
 .sensor-card:hover {
@@ -224,11 +228,12 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
     margin-bottom: 10px;
 }
 
 .sensor-header i {
-    font-size: 1.2em;
+    font-size: 1.4em;
     float: right;
     margin: 4px 2px 0px 2px;
 }
@@ -257,7 +262,6 @@ body {
 .type-Battery {
     background-color: #5c6bc0;
 }
-
 
 
 /* ========== Logs ========== */
@@ -296,29 +300,41 @@ body {
 .sensor-data {
     position: relative;
     height: 90%;
+    align-items: center;
 }
 
 .sensor-readings {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-row-gap: 10px;
-    grid-column-gap: 2px;
+    grid-column-gap: 10px;
+    justify-content: center;
     align-items: center;
-    margin-top: 20px;
 }
 
 .data-tile {
     aspect-ratio: 1;
-    background-color: #ffffff;
+    color: #ffffff;
     border-radius: 10px;
-    padding: 5px;
+    padding-top: 15px;
     position: relative;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, opacity 0.5s ease;
-    height: 90px;
+    height: 70px;
     width: 140px;
     text-align: center;
 
+}
+#solar-data-tile {
+    background-color: #ffa500;
+}
+
+#wind-data-tile {
+    background-color: #00aaff;
+}
+
+#battery-data-tile {
+    background-color: #5c6bc0;
 }
 
 .sensor-data p {
@@ -328,6 +344,7 @@ body {
 
 .icon {
     text-align: center;
+    margin: 0px 10px 0px 0px;
 }
 
 .voltage {
@@ -358,13 +375,16 @@ meter {
 
 /* ========== Timestamps and No-Sensor Message ========== */
 .timestamp {
+    display: block;
+    width: 100%;
     font-size: 0.8em;
     color: #666;
     text-align: right;
-    margin-top: 10px;
-    position:absolute;
-    bottom: 8px;
+    box-sizing: border-box;
     width:100%;
+    overflow-wrap: break-word;
+    bottom: 8px;
+    margin-top: 15px;
 }
 
 .no-sensors {
@@ -527,6 +547,16 @@ button.delete-btn {
 }
 
 .fa-book:hover {
+    color: #333;
+}
+
+.fa-rotate {
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-rotate:hover {
     color: #333;
 }
 
