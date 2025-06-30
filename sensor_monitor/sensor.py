@@ -106,7 +106,7 @@ class Sensor:
                 return False
         return True
 
-    def smoothed_data(self, time_stamp, window=5):
+    def smoothed_data(self, time_stamp):
         """
         Return moving average for each value over the last N readings.
         Also adds trend (rate of change) for voltage/current/power.
