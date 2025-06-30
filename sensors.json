@@ -1,1 +1,16 @@
-[{"name": "Turbine", "address": 64, "type": "Wind", "max_power": 30, "rating": 12}, {"name": "Battery", "address": 65, "type": "Battery", "max_power": 100, "rating": 12}]
+[
+    {
+        "name": "Turbine",
+        "address": 64,
+        "type": "Wind",
+        "max_power": 30,
+        "rating": 12
+    },
+    {
+        "name": "Battery",
+        "address": 65,
+        "type": "Battery",
+        "max_power": 100,
+        "rating": 12
+    }
+]
