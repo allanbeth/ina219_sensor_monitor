@@ -240,6 +240,7 @@ body {
 
 .sensor-name {
     font-size: 1.2em;
+    color: #222;
     font-weight: bold;
 }
 

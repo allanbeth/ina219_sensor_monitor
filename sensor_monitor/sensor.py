@@ -67,17 +67,87 @@ class Sensor:
                 output = float(voltage / self.rating) * 100
                 new_readings["output"] = round(output, 0)
 
-            self.readings.append(new_readings)
-            data = self.average_data(time_stamp)
+            # Outlier rejection before appending
+            if self.is_valid_reading(new_readings):
+                self.readings.append(new_readings)
+            else:
+                logging.info(f"Outlier detected for {self.name}: {new_readings}")
+
+            data = self.smoothed_data(time_stamp)
         except Exception as e:
             logging.info(f"Error reading sensor {self.name}: {e}")
             data = {
                 "voltage": 0, "current": 0, "power": 0,
                 "time_stamp": datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                 "state_of_charge": 0 if self.type == "Battery" else None,
-                "output": 0 if self.type != "Battery" else None
+                "output": 0 if self.type != "Battery" else None,
+                "voltage_trend": 0,
+                "current_trend": 0,
+                "power_trend": 0
             }
         return data
+
+    def is_valid_reading(self, new_reading, threshold=0.4):
+        """
+        Reject readings that deviate too much from the median of the last N readings.
+        threshold: fraction of median (e.g., 0.4 = 40% deviation allowed)
+        """
+        if len(self.readings) < 3:
+            return True  # Not enough data to judge
+        keys = ["voltage", "current", "power"]
+        for key in keys:
+            values = [r[key] for r in self.readings if key in r]
+            if not values:
+                continue
+            median = sorted(values)[len(values)//2]
+            if median == 0:
+                continue
+            if abs(new_reading[key] - median) > threshold * abs(median):
+                return False
+        return True
+
+    def smoothed_data(self, time_stamp, window=5):
+        """
+        Return moving average for each value over the last N readings.
+        Also adds trend (rate of change) for voltage/current/power.
+        """
+        if not self.readings:
+            return {
+                "voltage": 0, "current": 0, "power": 0,
+                "time_stamp": "No Data",
+                "state_of_charge": 0 if self.type == "Battery" else None,
+                "output": 0 if self.type != "Battery" else None,
+                "voltage_trend": 0,
+                "current_trend": 0,
+                "power_trend": 0
+            }
+        readings = list(self.readings)
+        n = len(readings)
+        averaged = {
+            "voltage": round(sum(r["voltage"] for r in readings) / n, 2),
+            "current": round(sum(r["current"] for r in readings) / n, 2),
+            "power": round(sum(r["power"] for r in readings) / n, 2),
+            "time_stamp": time_stamp
+        }
+        if self.type == "Battery":
+            averaged["state_of_charge"] = round(sum(r["state_of_charge"] for r in readings) / n, 0)
+        else:
+            averaged["output"] = round(sum(r["output"] for r in readings) / n, 0)
+
+        # Trend calculation (difference per reading)
+        if n > 1:
+            dv = readings[-1]["voltage"] - readings[0]["voltage"]
+            di = readings[-1]["current"] - readings[0]["current"]
+            dp = readings[-1]["power"] - readings[0]["power"]
+            averaged["voltage_trend"] = round(dv / (n-1), 3)
+            averaged["current_trend"] = round(di / (n-1), 3)
+            averaged["power_trend"] = round(dp / (n-1), 3)
+        else:
+            averaged["voltage_trend"] = 0
+            averaged["current_trend"] = 0
+            averaged["power_trend"] = 0
+
+        return averaged
 
     def read_data(self):
         data = self.fetch_data()
@@ -89,7 +159,11 @@ class Sensor:
             return {
                 "voltage": 0, "current": 0, "power": 0,
                 "time_stamp": "No Data",
-                "state_of_charge" if self.type == "Battery" else "output": 0
+                "state_of_charge": 0 if self.type == "Battery" else None,
+                "output": 0 if self.type != "Battery" else None,
+                "voltage_trend": 0,
+                "current_trend": 0,
+                "power_trend": 0
             }
 
         n = len(self.readings)
@@ -104,6 +178,20 @@ class Sensor:
             averaged["state_of_charge"] = round(sum(r["state_of_charge"] for r in self.readings) / n, 0)
         else:
             averaged["output"] = round(sum(r["output"] for r in self.readings) / n, 0)
+
+        # Trend calculation for average_data as well
+        if n > 1:
+            readings = list(self.readings)
+            dv = readings[-1]["voltage"] - readings[0]["voltage"]
+            di = readings[-1]["current"] - readings[0]["current"]
+            dp = readings[-1]["power"] - readings[0]["power"]
+            averaged["voltage_trend"] = round(dv / (n-1), 3)
+            averaged["current_trend"] = round(di / (n-1), 3)
+            averaged["power_trend"] = round(dp / (n-1), 3)
+        else:
+            averaged["voltage_trend"] = 0
+            averaged["current_trend"] = 0
+            averaged["power_trend"] = 0
 
         return averaged
 
@@ -120,6 +208,17 @@ class Sensor:
             data["state_of_charge"] = latest.get("state_of_charge", 0)
         else:
             data["output"] = latest.get("output", 0)
+        # Add trend for current_data
+        n = len(self.readings)
+        if n > 1:
+            readings = list(self.readings)
+            data["voltage_trend"] = round((readings[-1]["voltage"] - readings[0]["voltage"]) / (n-1), 3)
+            data["current_trend"] = round((readings[-1]["current"] - readings[0]["current"]) / (n-1), 3)
+            data["power_trend"] = round((readings[-1]["power"] - readings[0]["power"]) / (n-1), 3)
+        else:
+            data["voltage_trend"] = 0
+            data["current_trend"] = 0
+            data["power_trend"] = 0
         return data
 
     def estimate_soc(self, voltage):

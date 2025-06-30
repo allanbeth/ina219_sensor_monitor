@@ -45,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <i class="fa-solid fa-book" style="cursor:pointer" onclick="openLog('${name}')"></i>
                         </div>
                     </div>
+                    <div id="view-${name}">
                     <div class="sensor-readings">
                         <div class="data-tile" id="${sensor.type.toLowerCase()}-data-tile">
                             <span class="icon"> <i class="fa-solid fa-wave-square"></i></span>
@@ -73,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <span class="icon"> <i class="fa-solid fa-plug"></i></span>
                             <p class="output">${sensor.max_power ?? 0} W</p>
                             <p><meter value="${sensor.data.output ?? 0}" min="0" max="100"></meter></p>
+                        </div>
                         </div>
                     </div>`;
                 }
