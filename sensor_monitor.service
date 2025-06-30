@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=USERNAME
-WorkingDirectory=/home/pi/EnergyMonitor/sensor_monitor/
-ExecStart=/srv/EnergyMonitor/bin/python3 /home/pi/EnergyMonitor/sensor_monitor/main.py
+User=allanbeth
+WorkingDirectory=/home/energymonitor/EnergyMonitor/sensor_monitor/
+ExecStart=/srv/energymonitor/bin/python3 /home/energymonitor/EnergyMonitor/sensor_monitor/main.py
 Restart=on-failure
 
 [Install]
