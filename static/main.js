@@ -75,12 +75,13 @@ document.addEventListener("DOMContentLoaded", () => {
                             <p class="output">${sensor.max_power ?? 0} W</p>
                             <p><meter value="${sensor.data.output ?? 0}" min="0" max="100"></meter></p>
                         </div>
-                        </div>
+                        
                     </div>`;
                 }
 
                 content += `
                         <div class="timestamp" id="timestamp-${name}">Last Updated: ${sensor.data.time_stamp}</div>
+                    </div>
                     </div>
                     <div id="edit-${name}" class="edit-form hidden">
                         <h4>Edit Sensor - ${hexAddress}</h4>

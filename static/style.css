@@ -43,23 +43,25 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    background-color: #d2d2d2;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, opacity 0.5s ease;
     gap: 20px;
+    padding: 5px;
 }
 
 .settings-card {
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 15px 20px;
+    padding: 15px;
     width: 280px;
     position: relative;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, opacity 0.5s ease;
     height: 550px;
 }
 
 .settings-card h4 {
     text-align: left;
     margin: 8px 0px 4px 0px;
+    position: relative;
 }
 
 .settings-data {
@@ -68,20 +70,24 @@ body {
     padding: 4px;
     overflow: visible;
     overflow-y: auto;
-    max-height: 460px;
+    max-height: 470px;
+
+
 }
 
 .settings-entry {
     margin: 4px 0px 4px 0px;
+    font-size: 0.6em;
     display: flex;
 }
 
 .settings-entry input{
-    width: 40%;
+    width: 30%;
+    margin-right: 4px;
 }
 
 .settings-entry label{
-    width: 60%;
+    width: 70%;
 }
 
 .settings-entry input,
@@ -98,17 +104,18 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    background-color: #d2d2d2;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, opacity 0.5s ease;
     gap: 20px;
+    padding: 5px;
 }
 
 .about-card {
-    background-color: #fff;
-    border-radius: 10px;
     padding: 15px 20px;
-    width: 280px;
+    width: 100%;
     position: relative;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, opacity 0.5s ease;
     height: 550px;
 }
 
@@ -118,7 +125,9 @@ body {
 }
 
 .about-info {
-    display: flex;
+    margin: 1px 0;
+    padding: 4px;
+    width: 100%;
     margin: 1px 0;
     padding: 4px;
     width: 100%;
@@ -129,6 +138,8 @@ body {
 
 .about-content {
     font-size: 0.6em;
+    width: 100%;
+
 }
 
 /* ========== Log File Container and Cards ========== */
@@ -137,17 +148,19 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    background-color: #d2d2d2;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, opacity 0.5s ease;
     gap: 20px;
+    padding: 5px;
 }
 
 .log-file-card {
-    background-color: #fff;
-    border-radius: 10px;
+    
     padding: 15px 20px;
-    width: 90%;
+    width: 100%;
     position: relative;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, opacity 0.5s ease;
     height: 550px;
 }
 
@@ -177,6 +190,7 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
+    padding: 5px;
 }
 
 .restart-card {
@@ -267,31 +281,36 @@ body {
 
 /* ========== Logs ========== */
 
-.log-entry{
-    margin: 10px;
-    background-color: #efeeee
+.log-entry {
+    margin-bottom: 4px;
+    padding: 2px 2px 2px 2px;
+    border-bottom: #333 1px solid;
 }
 
 .log-entry p {
-    padding: 0px 0px 2px 0px;
-    font-size: 0.8em;
+    font-size: 0.4em;
     text-align: left;
     color: #555;
-    margin: 1px 0px 4px 0px;
+    margin: 0px 0px 2px 0px;
+    width: 100%;
 }
 
 .log-data {
-    overflow: visible;    
+    width: 100%;   
+    position: relative; 
+    height: 100%;
 }
 
 .log-data h4 {
     text-align: left;
-    margin: 8px 0px 4px 0px;  
+    margin: 0px 0px 6px 10px;  
 }
 
 .log-entries {
     overflow-y: auto;
-    max-height: 180px;
+    height: 140px;
+    border-radius: 10px;
+    width: 100%;
 }
 
 
@@ -403,11 +422,11 @@ meter {
     margin-top: 10px;
     overflow: visible; 
     position: relative;
-    height: 90%;
+    height: 100%;
 }
 
 .edit-form h4 {
-    margin: 4px 0px 4px 0px;
+    margin: 0px 0px 0px 4px;
 }
 
 .edit-data {
@@ -440,10 +459,11 @@ meter {
 .edit-buttons {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
-    position:absolute;
-    bottom: 12px;
-    width:90%;
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    width:100%;
+    margin: 0px 4px 0px 4px;
 }
 
 .edit-buttons button,
@@ -473,7 +493,7 @@ button.refresh-btn {
 }
 
 button.back-btn {
-    background-color: #ccc;
+    background-color: #b1b1b1;
     color: #555;
 }
 
@@ -578,40 +598,40 @@ button.delete-btn {
 }
 
 @media (min-width: 600px) {
-    .sensor-card,
-    .about-card,
-    .settings-card {
+    .sensor-card {
         width: 45%;
         max-width: 320px;
     }
 
-    .log-file-card {
+    .log-file-card,
+    .about-card,
+    .settings-card {
         width: 90%;
     }
 }
 
 @media (min-width: 900px) {
-    .sensor-card,
-    .about-card,
-    .settings-card {
+    .sensor-card {
         width: 30%;
         max-width: 340px;
     }
 
-    .log-file-card {
+    .log-file-card,
+    .about-card,
+    .settings-card {
         width: 90%;
     }
 }
 
 @media (min-width: 1200px) {
-    .sensor-card,
-    .about-card,
-    .settings-card {
+    .sensor-card {
         width: 25%;
         max-width: 360px;
     }
 
-    .log-file-card {
+    .log-file-card,
+    .about-card,
+    .settings-card {
         width: 90%;
     }
 }

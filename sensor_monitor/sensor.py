@@ -1,5 +1,6 @@
 from adafruit_ina219 import INA219
 from collections import deque
+from sensor_monitor.logger import sensor_logger
 import board
 import busio
 import datetime
@@ -12,6 +13,7 @@ DEFAULT_CALIBRATION = 4191
 class Sensor:
     def __init__(self, name, address, sensor_type, max_power, rating, max_readings, i2c=None, pi=None):
         self.name = name
+        self.logger = sensor_logger()
         self.type = sensor_type
         self.max_power = max_power
         self.address = address
@@ -24,16 +26,16 @@ class Sensor:
 
         if self.pi:
             self.handle = self.pi.i2c_open(1, self.address)
-            logging.info(f"Sensor {self.name}: Remote I2C handle {self.handle} opened at address {hex(self.address)}")
+            self.logger.info(f"Sensor {self.name}: Remote I2C handle {self.handle} opened at address {hex(self.address)}")
             self.calibrate()  # Calibrate when using remote GPIO
         else:
             try:
                 self.i2c = i2c or busio.I2C(board.SCL, board.SDA)
                 self.ina = INA219(self.i2c)
                 self.ina.i2c_device.device_address = self.address
-                logging.info(f"INA219 sensor connected on address {hex(self.address)}")
+                self.logger.info(f"INA219 sensor connected on address {hex(self.address)}")
             except Exception as e:
-                logging.info("INA219 sensor not detected: %s", str(e))
+                self.logger.warning("INA219 sensor not detected: %s", str(e))
                 self.ina = None
 
     def calibrate(self, value=DEFAULT_CALIBRATION):
@@ -41,21 +43,58 @@ class Sensor:
             if self.pi and hasattr(self, 'handle'):
                 # Write value as big-endian (high byte first)
                 self.pi.i2c_write_word_data(self.handle, CALIBRATION_REGISTER, value)
-                logging.info(f"Calibrated {self.name} with value {value}")
+                self.logger.info(f"Calibrated {self.name} with value {value}")
         except Exception as e:
-            logging.error(f"Calibration failed for {self.name}: {e}")
+            self.logger.error(f"Calibration failed for {self.name}: {e}")
+
+    def is_battery_voltage_valid(self, voltage):
+        """
+        Check if the voltage is within the valid range for the battery type.
+        Returns True if valid, False otherwise.
+        """
+        if self.rating >= 20:  # Assume 24V battery if rating >= 20
+            min_v, max_v = 21.0, 29.0  # Typical 24V lead-acid: 21V (empty) - 29V (full, charging)
+        else:
+            min_v, max_v = 10.5, 14.8  # Typical 12V lead-acid: 10.5V (empty) - 14.8V (full, charging)
+        return min_v <= voltage <= max_v
+
+    def clamp_battery_voltage(self, voltage):
+        """
+        Clamp the voltage to the valid range for the battery type.
+        """
+        if self.rating >= 20:
+            min_v, max_v = 21.0, 29.0
+        else:
+            min_v, max_v = 10.5, 14.8
+        return max(min_v, min(max_v, voltage))
+
+    def handle_battery_voltage(self, voltage):
+        """
+        If voltage is outside valid range, log a warning and clamp it.
+        Returns the (possibly clamped) voltage.
+        """
+        if not self.is_battery_voltage_valid(voltage):
+            self.logger.warning(
+                f"{self.name}: Battery voltage {voltage}V out of range for {self.rating}V system. Clamping."
+            )
+            return self.clamp_battery_voltage(voltage)
+        return voltage
 
     def fetch_data(self):
         try:
             if self.pi:
                 raw_voltage = self.read_register_16(0x02)
-                voltage = round((raw_voltage >> 3) * 0.004, 2)  # LSB = 4mV, right shift 3 bits
+                voltage = round((raw_voltage >> 3) * 0.004, 1)
                 raw_current = self.read_register_16(0x04)
-                CURRENT_LSB = 3.2 / 32767  # ≈ 0.0000977
-                current = round(raw_current * CURRENT_LSB, 2)
+                CURRENT_LSB = 3.2 / 32767
+                current = round(raw_current * CURRENT_LSB, 0)
             else:
                 voltage = round(self.ina.bus_voltage, 1) if self.ina else 0.0
                 current = round(self.ina.current / 1000, 0) if self.ina else 0.0
+
+            # --- Battery voltage validation ---
+            if self.type == "Battery":
+                voltage = self.handle_battery_voltage(voltage)
 
             power = round(voltage * current, 0)
             time_stamp = datetime.datetime.now().strftime("%I:%M:%S%p on %B %d, %Y")
@@ -71,11 +110,11 @@ class Sensor:
             if self.is_valid_reading(new_readings):
                 self.readings.append(new_readings)
             else:
-                logging.info(f"Outlier detected for {self.name}: {new_readings}")
+                self.logger.info(f"Outlier detected for {self.name}: {new_readings}")
 
             data = self.smoothed_data(time_stamp)
         except Exception as e:
-            logging.info(f"Error reading sensor {self.name}: {e}")
+            self.logger.error(f"Error reading sensor {self.name}: {e}")
             data = {
                 "voltage": 0, "current": 0, "power": 0,
                 "time_stamp": datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
@@ -154,47 +193,6 @@ class Sensor:
         data["readings"] = list(self.readings)
         return data
 
-    def average_data(self, time_stamp):
-        if not self.readings:
-            return {
-                "voltage": 0, "current": 0, "power": 0,
-                "time_stamp": "No Data",
-                "state_of_charge": 0 if self.type == "Battery" else None,
-                "output": 0 if self.type != "Battery" else None,
-                "voltage_trend": 0,
-                "current_trend": 0,
-                "power_trend": 0
-            }
-
-        n = len(self.readings)
-        averaged = {
-            "voltage": round(sum(r["voltage"] for r in self.readings) / n, 1),
-            "current": round(sum(r["current"] for r in self.readings) / n, 0),
-            "power": round(sum(r["power"] for r in self.readings) / n, 0),
-            "time_stamp": time_stamp
-        }
-
-        if self.type == "Battery":
-            averaged["state_of_charge"] = round(sum(r["state_of_charge"] for r in self.readings) / n, 0)
-        else:
-            averaged["output"] = round(sum(r["output"] for r in self.readings) / n, 0)
-
-        # Trend calculation for average_data as well
-        if n > 1:
-            readings = list(self.readings)
-            dv = readings[-1]["voltage"] - readings[0]["voltage"]
-            di = readings[-1]["current"] - readings[0]["current"]
-            dp = readings[-1]["power"] - readings[0]["power"]
-            averaged["voltage_trend"] = round(dv / (n-1), 3)
-            averaged["current_trend"] = round(di / (n-1), 3)
-            averaged["power_trend"] = round(dp / (n-1), 3)
-        else:
-            averaged["voltage_trend"] = 0
-            averaged["current_trend"] = 0
-            averaged["power_trend"] = 0
-
-        return averaged
-
     def current_data(self):
         latest = self.readings[-1] if self.readings else {}
         data = {
@@ -205,16 +203,17 @@ class Sensor:
             "readings": list(self.readings)
         }
         if self.type == "Battery":
-            data["state_of_charge"] = latest.get("state_of_charge", 0)
+            data["state_of_charge"] = latest.get("state_of_charge", 1)
         else:
             data["output"] = latest.get("output", 0)
+            
         # Add trend for current_data
         n = len(self.readings)
         if n > 1:
             readings = list(self.readings)
-            data["voltage_trend"] = round((readings[-1]["voltage"] - readings[0]["voltage"]) / (n-1), 3)
-            data["current_trend"] = round((readings[-1]["current"] - readings[0]["current"]) / (n-1), 3)
-            data["power_trend"] = round((readings[-1]["power"] - readings[0]["power"]) / (n-1), 3)
+            data["voltage_trend"] = round((readings[-1]["voltage"] - readings[0]["voltage"]) / (n-1), 1)
+            data["current_trend"] = round((readings[-1]["current"] - readings[0]["current"]) / (n-1), 1)
+            data["power_trend"] = round((readings[-1]["power"] - readings[0]["power"]) / (n-1), 1)
         else:
             data["voltage_trend"] = 0
             data["current_trend"] = 0
@@ -222,11 +221,45 @@ class Sensor:
         return data
 
     def estimate_soc(self, voltage):
-        voltage = max(11.8, min(12.6, voltage))
-        x = (voltage - 12.2) * 10
-        soc = 1 / (1 + math.exp(-x))
-        return int(soc * 100)
+        """
+        Estimate state of charge (SoC) for a 12V or 24V lead-acid battery using a piecewise linear table.
+        Assumes voltage is measured at rest (not charging/discharging).
+        """
+        if self.rating >= 20:  # 24V battery
+            soc_table = [
+                (25.4, 100),
+                (25.2, 90),
+                (24.8, 75),
+                (24.4, 50),
+                (24.0, 25),
+                (23.8, 10),
+                (23.6, 0)
+            ]
+            min_v, max_v = 23.6, 25.4
+        else:  # 12V battery
+            soc_table = [
+                (12.7, 100),
+                (12.6, 90),
+                (12.4, 75),
+                (12.2, 50),
+                (12.0, 25),
+                (11.9, 10),
+                (11.8, 0)
+            ]
+            min_v, max_v = 11.8, 12.7
 
+        # Clamp voltage to table range
+        voltage = max(min_v, min(max_v, voltage))
+        for i in range(len(soc_table) - 1):
+            v_high, soc_high = soc_table[i]
+            v_low, soc_low = soc_table[i + 1]
+            if v_low <= voltage <= v_high:
+                # Linear interpolation
+                soc = soc_low + (soc_high - soc_low) * (voltage - v_low) / (v_high - v_low)
+                return int(round(soc))
+        # If voltage is below lowest value
+        return 0
+    
     def read_register_16(self, reg):
         if not self.pi:
             return 0

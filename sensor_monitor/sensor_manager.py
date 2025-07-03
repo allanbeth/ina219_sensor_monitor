@@ -171,7 +171,7 @@ class SensorManager:
             if current_time - last_poll >= poll_interval:
                 sensor_data = s.read_data()
                 self.last_poll_times[s.name] = current_time
-                self.logger.info(f"New Reading - {s.name}: {sensor_data['time_stamp']}: {sensor_data['voltage']}V, {sensor_data['current']}A, {sensor_data['power']}W")     
+                self.logger.info(f"New Reading - {s.name}: {sensor_data['time_stamp']}: {sensor_data['voltage']}V({sensor_data['voltage_trend']}), {sensor_data['current']}A, {sensor_data['power']}W")     
                 self.mqtt.publish_new_data(s.name, sensor_data)
                 data[s.name]['data'] = sensor_data
                 self.webserver.broadcast_sensor_data()
