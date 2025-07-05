@@ -136,7 +136,6 @@ class SensorManager:
 
         
         self.sensor_config.save_sensors(sensors)
-        #self.load_mqtt_discovery()
         return sensors
     
 
