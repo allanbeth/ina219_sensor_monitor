@@ -38,6 +38,22 @@ body {
     margin: 0px 3px 0px 3px;
 }
 
+.settings-header,
+.log-file-header,
+.about-header, 
+.restart-header {
+    border-bottom: #333 1px solid;
+    padding-bottom: 5px;
+}
+
+.settings-header,
+.log-file-header,
+.about-header, 
+.restart-header i {
+    font-size: 1.4em;
+    transition: color 0.2s;
+    margin: 0px 1px 15px 6px;
+}
 /* ========== Settings container and Card ========== */
 .settings-container {
     display: flex;
@@ -59,9 +75,9 @@ body {
 }
 
 .settings-card h4 {
-    text-align: left;
-    margin: 8px 0px 4px 0px;
-    position: relative;
+    display: inline;
+    color: #333;
+    margin: 0px 10px 10px 4px;
 }
 
 .settings-data {
@@ -98,6 +114,11 @@ body {
     border-radius: 6px;
 }
 
+.settings-btns {
+    float: right;
+    margin: 0px 4px 0px 4px;
+}
+
 /* ========== About Card ========== */
 
 .about-container {
@@ -120,8 +141,9 @@ body {
 }
 
 .about-card h4 {
-    text-align: left;
-    margin: 8px 0px 4px 0px;
+    display: inline;
+    color: #333;
+    margin: 0px 10px 10px 4px;
 }
 
 .about-info {
@@ -140,6 +162,11 @@ body {
     font-size: 0.6em;
     width: 100%;
 
+}
+
+.about-btns {
+    float: right;
+    margin: 0px 4px 0px 4px;
 }
 
 /* ========== Log File Container and Cards ========== */
@@ -165,8 +192,9 @@ body {
 }
 
 .log-file-card h4 {
-    text-align: left;
-    margin: 8px 0px 4px 0px;
+    display: inline;
+    color: #333;
+    margin: 0px 10px 10px 4px;
 }
 
 .log-file-entries {
@@ -180,6 +208,11 @@ body {
 
 .log-file-entry {
     font-size: 0.6em;
+}
+
+.log-file-btns {
+    float: right;
+    margin: 0px 4px 0px 4px;
 }
 
 
@@ -205,8 +238,14 @@ body {
 }
 
 .restart-card h4 {
-    text-align: left;
-    margin: 8px 0px 4px 0px;
+    display: inline;
+    color: #333;
+    margin: 0px 10px 10px 4px;
+}
+
+.restart-btns {
+    float: right;
+    margin: 0px 4px 0px 4px;
 }
 
 
@@ -265,6 +304,29 @@ body {
     color: white;
 }
 
+.sensor-btns {
+    float: right;
+    margin: 0px 4px 0px 4px;
+}
+
+.back-btn {
+    float: left;
+    margin: 0px 15px 0px 4px;
+}
+
+.sensor-btns,
+.back-btn i {
+    font-size: 1.1em;
+    transition: color 0.2s;
+    margin: 0px 1px 0px 6px;
+}
+
+.sensor-edit-header,
+.sensor-log-header {
+    border-bottom: #333 1px solid;
+    padding-bottom: 5px;
+}
+
 /* Sensor Type Colors */
 .type-Solar {
     background-color: #ffa500;
@@ -287,30 +349,39 @@ body {
     border-bottom: #333 1px solid;
 }
 
+.sensor-log-header h4 {
+    display: inline;
+    color: #333;
+    margin: 0px 10px 10px 4px;
+}
+
 .log-entry p {
     font-size: 0.4em;
     text-align: left;
     color: #555;
-    margin: 0px 0px 2px 0px;
+    margin-bottom: 2px;
     width: 100%;
 }
 
-.log-data {
-    width: 100%;   
-    position: relative; 
-    height: 100%;
+.reading-details {
+    margin-left: 8px;
 }
 
-.log-data h4 {
-    text-align: left;
-    margin: 0px 0px 6px 10px;  
+
+.log-data {
+    margin-top: 10px;
+    overflow: visible; 
+    position: relative;
+    height: 100%;
+    width: 90%;
 }
 
 .log-entries {
     overflow-y: auto;
-    height: 140px;
+    height: 170px;
     border-radius: 10px;
     width: 100%;
+    margin-top: 10px;
 }
 
 
@@ -425,30 +496,33 @@ meter {
     height: 100%;
 }
 
-.edit-form h4 {
-    margin: 0px 0px 0px 4px;
+.sensor-edit-header h4 {
+    display: inline;
+    color: #333;
 }
 
 .edit-data {
     overflow-y: auto;
     max-height: 160px;
+    width: 100%;
+    margin-top: 10px;
 }
 
 .edit-entry {
     display: flex;
     width: 90%;
     margin: 1px 0;
-    padding: 4px;
 }
 
 .edit-data input,
 .edit-data label,
 .edit-dropdown {
     width: 50%;
-    margin: 1px 0;
-    padding: 4px;
+    margin: 4px;
     box-sizing: border-box;
-    border-radius: 6px;
+    border-radius: 4px;
+    padding: 2px 4px; 
+    font-size: 0.6em;
 }
 
 .edit-dropdown {
@@ -579,6 +653,54 @@ button.delete-btn {
 
 .fa-rotate:hover {
     color: #333;
+}
+
+.fa-save {
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-save:hover {
+    color: #333;
+}
+
+.fa-delete {
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-delete:hover {
+    color: #333;
+}
+.fa-arrow-left {
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-arrow-left:hover {
+    color: #333;
+}
+.fa-sync-alt {
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-sync-alt:hover {
+    color: #333;
+}
+
+.fa-check {
+    color: #175a17;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-check:hover {
+    color: #299e29;;
 }
 
 /* ========== Responsive Layout ========== */

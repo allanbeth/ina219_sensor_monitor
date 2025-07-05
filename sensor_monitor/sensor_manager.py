@@ -80,10 +80,6 @@ class SensorManager:
         self.webserver = flaskWrapper(self.logger, self.config, self.sensor_config)  
         self.load_mqtt_discovery()  
 
-        #self.webserver.run_webserver()
-        #self.webserver.broadcast_sensor_data()
-        #self.logger.info(f"Loading Webserver")
-
     def set_config(self):
         self.poll_intervals = self.config.config_data.get("poll_intervals", {})
         self.logger.set_log_size(self.config.config_data["max_log"])  
@@ -118,7 +114,7 @@ class SensorManager:
             with open(SENSOR_FILE, "r") as f:
                 sensor_data = json.load(f)
                 sensors = [Sensor(s["name"], s["address"], s["type"], s["max_power"], s["rating"], self.config.config_data['max_readings'],i2c=self.i2c,pi=self.pi) for s in sensor_data]
-                self.logger.info("Configured Sensor:")
+                self.logger.info("Configured Sensors Successfully")
 
                 for sensor in sensors:
                     self.logger.info(f"Connected to {sensor.name} Sucessfully")     
@@ -146,7 +142,8 @@ class SensorManager:
     def load_mqtt_discovery(self):
         try:
             for sensor in self.sensors:
-                self.mqtt.send_discovery_config(sensor.name, sensor.type)               
+                self.mqtt.send_discovery_config(sensor.name, sensor.type)   
+                self.logger.error(f"MQTT discovery published succesfully for {sensor.name} of type {sensor.type}")            
         except Exception as e:
             self.logger.error(f"MQTT publish failed: {e}")
             
@@ -179,7 +176,7 @@ class SensorManager:
                 if s.readings:
                     sensor_data = s.current_data()
                     data[s.name]['data'] = sensor_data
-                    #self.logger.info(f"Last Reading - {s.name}: {sensor_data['time_stamp']}: {sensor_data['voltage']}V, {sensor_data['current']}A, {sensor_data['power']}W")
+                    self.logger.info(f"Using last Reading - {s.name}: {sensor_data['time_stamp']}: {sensor_data['voltage']}V, {sensor_data['current']}A, {sensor_data['power']}W")
                 else:
                     sensor_data = {
                         "voltage": 0,

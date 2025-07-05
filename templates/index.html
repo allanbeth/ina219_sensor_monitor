@@ -26,7 +26,16 @@
 
     <div class="settings-container hidden" id="settings-container">
         <div id="settings-card" class="settings-card">
+            <div class="settings-header">
+                <div class="back-btn">
+                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" onclick="cancelSettings()"></i>
+                </div>
                 <h4>Settings</h4>
+                <div class="settings-btns">
+                    <i class="fa-solid fa-save" style="cursor:pointer" onclick="saveSettings()"></i>
+                </div>
+            </div>
+                
             <div class="settings-data">
                 <div class="settings-entry">
                     <label for="max-log">Max Log File Size (MB):</label>
@@ -78,37 +87,40 @@
                     <input type="text" id="gpio-address"/>
                 </div>                
             </div>
-            <div class="edit-buttons">
-                <button class="save-btn" onclick="saveSettings()">Save</button>
-                <button class="back-btn" onclick="cancelSettings()">Close</button>
-            </div>
         </div>
     </div>
 
     <div class="about-container hidden" id="about-container">
         <div id="about-card" class="about-card">
-            <h4>About</h4>
+            <div class="about-header">
+                <div class="back-btn">
+                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" onclick="cancelAbout()"></i>
+                </div>
+                <h4>About</h4>
+            </div>
+            
             <div class="about-info">
                 <div class="about-content" id="about-content">
                     Loading README...
                 </div>
-            </div>
-            <div class="edit-buttons">
-                <button class="back-btn" onclick="cancelAbout()">Close</button>
             </div>
         </div>
     </div>
 
     <div class="restart-container hidden" id="restart-container">
         <div id="restart-card" class="restart-card">
-            <h4>Restart</h4>
+            <div class="restart-header">
+                <div class="back-btn">
+                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" onclick="cancelRestart()"></i>
+                </div>
+                <h4>Restart</h4>
+                <div class="restart-btns">
+                    <i class="fa-solid fa-check" style="cursor:pointer" onclick="restartProgram()"></i>
+                </div>
+            </div>
             <div class="restart-info">
                 <div class="restart-content" id="restart-content">   
                 </div>
-            </div>
-            <div class="edit-buttons" id="restart-btns">
-                <button class="back-btn" onclick="cancelRestart()">Cancel</button>
-                <button class="save-btn" onclick="restartProgram()">Confirm</button>
             </div>
         </div>
     </div>
@@ -116,15 +128,19 @@
 
     <div class="log-file-container hidden" id="log-file-container">
         <div id="log-file-card" class="log-file-card">
-            <h4>Logs</h4>
+            <div class="log-file-header">
+                <div class="back-btn">
+                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" onclick="closeFullLog()"></i>
+                </div>
+                <h4>Logs</h4>
+                <div class="log-file-btns">
+                    <i class="fa-solid fa-sync-alt" style="cursor:pointer" onclick="fullLog()"></i>
+                </div>
+            </div>
             <div class="log-file-data" id="log-file-data">
                 <div class="log-file-entries" id="log-file-entries">
                     Loading...
                 </div>                                              
-                <div class="edit-buttons">
-                    <button class="back-btn" onclick="closeFullLog()">Close</button>
-                    <button class="refresh-btn" onclick="fullLog()">Refresh</button>
-                </div>
             </div>
         </div>
     </div>

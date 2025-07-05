@@ -55,7 +55,7 @@ class Sensor:
         if self.rating >= 20:  # Assume 24V battery if rating >= 20
             min_v, max_v = 21.0, 29.0  # Typical 24V lead-acid: 21V (empty) - 29V (full, charging)
         else:
-            min_v, max_v = 10.5, 14.8  # Typical 12V lead-acid: 10.5V (empty) - 14.8V (full, charging)
+            min_v, max_v = 11.8, 14.8  # Typical 12V lead-acid: 10.5V (empty) - 14.8V (full, charging)
         return min_v <= voltage <= max_v
 
     def clamp_battery_voltage(self, voltage):
@@ -269,7 +269,13 @@ class Sensor:
             # Convert to signed 16-bit
             if value & 0x8000:
                 value -= 0x10000
+            self.logger.debug(f"Read register {reg} from {self.name}: {value}")
+            if reg == CALIBRATION_REGISTER and value == 0:
+                self.calibrate()  # Recalibrate if calibration register is zero
+            elif reg == CALIBRATION_REGISTER and value != DEFAULT_CALIBRATION:
+                self.logger.warning(f"Calibration register {reg} for {self.name} has unexpected value {value}, recalibrating.")
+                self.calibrate(DEFAULT_CALIBRATION)
             return value
         except Exception as e:
-            logging.error(f"Failed to read register {reg} from {self.name}: {e}")
+            self.logger.error(f"Failed to read register {reg} from {self.name}: {e}")
             return 0

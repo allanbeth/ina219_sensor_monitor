@@ -40,9 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div class="sensor-header">
                         <span class="sensor-type ${typeClass}">${sensor.type} ${rating}V</span>
                         <span class="sensor-name">${name}</span>
-                        <div class="type-edit-container" id="btns-${name}">                                    
+                        <div class="type-edit-container" id="btns-${name}">          
+                            <i class="fa-solid fa-book" style="cursor:pointer" onclick="openLog('${name}')"></i>                          
                             <i class="fa-solid fa-gear" style="cursor:pointer" onclick="enterEditMode('${name}')"></i>
-                            <i class="fa-solid fa-book" style="cursor:pointer" onclick="openLog('${name}')"></i>
                         </div>
                     </div>
                     <div id="view-${name}">
@@ -84,7 +84,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                     </div>
                     <div id="edit-${name}" class="edit-form hidden">
-                        <h4>Edit Sensor - ${hexAddress}</h4>
+                    <div class="sensor-edit-header">
+                        <div class="back-btn">          
+                            <i class="fa-solid fa-arrow-left" style="cursor:pointer" onclick="cancelEdit('${name}')"></i>                          
+                        </div>
+                        <h4>Edit Sensor</h4>
+                        <div class="sensor-btns">                                  
+                            <i class="fa-solid fa-delete" style="cursor:pointer" onclick="showDeleteConfirmation('${name}')"></i>
+                            <i class="fa-solid fa-save" style="cursor:pointer" onclick="saveSensor('${name}')"></i>
+                        </div>
+                    </div>
                         <div class="edit-data">
                             <div class="edit-entry">
                                 <label>Name:</label>
@@ -106,22 +115,25 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <label>Voltage Rating:</label>
                                 <input type="number" id="rating-${name}" value="${rating}">
                             </div>
-                        </div>
-                        <div class="edit-buttons">
-                            <button class="back-btn" onclick="cancelEdit('${name}')">Back</button>
-                            <button class="save-btn" onclick="saveSensor('${name}')">Save</button>
-                            <button class="delete-btn" onclick="showDeleteConfirmation('${name}')">Delete</button>
+                            <div class="edit-entry">
+                                <label>i2c Address:</label>
+                                <input type="number" id="address-${name}" value="${hexAddress}">
+                            </div>
                         </div>
                     </div>
                     <div id="log-${name}" class="log-data hidden">
-                        <h4>Logs</h4>
+                        <div class="sensor-log-header">
+                            <div class="back-btn">          
+                            <i class="fa-solid fa-arrow-left" style="cursor:pointer" onclick="closeLog('${name}')"></i>                          
+                        </div>
+                        <h4>Readings</h4>
+                        <div class="sensor-btns">                                   
+                            <i class="fa-solid fa-sync-alt" style="cursor:pointer" onclick="refreshLog('${name}')"></i>
+                        </div>
+                    </div>
                         <div class="log-entries" id="log-entries-${name}">
                             ${logHTML}
                         </div>                                              
-                        <div class="edit-buttons">
-                            <button class="back-btn" onclick="closeLog('${name}')">Close</button>
-                            <button class="refresh-btn" onclick="refreshLog('${name}')">Refresh</button>
-                        </div>
                     </div>
                     <div id="delete-${name}" class="delete-confirmation hidden">
                         <h3 class="confirm">Confirm delete?</h3>
@@ -155,7 +167,7 @@ function generateLogHTML(readings) {
             <p>
                 <strong>${reading.time_stamp ?? ''}</strong>
             </p>
-            <p>
+            <p class="reading-details">
                 <strong>V:</strong> ${reading.voltage ?? 'N/A'} V | 
                 <strong>C:</strong> ${reading.current ?? 'N/A'} A | 
                 <strong>P:</strong> ${reading.power ?? 'N/A'} W | 
