@@ -54,6 +54,11 @@ body {
     transition: color 0.2s;
     margin: 0px 1px 15px 6px;
 }
+
+.gpio-status {
+    margin-right: 10px;
+}
+
 /* ========== Settings container and Card ========== */
 .settings-container {
     display: flex;
@@ -694,13 +699,33 @@ button.delete-btn {
 }
 
 .fa-check {
-    color: #175a17;
+    color: #666;
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .fa-check:hover {
-    color: #299e29;;
+    color: #00ff00;;
+}
+
+.fa-cloud {
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-cloud:hover {
+    color: #333;;
+}
+
+.fa-microchip {
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-microchip:hover {
+    color: #333;
 }
 
 /* ========== Responsive Layout ========== */

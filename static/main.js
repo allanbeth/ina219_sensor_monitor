@@ -3,9 +3,16 @@ const socket = io({ reconnection: true });
 
 let paused = false;
 let undoTimers = {};
+let isRemoteGpio = false;
 
 // DOMContentLoaded event to set up socket and initial UI
 document.addEventListener("DOMContentLoaded", () => {
+    fetch("/get_settings")
+        .then(res => res.json())
+        .then(data => {
+            isRemoteGpio = data.remote_gpio == 1;
+            updateGpioStatus();
+        });
     socket.on("connect", function () {
         console.log("Socket Connected:", socket.id);
     });
@@ -35,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const rating = sensor.rating ?? "";
                 const hexAddress = sensor.address ? `0x${parseInt(sensor.address).toString(16).padStart(2, '0')}` : "0x00";
                 const logHTML = generateLogHTML(sensor.data.readings ?? []);
+                const i2cDisabled = isRemoteGpio ? "" : "disabled";
 
                 let content = `
                     <div class="sensor-header">
@@ -117,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             </div>
                             <div class="edit-entry">
                                 <label>i2c Address:</label>
-                                <input type="number" id="address-${name}" value="${hexAddress}">
+                                <input type="text" id="address-${name}" value="${hexAddress}" ${i2cDisabled}>
                             </div>
                         </div>
                     </div>
@@ -177,6 +185,17 @@ function generateLogHTML(readings) {
     `).join('');
 }
 
+function updateGpioStatus() {
+    const statusSpan = document.getElementById("gpio-status");
+    if (isRemoteGpio) {
+        statusSpan.innerHTML = '<i class="fa-solid fa-cloud" title="Remote GPIO"></i>';
+        statusSpan.className = "gpio-status remote";
+    } else {
+        statusSpan.innerHTML = '<i class="fa-solid fa-microchip" title="Local GPIO"></i>';
+        statusSpan.className = "gpio-status local";
+    }
+}
+
 // --- Sensor Edit Functions ---
 
 function enterEditMode(name) {
@@ -200,6 +219,8 @@ function saveSensor(originalName) {
     const newType = document.getElementById(`type-${originalName}`).value;
     const maxPower = document.getElementById(`maxPower-${originalName}`).value;
     const rating = document.getElementById(`rating-${originalName}`).value;
+    const hexAddress = document.getElementById(`address-${originalName}`).value;
+    const address = parseInt(hexAddress, 16); 
 
     fetch("/update_sensor", {
         method: "POST",
@@ -209,7 +230,8 @@ function saveSensor(originalName) {
             name: newName,
             type: newType,
             max_power: maxPower,
-            rating: rating
+            rating: rating,
+            address: address
         })
     })
         .then(res => res.json())
@@ -242,6 +264,19 @@ function settings() {
             document.getElementById("webserver-port").value = data.webserver_port ?? "";
             document.getElementById("remote-gpio").checked = data.remote_gpio == 1;
             document.getElementById("gpio-address").value = data.gpio_address ?? "";
+            
+            isRemoteGpio = data.remote_gpio == 1;
+            updateGpioStatus();
+
+            // Enable/disable i2c address input based on remote gpio
+            const i2cInput = document.getElementById("gpio-address");
+            const remoteGpioCheckbox = document.getElementById("remote-gpio");
+            i2cInput.disabled = !remoteGpioCheckbox.checked;
+
+            // Add event listener to toggle on change
+            remoteGpioCheckbox.addEventListener("change", function() {
+                i2cInput.disabled = !this.checked;
+            });
         });
 }
 
@@ -287,7 +322,16 @@ function saveSettings() {
         .then(() => {
             socket.emit("sensor_update_request");
         });
+
+    updateEditFormI2CInputs(); 
+    updateGpioStatus();   
     cancelSettings();
+}
+
+function updateEditFormI2CInputs() {
+    document.querySelectorAll('input[id^="address-"]').forEach(input => {
+        input.disabled = !isRemoteGpio;
+    });
 }
 
 // --- About/README Functions ---

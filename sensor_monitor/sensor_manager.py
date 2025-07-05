@@ -22,13 +22,14 @@ class sensor_config:
         with open(SENSOR_FILE, "w") as f:
             json.dump([{"name": s.name, "address": s.address, "type": s.type, "max_power": s.max_power, "rating": s.rating} for s in sensors], f)
 
-    def update_sensor(self, name, new_name, new_type, new_max_power, new_rating):
+    def update_sensor(self, name, new_name, new_type, new_max_power, new_rating, new_address):
         for sensor in self.sensors:
             if sensor.name == name:
                 sensor.name = new_name
                 sensor.type = new_type
                 sensor.max_power = new_max_power
                 sensor.rating = new_rating
+                sensor.address = new_address
                 self.save_sensors()
                 self.mqtt.send_discovery_config(sensor.name, sensor.type)
                 return True
