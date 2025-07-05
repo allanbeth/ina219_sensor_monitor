@@ -535,66 +535,13 @@ meter {
 }
 
 /* ========== Buttons ========== */
-.edit-buttons {
-    display: flex;
-    justify-content: space-between;
-    position: absolute;
-    bottom: 0px;
-    left: 0;
-    width:100%;
-    margin: 0px 4px 0px 4px;
-}
-
-.edit-buttons button,
-button.save-btn,
-button.back-btn,
-button.delete-btn,
-.confirm-delete-btn,
-.cancel-delete-btn,
-.undo-btn,
-button.refresh-btn {
-    padding: 5px 10px;
-    font-size: 0.9em;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-/* Specific Button Colors */
-button.save-btn {
-    background-color: #4CAF50;
-    color: white;
-}
-
-button.refresh-btn {
-    background-color: #4CAF50;
-    color: white;
-}
-
-button.back-btn {
-    background-color: #b1b1b1;
-    color: #555;
-}
-
-button.delete-btn {
-    background-color: #fa6868;
-    color: white;
-}
-
-.confirm-delete-btn {
-    background-color: #d9534f;
-    color: white;
-}
-
-.cancel-delete-btn {
-    background-color: #5bc0de;
-    color: white;
-}
-
-.undo-btn {
-    background-color: #5cb85c;
-    color: white;
-    padding: 8px 15px;
+/* Hide only the button elements, not the icons themselves */
+.type-edit-container button,
+.edit-form button,
+.log-data button,
+.delete-confirmation button,
+.countdown button {
+    display: none !important;
 }
 
 /* ========== Delete Confirmation and Countdown ========== */
@@ -726,6 +673,16 @@ button.delete-btn {
 
 .fa-microchip:hover {
     color: #333;
+}
+
+.fa-trash {
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-trash:hover {
+    color: #f43434;
 }
 
 /* ========== Responsive Layout ========== */

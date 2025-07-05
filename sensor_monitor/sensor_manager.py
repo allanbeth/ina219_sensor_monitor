@@ -136,7 +136,7 @@ class SensorManager:
 
         
         self.sensor_config.save_sensors(sensors)
-        self.load_mqtt_discovery()
+        #self.load_mqtt_discovery()
         return sensors
     
 
@@ -144,7 +144,7 @@ class SensorManager:
         try:
             for sensor in self.sensors:
                 self.mqtt.send_discovery_config(sensor.name, sensor.type)   
-                self.logger.error(f"MQTT discovery published succesfully for {sensor.name} of type {sensor.type}")            
+                self.logger.info(f"MQTT discovery published succesfully for {sensor.name} of type {sensor.type}")            
         except Exception as e:
             self.logger.error(f"MQTT publish failed: {e}")
             

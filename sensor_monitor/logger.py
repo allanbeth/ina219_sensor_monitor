@@ -4,16 +4,18 @@ import logging, time, os
 from sensor_monitor.config_manager import LOG_FILE
 
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s',
-                    filename=LOG_FILE,
-                    filemode='a')
-
 class sensor_logger:
         
     def __init__(self):
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger("sensor_monitor")
         self.max_log_size = 1000 * 1024 * 1024
+        if not self.logger.handlers:
+            handler = logging.FileHandler(LOG_FILE)
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+            self.logger.setLevel(logging.INFO)
+            self.logger.propagate = False
 
     def set_log_size(self, max):
         self.max_log_size = max * 1024 * 1024
