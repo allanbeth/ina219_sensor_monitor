@@ -41,7 +41,8 @@ body {
 .settings-header,
 .log-file-header,
 .about-header, 
-.restart-header {
+.restart-header,
+.add-sensor-header {
     border-bottom: #333 1px solid;
     padding-bottom: 5px;
 }
@@ -49,7 +50,8 @@ body {
 .settings-header,
 .log-file-header,
 .about-header, 
-.restart-header i {
+.restart-header,
+.add-sensor-card i {
     font-size: 1.4em;
     transition: color 0.2s;
     margin: 0px 1px 15px 6px;
@@ -61,22 +63,22 @@ body {
 
 /* ========== Settings container and Card ========== */
 .settings-container {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 1000;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
-    background-color: #d2d2d2;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, opacity 0.5s ease;
-    gap: 20px;
-    padding: 5px;
 }
 
 .settings-card {
-    padding: 15px;
-    width: 280px;
-    position: relative;
-    height: 550px;
+    background: #d2d2d2;
+    border-radius: 10px;
+    padding: 2em 2em 1em 2em;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    min-width: 320px;
+    max-width: 90vw;
 }
 
 .settings-card h4 {
@@ -98,17 +100,17 @@ body {
 
 .settings-entry {
     margin: 4px 0px 4px 0px;
-    font-size: 0.6em;
+    font-size: 0.8em;
     display: flex;
 }
 
 .settings-entry input{
-    width: 30%;
+    width: 50%;
     margin-right: 4px;
 }
 
 .settings-entry label{
-    width: 70%;
+    width: 50%;
 }
 
 .settings-entry input,
@@ -127,22 +129,22 @@ body {
 /* ========== About Card ========== */
 
 .about-container {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 1000;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
-    background-color: #d2d2d2;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, opacity 0.5s ease;
-    gap: 20px;
-    padding: 5px;
 }
 
 .about-card {
-    padding: 15px 20px;
-    width: 100%;
-    position: relative;
-    height: 550px;
+    background: #d2d2d2;
+    border-radius: 10px;
+    padding: 2em 2em 1em 2em;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    min-width: 320px;
+    max-width: 90vw;
 }
 
 .about-card h4 {
@@ -177,23 +179,22 @@ body {
 /* ========== Log File Container and Cards ========== */
 
 .log-file-container {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 1000;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
-    background-color: #d2d2d2;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, opacity 0.5s ease;
-    gap: 20px;
-    padding: 5px;
 }
 
 .log-file-card {
-    
-    padding: 15px 20px;
-    width: 100%;
-    position: relative;
-    height: 550px;
+    background: #d2d2d2;
+    border-radius: 10px;
+    padding: 2em 2em 1em 2em;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    min-width: 320px;
+    max-width: 90vw;
 }
 
 .log-file-card h4 {
@@ -224,22 +225,22 @@ body {
 /* ========== Restart Container and Cards ========== */
 
 .restart-container {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 1000;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
-    gap: 20px;
-    padding: 5px;
 }
 
 .restart-card {
-    background-color: #fff;
+    background: #d2d2d2;
     border-radius: 10px;
-    padding: 15px 20px;
-    width: 280px;
-    position: relative;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, opacity 0.5s ease;
-    height: 280px;
+    padding: 2em 2em 1em 2em;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    min-width: 320px;
+    max-width: 90vw;
 }
 
 .restart-card h4 {
@@ -266,15 +267,17 @@ body {
     background-color: #d2d2d2;
     border-radius: 10px;
     padding: 10px;
-    width: 245px;
+    width: 100%;
+    max-width: 340px; /* or whatever you want as a max */
+    min-width: 220px;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, opacity 0.5s ease;
-    height: 245px;
     margin-top: 5px;
+    height: auto; /* let content define height */
 }
 
 .sensor-card:hover {
@@ -389,8 +392,78 @@ body {
     margin-top: 10px;
 }
 
+/* ========== Add sensor ========== */
+
+#add-sensor-btn.hidden {
+    display: none !important;
+}
+.add-sensor-container {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.add-sensor-container.hidden {
+    display: none !important;
+}
+.add-sensor-card {
+    background: #d2d2d2;
+    border-radius: 10px;
+    padding: 2em 2em 1em 2em;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    min-width: 320px;
+    max-width: 90vw;
+}
+
+.add-sensor-card h4 {
+    display: inline;
+    color: #333;
+    margin: 0px 10px 10px 4px;
+}
+
+.add-sensor-data {
+    width: 100%;
+    margin: 1px 0;
+    padding: 4px;
+    overflow: visible;
+    overflow-y: auto;
+    max-height: 470px;
 
 
+}
+
+.add-sensor-entry {
+    margin: 4px 0px 4px 0px;
+    font-size: 0.8em;
+    display: flex;
+}
+
+.add-sensor-entry input,
+.add-sensor-entry label,
+.add-sensor-entry select {
+    margin: 1px 0;
+    padding: 4px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    width: 50%;
+}
+
+.add-sensor-entry select {
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 1px 2px #eee inset, 0 1px 0 #fff;
+    padding: 4px;
+    appearance: none;
+}
+
+.add-sensor-btns {
+    float: right;
+    margin: 0px 4px 0px 4px;
+}
 
 /* ========== Sensor Data and Output ========== */
 .sensor-data {
@@ -402,23 +475,25 @@ body {
 .sensor-readings {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-row-gap: 10px;
-    grid-column-gap: 10px;
-    justify-content: center;
-    align-items: center;
+    gap: 10px;
+    width: 100%;
 }
 
 .data-tile {
-    aspect-ratio: 1;
-    color: #ffffff;
+    background: inherit;
+    color: #fff;
     border-radius: 10px;
     padding-top: 15px;
-    position: relative;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, opacity 0.5s ease;
-    height: 70px;
-    width: 140px;
+    width: 100%;
+    aspect-ratio: 2/1; /* keeps tiles proportional */
+    min-width: 0;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
 }
 #solar-data-tile {
@@ -515,13 +590,13 @@ meter {
 
 .edit-entry {
     display: flex;
-    width: 90%;
+    width: 100%;
     margin: 1px 0;
 }
 
 .edit-data input,
 .edit-data label,
-.edit-dropdown {
+.edit-data select {
     width: 50%;
     margin: 4px;
     box-sizing: border-box;
@@ -530,8 +605,13 @@ meter {
     font-size: 0.6em;
 }
 
-.edit-dropdown {
-    border: 1px solid #333;
+.edit-data select {
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 1px 2px #eee inset, 0 1px 0 #fff;
+    padding: 4px;
+    appearance: none;
 }
 
 /* ========== Buttons ========== */
@@ -559,7 +639,6 @@ meter {
 
 .countdown {
     align-items: center;
-
     font-size: 1.1em;
     font-weight: bold;
     color: #d9534f;
@@ -614,7 +693,7 @@ meter {
 }
 
 .fa-save:hover {
-    color: #333;
+    color: #00ff15;
 }
 
 .fa-delete {
@@ -633,6 +712,16 @@ meter {
 }
 
 .fa-arrow-left:hover {
+    color: #333;
+}
+
+.fa-plus{
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-plus:hover {
     color: #333;
 }
 .fa-sync-alt {
@@ -657,7 +746,6 @@ meter {
 
 .fa-cloud {
     color: #666;
-    cursor: pointer;
     transition: color 0.2s;
 }
 
@@ -690,15 +778,6 @@ meter {
     .container {
         display: block;
     }
-
-    .sensor-card,
-    .about-card,
-    .settings-card,
-    .log-file-card {
-        width: 90%;
-        max-width: 100%;
-        margin: 0 auto 20px;
-    }
 }
 
 @media (min-width: 600px) {
@@ -706,24 +785,12 @@ meter {
         width: 45%;
         max-width: 320px;
     }
-
-    .log-file-card,
-    .about-card,
-    .settings-card {
-        width: 90%;
-    }
 }
 
 @media (min-width: 900px) {
     .sensor-card {
         width: 30%;
         max-width: 340px;
-    }
-
-    .log-file-card,
-    .about-card,
-    .settings-card {
-        width: 90%;
     }
 }
 
@@ -733,10 +800,5 @@ meter {
         max-width: 360px;
     }
 
-    .log-file-card,
-    .about-card,
-    .settings-card {
-        width: 90%;
-    }
 }
 

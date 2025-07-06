@@ -17,6 +17,7 @@
                 <h1>Energy Monitor</h1>    
             <div class="header-btns" id="header-btns">
                 <span id="gpio-status" class="gpio-status"></span>
+                <i class="fa-solid fa-plus" id="add-sensor-btn" title="Add Sensor"></i>
                 <i class="fa-solid fa-gear" onclick="settings()"></i>
                 <i class="fa-solid fa-book" onclick="fullLog()"></i>
                 <i class="fa-solid fa-question" onclick="about()"></i>
@@ -24,6 +25,46 @@
             </div>
         </div>
     </div>
+
+    <div class="add-sensor-container hidden" id="add-sensor-container">
+    <div class="add-sensor-card">
+        <div class="add-sensor-header">
+            <div class="back-btn">
+                <i class="fa-solid fa-arrow-left" id="add-sensor-cancel" title="Back"></i>
+            </div>
+            <h4>Add New Sensor</h4>
+            <div class="add-sensor-btns">
+                <i class="fa-solid fa-save" id="add-sensor-save" title="Save New Sensor"></i>
+            </div>
+        </div>
+        <div class="add-sensor-data">
+            <div class="add-sensor-entry">
+                <label for="add-sensor-name">Senor Name:</label>
+                <input type="text" id="add-sensor-name" placeholder="Name"/>
+            </div>
+            <div class="add-sensor-entry">
+                <label for="add-sensor-type">Senor Type:</label>
+                <select id="add-sensor-type">
+                    <option value="Solar">Solar</option>
+                    <option value="Wind">Wind</option>
+                    <option value="Battery">Battery</option>
+                </select>
+            </div>
+            <div class="add-sensor-entry">
+                <label for="add-sensor-max-power"> Senor Max Power:</label>
+                <input type="number" id="add-sensor-max-power" placeholder="Max Power (W)"/>
+            </div>
+            <div class="add-sensor-entry">
+                <label for="add-sensor-rating">Sensor Rating:</label>
+                <input type="number" id="add-sensor-rating" placeholder="Voltage Rating (V)"/>
+            </div>
+            <div class="add-sensor-entry">
+                <label for="add-sensor-address">Senor Name:</label>
+                <input type="text" id="add-sensor-address" placeholder="I2C Address (hex)"/>
+            </div>
+        </div>  
+    </div>
+</div>
 
     <div class="settings-container hidden" id="settings-container">
         <div id="settings-card" class="settings-card">

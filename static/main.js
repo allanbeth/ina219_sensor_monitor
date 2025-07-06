@@ -34,6 +34,15 @@ function setupEventHandlers() {
     document.querySelector(".fa-question").addEventListener("click", about);
     document.querySelector(".fa-rotate").addEventListener("click", restartConfirmation);
 
+    document.getElementById("add-sensor-btn").addEventListener("click", () => {
+        document.getElementById("add-sensor-container").classList.remove("hidden");
+    });
+    document.getElementById("add-sensor-cancel").addEventListener("click", () => {
+        document.getElementById("add-sensor-container").classList.add("hidden");
+    });
+    document.getElementById("add-sensor-save").addEventListener("click", addSensor);
+
+
     // Settings
     document.getElementById("settings-container").addEventListener("click", (e) => {
         if (e.target.closest(".fa-arrow-left")) cancelSettings();
@@ -110,13 +119,11 @@ function handleSensorUpdate(data) {
                         <div class="data-tile" id="${sensor.type.toLowerCase()}-data-tile">
                             <span class="icon"><i class="fa-solid fa-battery"></i></span>
                             <p class="soc">${sensor.data.state_of_charge ?? 0}%</p>
-                            <p><meter value="${sensor.data.state_of_charge ?? 0}" min="0" max="100"></meter></p>
                         </div>
                     </div>` : `
                         <div class="data-tile" id="${sensor.type.toLowerCase()}-data-tile">
                             <span class="icon"><i class="fa-solid fa-plug"></i></span>
                             <p class="output">${sensor.max_power ?? 0} W</p>
-                            <p><meter value="${sensor.data.output ?? 0}" min="0" max="100"></meter></p>
                         </div>
                     </div>`}
                     <div class="timestamp" id="timestamp-${name}">Last Updated: ${sensor.data.time_stamp}</div>
@@ -140,7 +147,7 @@ function handleSensorUpdate(data) {
                     </div>
                     <div class="edit-entry">
                         <label>Type:</label>
-                        <select id="type-${name}" class="edit-dropdown">
+                        <select id="type-${name}">
                             <option value="Solar" ${sensor.type === "Solar" ? "selected" : ""}>Solar</option>
                             <option value="Wind" ${sensor.type === "Wind" ? "selected" : ""}>Wind</option>
                             <option value="Battery" ${sensor.type === "Battery" ? "selected" : ""}>Battery</option>
@@ -211,6 +218,29 @@ function handleSensorUpdate(data) {
     }
 }
 
+function addSensor() {
+    const name = document.getElementById("add-sensor-name").value;
+    const type = document.getElementById("add-sensor-type").value;
+    const max_power = document.getElementById("add-sensor-max-power").value;
+    const rating = document.getElementById("add-sensor-rating").value;
+    const address = document.getElementById("add-sensor-address").value;
+
+    fetch("/add_sensor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, type, max_power, rating, address })
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.status === "success") {
+            document.getElementById("add-sensor-container").classList.add("hidden");
+            socket.emit("sensor_update_request");
+        } else {
+            alert("Failed to add sensor: " + (result.message || "Unknown error"));
+        }
+    });
+}
+
 // --- GPIO Status Badge ---
 function updateGpioStatus() {
     const statusSpan = document.getElementById("gpio-status");
@@ -220,6 +250,17 @@ function updateGpioStatus() {
     } else {
         statusSpan.innerHTML = '<i class="fa-solid fa-microchip" title="Local GPIO"></i>';
         statusSpan.className = "gpio-status local";
+    }
+    updateAddSensorVisibility();
+}
+
+function updateAddSensorVisibility() {
+    const addBtn = document.getElementById("add-sensor-btn");
+    if (isRemoteGpio) {
+        addBtn.classList.remove("hidden");
+    } else {
+        addBtn.classList.add("hidden");
+        document.getElementById("add-sensor-container").classList.add("hidden");
     }
 }
 

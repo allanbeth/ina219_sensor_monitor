@@ -27,6 +27,7 @@ class flaskWrapper:
         self.app.route("/get_log_file", methods=["GET", "POST"])(self.get_log_file)
         self.app.route("/readme", methods=["GET", "POST"])(self.serve_readme)
         self.app.route("/restart", methods=["POST"])(self.restart_program)
+        self.app.route("/add_sensor", methods=["POST"])(self.add_sensor)
 
 
     def main(self):
@@ -100,6 +101,34 @@ class flaskWrapper:
             return jsonify({"status": "restarting"}), 200
         except Exception as e:
             self.logger.info(f"Failed to restart")
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+    def add_sensor(self):
+        data = request.get_json()
+        name = data.get("name")
+        sensor_type = data.get("type")
+        max_power = int(data.get("max_power", 100))
+        rating = int(data.get("rating", 12))
+        address = data.get("address")
+        try:
+            # Add to config and save
+            new_sensor = {
+                "name": name,
+                "address": address,
+                "type": sensor_type,
+                "max_power": max_power,
+                "rating": rating
+            }
+            # Load, append, and save
+            with open(self.config_manager.SENSOR_FILE, "r") as f:
+                sensors = json.load(f)
+            sensors.append(new_sensor)
+            with open(self.config_manager.SENSOR_FILE, "w") as f:
+                json.dump(sensors, f)
+            self.logger.info(f"Added new sensor: {name}")
+            return jsonify({"status": "success"})
+        except Exception as e:
+            self.logger.error(f"Failed to add sensor: {e}")
             return jsonify({"status": "error", "message": str(e)}), 500
 
     def run_webserver(self): 

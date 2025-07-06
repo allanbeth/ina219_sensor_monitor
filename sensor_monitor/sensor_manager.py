@@ -4,7 +4,6 @@ from sensor_monitor.sensor import Sensor
 from sensor_monitor.config_manager import SENSOR_FILE
 from sensor_monitor.mqtt import MQTTPublisher
 from sensor_monitor.logger import sensor_logger
-#from sensor_monitor.live_data import live_data
 from sensor_monitor.webserver import flaskWrapper
 
 import pigpio
