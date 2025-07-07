@@ -328,7 +328,7 @@ function saveSensor(originalName) {
 }
 
 // --- Settings Functions ---
-function settings() {
+function getSettings() {
     fetch("/get_settings")
         .then(res => res.json())
         .then(data => {
@@ -437,11 +437,11 @@ function generateLogHTML(readings) {
 }
 
 function getLogFile() {
-    // Clear previous log entries
-    document.getElementById("log-file-entries").innerHTML = "";
 
     const logContainer = document.getElementById("log-file-entries");
-    logContainer.innerHTML = "<p>Loading logs...</p>";
+    // logContainer.innerHTML = "<p>Loading logs...</p>";
+
+    
 
     fetch("/get_log_file")
         .then(res => res.json())
