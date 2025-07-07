@@ -460,6 +460,10 @@ body {
     appearance: none;
 }
 
+.select-placeholder {
+    color: darkgray;
+}
+
 .add-sensor-btns {
     float: right;
     margin: 0px 4px 0px 4px;
@@ -673,7 +677,7 @@ meter {
 }
 
 .fa-book:hover {
-    color: #333;
+    color: #151212;
 }
 
 .fa-rotate {
@@ -683,7 +687,7 @@ meter {
 }
 
 .fa-rotate:hover {
-    color: #333;
+    color: #151212;
 }
 
 .fa-save {
@@ -693,7 +697,7 @@ meter {
 }
 
 .fa-save:hover {
-    color: #00ff15;
+    color: #24b02d;
 }
 
 .fa-delete {
@@ -712,7 +716,7 @@ meter {
 }
 
 .fa-arrow-left:hover {
-    color: #333;
+    color: #151212;
 }
 
 .fa-plus{
@@ -722,7 +726,7 @@ meter {
 }
 
 .fa-plus:hover {
-    color: #333;
+    color: #151212;
 }
 .fa-sync-alt {
     color: #666;
@@ -731,7 +735,7 @@ meter {
 }
 
 .fa-sync-alt:hover {
-    color: #333;
+    color: #151212;
 }
 
 .fa-check {
@@ -741,26 +745,17 @@ meter {
 }
 
 .fa-check:hover {
-    color: #00ff00;;
+    color: #24b02d;
 }
 
-.fa-cloud {
-    color: #666;
+.fa-wifi {
+    color: #00ff6e8f;
     transition: color 0.2s;
 }
 
-.fa-cloud:hover {
-    color: #333;;
-}
-
-.fa-microchip {
-    color: #666;
-    cursor: pointer;
+.fa-network-wired {
+    color: #00ff6e8f;
     transition: color 0.2s;
-}
-
-.fa-microchip:hover {
-    color: #333;
 }
 
 .fa-trash {
@@ -770,7 +765,7 @@ meter {
 }
 
 .fa-trash:hover {
-    color: #f43434;
+    color: #8a1414;
 }
 
 /* ========== Responsive Layout ========== */

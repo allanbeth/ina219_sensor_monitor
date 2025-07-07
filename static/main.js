@@ -29,11 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // --- Event Handler Setup ---
 function setupEventHandlers() {
     // Header buttons
-    document.querySelector(".fa-gear").addEventListener("click", settings);
-    document.querySelector(".fa-book").addEventListener("click", fullLog);
-    document.querySelector(".fa-question").addEventListener("click", about);
-    document.querySelector(".fa-rotate").addEventListener("click", restartConfirmation);
 
+    // Add Sensor
     document.getElementById("add-sensor-btn").addEventListener("click", () => {
         document.getElementById("add-sensor-container").classList.remove("hidden");
     });
@@ -44,26 +41,46 @@ function setupEventHandlers() {
 
 
     // Settings
-    document.getElementById("settings-container").addEventListener("click", (e) => {
-        if (e.target.closest(".fa-arrow-left")) cancelSettings();
-        if (e.target.closest(".fa-save")) saveSettings();
+    document.getElementById("settings-btn").addEventListener("click", () => {
+        document.getElementById("settings-container").classList.remove("hidden");
+        getSettings();
     });
+    document.getElementById("settings-cancel").addEventListener("click", () => {
+        document.getElementById("settings-container").classList.add("hidden");
+    });
+    document.getElementById("settings-save").addEventListener("click", saveSettings);
 
     // About
-    document.getElementById("about-container")?.addEventListener("click", (e) => {
-        if (e.target.closest(".fa-arrow-left")) cancelAbout();
+    document.getElementById("about-btn").addEventListener("click", () => {
+        document.getElementById("about-container").classList.remove("hidden");
+        getAbout();
+    });
+    document.getElementById("about-cancel").addEventListener("click", () => {
+        document.getElementById("about-container").classList.add("hidden");
     });
 
     // Restart
-    document.getElementById("restart-container")?.addEventListener("click", (e) => {
-        if (e.target.closest(".cancel-btn")) cancelRestart();
-        if (e.target.closest(".save-btn")) restartProgram();
+    document.getElementById("restart-btn").addEventListener("click", () => {
+        document.getElementById("restart-container").classList.remove("hidden");
+        restartConfirmation();
     });
+    document.getElementById("restart-cancel").addEventListener("click", () => {
+        document.getElementById("restart-container").classList.add("hidden");
+    });
+    document.getElementById("restart-save").addEventListener("click", restartProgram);
 
     // Log file
-    document.getElementById("log-file-container")?.addEventListener("click", (e) => {
-        if (e.target.closest(".fa-arrow-left")) closeFullLog();
+    document.getElementById("log-file-btn").addEventListener("click", () => {
+        document.getElementById("log-file-container").classList.remove("hidden");
+        getLogFile();
     });
+    document.getElementById("log-file-cancel").addEventListener("click", () => {
+        document.getElementById("log-file-container").classList.add("hidden");
+    });
+    document.getElementById("log-file-refresh").addEventListener("click", () => {
+        getLogFile();
+    });
+    
 }
 
 // --- Sensor Update Handler ---
@@ -245,10 +262,10 @@ function addSensor() {
 function updateGpioStatus() {
     const statusSpan = document.getElementById("gpio-status");
     if (isRemoteGpio) {
-        statusSpan.innerHTML = '<i class="fa-solid fa-cloud" title="Remote GPIO"></i>';
+        statusSpan.innerHTML = '<i class="fa-solid fa-wifi" title="Remote GPIO"></i>';
         statusSpan.className = "gpio-status remote";
     } else {
-        statusSpan.innerHTML = '<i class="fa-solid fa-microchip" title="Local GPIO"></i>';
+        statusSpan.innerHTML = '<i class="fa-solid fa-network-wired" title="Local GPIO"></i>';
         statusSpan.className = "gpio-status local";
     }
     updateAddSensorVisibility();
@@ -312,10 +329,6 @@ function saveSensor(originalName) {
 
 // --- Settings Functions ---
 function settings() {
-    paused = true;
-    document.getElementById("settings-container").classList.remove("hidden");
-    document.getElementById("sensor-container").classList.add("hidden");
-    document.getElementById("header-btns").classList.add("hidden");
     fetch("/get_settings")
         .then(res => res.json())
         .then(data => {
@@ -342,13 +355,6 @@ function settings() {
                 i2cInput.disabled = !this.checked;
             });
         });
-}
-
-function cancelSettings() {
-    paused = false;
-    document.getElementById("settings-container").classList.add("hidden");
-    document.getElementById("sensor-container").classList.remove("hidden");
-    document.getElementById("header-btns").classList.remove("hidden");
 }
 
 function saveSettings() {
@@ -388,7 +394,7 @@ function saveSettings() {
 
     updateEditFormI2CInputs();
     updateGpioStatus();
-    cancelSettings();
+    document.getElementById("settings-container").classList.add("hidden");
 }
 
 function updateEditFormI2CInputs() {
@@ -398,11 +404,7 @@ function updateEditFormI2CInputs() {
 }
 
 // --- About/README Functions ---
-function about() {
-    paused = true;
-    document.getElementById("sensor-container").classList.add("hidden");
-    document.getElementById("header-btns").classList.add("hidden");
-    document.getElementById("about-container").classList.remove("hidden");
+function getAbout() {
     fetch("/readme")
         .then(res => res.text())
         .then(markdown => {
@@ -412,13 +414,6 @@ function about() {
             document.getElementById("about-content").innerText = "Failed to load README.";
             console.error("Error loading README:", error);
         });
-}
-
-function cancelAbout() {
-    paused = false;
-    document.getElementById("about-container").classList.add("hidden");
-    document.getElementById("sensor-container").classList.remove("hidden");
-    document.getElementById("header-btns").classList.remove("hidden");
 }
 
 // --- Log Functions ---
@@ -441,11 +436,9 @@ function generateLogHTML(readings) {
     `).join('');
 }
 
-function fullLog() {
-    paused = true;
-    document.getElementById("log-file-container").classList.remove("hidden");
-    document.getElementById("sensor-container").classList.add("hidden");
-    document.getElementById("header-btns").classList.add("hidden");
+function getLogFile() {
+    // Clear previous log entries
+    document.getElementById("log-file-entries").innerHTML = "";
 
     const logContainer = document.getElementById("log-file-entries");
     logContainer.innerHTML = "<p>Loading logs...</p>";
@@ -481,12 +474,6 @@ function fullLog() {
         });
 }
 
-function closeFullLog() {
-    paused = false;
-    document.getElementById("log-file-container").classList.add("hidden");
-    document.getElementById("sensor-container").classList.remove("hidden");
-    document.getElementById("header-btns").classList.remove("hidden");
-}
 
 // --- Sensor Log Functions ---
 function openLog(name) {
@@ -571,36 +558,36 @@ function finalizeDelete(name) {
 }
 
 // --- Restart Functions ---
-function cancelRestart() {
-    document.getElementById("restart-container").classList.add("hidden");
-    document.getElementById("sensor-container").classList.remove("hidden");
-    document.getElementById("header-btns").classList.remove("hidden");
-    paused = false;
-}
+
 
 function restartConfirmation() {
-    paused = true;
     const resetMsg = document.getElementById("restart-content");
     resetMsg.innerHTML = '<h5>Are you sure you want to restart the program?</h5>';
-    document.getElementById("restart-container").classList.remove("hidden");
-    document.getElementById("sensor-container").classList.add("hidden");
-    document.getElementById("header-btns").classList.add("hidden");
 }
 
-function restartProgram() {
-    const restartMsg = document.getElementById("restart-content");
-    restartMsg.innerHTML = "<h5>Restarting...</h5>";
-    const closeBtn = document.getElementById("restart-btns");
-    closeBtn.innerHTML = '<button class="cancel-btn">Done</button>';
 
-    fetch("/restart", { method: "POST" })
-        .then(res => {
-            if (res.ok) {
-                restartMsg.innerHTML = "<h5>Successfully Restarted</h5>";
-            } else {
-                restartMsg.innerHTML = "<h5>Failed To Restart</h5><p>Check logs for errors.</p>";
-            }
-        });
+async function restartProgram() {
+  const restartMsg = document.getElementById("restart-content");
+  restartMsg.innerHTML = "<h5>Restarting...</h5>";
+
+  try {
+    const res = await fetch("/restart", { method: "POST" });
+
+    if (res.ok) {
+      restartMsg.innerHTML = "<h5>Successfully Restarted</h5>";
+      await sleep(2000); // pause for 2 seconds
+      document.getElementById("restart-container").classList.add("hidden");
+    } else {
+      restartMsg.innerHTML = "<h5>Failed To Restart</h5><p>Check logs for errors.</p>";
+    }
+  } catch (err) {
+    restartMsg.innerHTML = "<h5>Error restarting</h5><p>" + err.message + "</p>";
+  }
+}
+
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function closeRestart() {

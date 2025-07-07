@@ -18,10 +18,10 @@
             <div class="header-btns" id="header-btns">
                 <span id="gpio-status" class="gpio-status"></span>
                 <i class="fa-solid fa-plus" id="add-sensor-btn" title="Add Sensor"></i>
-                <i class="fa-solid fa-gear" onclick="settings()"></i>
-                <i class="fa-solid fa-book" onclick="fullLog()"></i>
-                <i class="fa-solid fa-question" onclick="about()"></i>
-                <i class="fa-solid fa-rotate" onclick="restartConfirmation()"></i>
+                <i class="fa-solid fa-gear" id="settings-btn" title="View Logs"></i>
+                <i class="fa-solid fa-book" id="log-file-btn" title="Configuration"></i>
+                <i class="fa-solid fa-question" id="about-btn" title="About"></i>
+                <i class="fa-solid fa-rotate" id="restart-btn" title="Restart Program"></i>
             </div>
         </div>
     </div>
@@ -45,6 +45,7 @@
             <div class="add-sensor-entry">
                 <label for="add-sensor-type">Senor Type:</label>
                 <select id="add-sensor-type">
+                    <option value="" disabled selected><span class="select-placeholder">Select Sensor Type</span></option>
                     <option value="Solar">Solar</option>
                     <option value="Wind">Wind</option>
                     <option value="Battery">Battery</option>
@@ -70,11 +71,11 @@
         <div id="settings-card" class="settings-card">
             <div class="settings-header">
                 <div class="back-btn">
-                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" onclick="cancelSettings()"></i>
+                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" id="settings-cancel"></i>
                 </div>
                 <h4>Settings</h4>
                 <div class="settings-btns">
-                    <i class="fa-solid fa-save" style="cursor:pointer" onclick="saveSettings()"></i>
+                    <i class="fa-solid fa-save" style="cursor:pointer" id="settings-save"></i>
                 </div>
             </div>
                 
@@ -136,7 +137,7 @@
         <div id="about-card" class="about-card">
             <div class="about-header">
                 <div class="back-btn">
-                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" onclick="cancelAbout()"></i>
+                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" id="about-cancel"></i>
                 </div>
                 <h4>About</h4>
             </div>
@@ -153,11 +154,11 @@
         <div id="restart-card" class="restart-card">
             <div class="restart-header">
                 <div class="back-btn">
-                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" onclick="cancelRestart()"></i>
+                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" id="restart-cancel"></i>
                 </div>
                 <h4>Restart</h4>
                 <div class="restart-btns">
-                    <i class="fa-solid fa-check" style="cursor:pointer" onclick="restartProgram()"></i>
+                    <i class="fa-solid fa-check" style="cursor:pointer" id="restart-save"></i>
                 </div>
             </div>
             <div class="restart-info">
@@ -172,11 +173,11 @@
         <div id="log-file-card" class="log-file-card">
             <div class="log-file-header">
                 <div class="back-btn">
-                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" onclick="closeFullLog()"></i>
+                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" id="log-file-cancel"></i>
                 </div>
                 <h4>Logs</h4>
                 <div class="log-file-btns">
-                    <i class="fa-solid fa-sync-alt" style="cursor:pointer" onclick="fullLog()"></i>
+                    <i class="fa-solid fa-sync-alt" style="cursor:pointer" id="log-file-refresh"></i>
                 </div>
             </div>
             <div class="log-file-data" id="log-file-data">
