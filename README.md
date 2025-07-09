@@ -7,11 +7,60 @@ A Python-based sensor monitoring system for reading INA219 power sensors via I²
 ## 🚀 Features
 
 - Reads voltage, current, power, and state of charge (for batteries) from INA219 sensors.
-- Web interface with real-time updates, configuration panel, logs, and sensor editing.
+- Web interface with real-time updates, configuration panel, logs, sensor editing, and backup/restore.
 - Publishes data to MQTT with Home Assistant discovery support.
 - Remote GPIO support using `pigpio` for controlling I²C-connected sensors on another device.
-- Automatically detects and registers sensors on I²C bus.
+- Automatically detects and registers sensors on the I²C bus.
 - Supports restart via the web UI when managed by `systemd`.
+
+---
+
+## 🔌 Hardware Requirements & Connections
+
+### Required Hardware
+
+- Raspberry Pi (or compatible SBC)
+- One or more **INA219** voltage/current/power sensors
+- I²C wires (SDA/SCL, VCC, GND)
+- Optional: Remote Raspberry Pi or controller for distributed monitoring
+- Optional: 3.3V logic-level shifter for longer I²C runs
+
+### Typical Connection (Local GPIO)
+
+| INA219 Pin | Connect To (Raspberry Pi) |
+|------------|---------------------------|
+| VCC        | 3.3V                      |
+| GND        | GND                       |
+| SDA        | GPIO2 (Pin 3)             |
+| SCL        | GPIO3 (Pin 5)             |
+
+Enable I²C on the Pi via `sudo raspi-config`.
+
+---
+
+## 🌐 Remote GPIO Setup (Using `pigpio`)
+
+To monitor sensors attached to another Pi on the network:
+
+### On the **Remote Pi** (with sensors):
+
+1. Enable I²C (`sudo raspi-config`)
+2. Start the `pigpiod` daemon:
+   ```bash
+   sudo systemctl enable pigpiod
+   sudo systemctl start pigpiod
+   ```
+3. Ensure port `8888` is open on the remote Pi.
+
+### On the **Main Pi** (running the app):
+
+In `config.json`:
+```json
+"remote_gpio": 1,
+"gpio_address": "192.168.1.10"
+```
+
+The app will connect via TCP to the `pigpiod` server on the remote device and read INA219 sensors over I²C.
 
 ---
 
@@ -22,7 +71,7 @@ A Python-based sensor monitoring system for reading INA219 power sensors via I²
 - Python 3.7 or later
 - Raspberry Pi OS or Linux with I²C enabled
 - MQTT broker (e.g. Mosquitto)
-- `pigpiod` running (if using remote GPIO)
+- `pigpiod` running (for remote GPIO)
 
 ### Install Dependencies
 
@@ -93,7 +142,11 @@ http://<host>:<webserver_port>
 
 - **Sensor Cards**: Show real-time voltage, current, power, and charge.
 - **Edit Panel**: Rename sensors, adjust type, rating, and max power.
-- **Settings Panel**: Adjust polling, MQTT, GPIO, and other config options.
+- **Settings Panel**:
+  - Modify polling intervals, MQTT broker settings, and GPIO mode.
+  - **💾 Backup & Restore**:
+    - Download a backup of your `config.json` and sensor settings.
+    - Upload a backup to restore previous configurations.
 - **Logs**: View the most recent log entries.
 - **Restart**: Button to trigger service restart when running via `systemd`.
 

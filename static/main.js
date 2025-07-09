@@ -462,13 +462,22 @@ function backupConfig() {
 
 function restoreConfig() {
 
-    fetch("/restore")
-        .then(res => res.text())
-        .then(markdown => {
-            document.getElementById("about-content").innerHTML = marked.parse(markdown);
+    const configFile = document.getElementById("restore-config-file").value;
+
+    fetch("/restore", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            configFile: programConfig,
         })
+    })
+        .then(res => res.json())
+        .then(() => {
+            document.getElementById("restore-config-data").innerHTML = "Restore Successful" ;
+        })
+
         .catch(error => {
-            document.getElementById("about-content").innerText = "Failed to restore Backup.";
+            document.getElementById("restore-config-data").innerText = "Failed to restore Backup.";
             console.error("Error restoring Backup:", error);
         });
 
@@ -647,6 +656,7 @@ async function restartProgram() {
     if (res.ok) {
       restartMsg.innerHTML = "<h5>Successfully Restarted</h5>";
       await sleep(2000); // pause for 2 seconds
+      document.getElementById("restart-container").classList.add("hidden");
       document.getElementById("restart-container").classList.add("hidden");
     } else {
       restartMsg.innerHTML = "<h5>Failed To Restart</h5><p>Check logs for errors.</p>";

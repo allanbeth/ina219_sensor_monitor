@@ -1,5 +1,8 @@
 # sensor_monitor/config_manager.py
 
+
+
+
 MQTT_TOPIC = "homeassistant/sensor"
 MQTT_DISCOVERY_PREFIX = "homeassistant"
 
@@ -19,10 +22,10 @@ class ConfigManager:
     def load_config(self):
         try:
             with open(CONFIG_FILE, "r") as f:
-                self.logger.info(f"Config file opened Successfully.")
+                self.logger.info("Config file opened Successfully.")
                 return json.load(f)
         except FileNotFoundError:
-            self.logger.warning(f"Config file not found, creating default config.")
+            self.logger.warning("Config file not found, creating default config.")
             default_config = {
                 "poll_intervals": {
                     "Wind": 7,

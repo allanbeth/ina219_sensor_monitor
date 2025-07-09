@@ -403,7 +403,8 @@ body {
     margin: 0px 4px 0px 4px;
 }
 
-.back-btn {
+.back-btn,
+.connection-type {
     float: left;
     margin: 0px 15px 0px 4px;
 }
