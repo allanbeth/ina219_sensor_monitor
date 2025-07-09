@@ -1,11 +1,10 @@
 # sensor_monitor/webserver.py
 
-from flask import Flask, render_template, request, redirect, send_file, abort, send_from_directory, jsonify
-from flask_socketio import SocketIO, emit
-#from sensor_monitor.config import WEB_SERVER_HOST, WEB_SERVER_PORT
+from flask import Flask, render_template, request, send_file, abort, jsonify
+from flask_socketio import SocketIO
 from sensor_monitor.live_data import sensor_data
 from pathlib import Path
-import json, os, sys, subprocess
+import json, subprocess
 
 class flaskWrapper:
     def __init__(self, logger, config_manager, sensor_config):
@@ -95,13 +94,13 @@ class flaskWrapper:
             return jsonify({"logs": []})
             
         try:
-            self.logger.info(f"Retrieving Logs")
+            self.logger.info("Retrieving Logs")
             with open(self.logFilePath, "r") as f:
                 lines = f.readlines()
 
             # Return last N lines (e.g., 100)
             logs = [{"logs": line.strip()} for line in lines[-100:]][::-1]
-            self.logger.info(f"Loaded logs")
+            self.logger.info("Loaded logs")
             return jsonify({"logs": logs})
         except Exception as e:
             return jsonify({"error": str(e), "logs": []}), 500
@@ -111,12 +110,12 @@ class flaskWrapper:
 
     def restart_program(self):
         try:
-            self.logger.info(f"Restarting.....")
+            self.logger.info("Restarting.....")
             subprocess.Popen(["sudo", "systemctl", "restart", "sensor_monitor.service"])
-            self.logger.info(f"Restarted Sucessfully ")
+            self.logger.info("Restarted Sucessfully ")
             return jsonify({"status": "restarting"}), 200
         except Exception as e:
-            self.logger.info(f"Failed to restart")
+            self.logger.info("Failed to restart")
             return jsonify({"status": "error", "message": str(e)}), 500
 
     def add_sensor(self):
