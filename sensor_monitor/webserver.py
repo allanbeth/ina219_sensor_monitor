@@ -28,10 +28,12 @@ class flaskWrapper:
         self.app.route("/readme", methods=["GET", "POST"])(self.serve_readme)
         self.app.route("/restart", methods=["POST"])(self.restart_program)
         self.app.route("/add_sensor", methods=["POST"])(self.add_sensor)
+        self.app.route("/backup", methods=["POST"])(self.backup_config)
+        self.app.route("/restore", methods=["POST"])(self.restore_config)
 
 
     def main(self):
-        self.logger.info(f"Loading index.html")
+        self.logger.info("Loading index.html")
         self.broadcast_sensor_data()
 
         return render_template("index.html", sensors=sensor_data)
@@ -50,13 +52,27 @@ class flaskWrapper:
 
         
     def get_settings(self):
-            self.logger.info(f"Requesting config data")
+            self.logger.info("Requesting config data")
             
             return self.config_manager.config_data
 
     def update_settings(self):
         data = request.get_json()
         self.config_manager.save_config(data)
+
+    def backup_config(self):
+        self.logger.info("Backing up configuration file(s)")
+        data = request.get_json()
+        program = data["programConfig"]
+        sensor = data["sensorConfig"]
+
+        self.config_manager.backup_config(program, sensor)
+
+    def restore_config(self):
+        self.logger.info("Restoring configuration file(s)")
+        
+
+        self.config_manager.restore_config()
     
     def delete_sensor(self):
         data = request.get_json()

@@ -76,6 +76,12 @@ class ConfigManager:
         except Exception as e:
             self.logger.error(f"Failed to save config: {e}")
 
+    def backup_config(self, program, sensor):
+        self.logger.info(f"Backed up {program} {sensor}")
+
+    def restore_config(self, config_file):
+        self.logger.info(f"Backed up {config_file}")    
+
 
     def reload_config (self):
         self.config_data = self.load_config()

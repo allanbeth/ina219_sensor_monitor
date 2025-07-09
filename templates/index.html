@@ -9,90 +9,99 @@
     <meta name="author" content="Your Name">
     <meta name="keywords" content="INA219, sensor monitor, solar, wind, battery, energy monitor">
     <meta name="viewport" content="width=device-width" />
-    
+
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='icons/favicon-16x16.png') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icons/android-chrome-192x192.png') }}">
-    <link rel="icon" type="image/png" sizes="512x512" href="{{ url_for('static', filename='icons/android-chrome-512x512.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192"
+        href="{{ url_for('static', filename='icons/android-chrome-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512"
+        href="{{ url_for('static', filename='icons/android-chrome-512x512.png') }}">
     <link rel="manifest" href="{{ url_for('static', filename='icons/site.webmanifest') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
+
 </head>
 
 <body>
     <div class="header-container">
         <div class="header-card">
-                <h1>Energy Monitor</h1>    
+            <div class="connection-type" id="connection-type">
+                <span id="gpio-status" class="gpio-status"></span>
+            </div>
+            <h1>Energy Monitor</h1>
             <div class="header-btns" id="header-btns">
                 <span id="gpio-status" class="gpio-status"></span>
                 <i class="fa-solid fa-plus" id="add-sensor-btn" title="Add Sensor"></i>
                 <i class="fa-solid fa-gear" id="settings-btn" title="View Logs"></i>
                 <i class="fa-solid fa-book" id="log-file-btn" title="Configuration"></i>
                 <i class="fa-solid fa-question" id="about-btn" title="About"></i>
-                <i class="fa-solid fa-rotate" id="restart-btn" title="Restart Program"></i>
+                <!-- <i class="fa-solid fa-rotate" id="restart-btn" title="Restart Program"></i> -->
             </div>
         </div>
     </div>
 
     <div class="add-sensor-container hidden" id="add-sensor-container">
-    <div class="add-sensor-card">
-        <div class="add-sensor-header">
-            <div class="back-btn">
-                <i class="fa-solid fa-arrow-left" id="add-sensor-cancel" title="Back"></i>
+        <div class="add-sensor-card">
+            <div class="add-sensor-header">
+                <div class="back-btn">
+                    <i class="fa-solid fa-arrow-left" id="add-sensor-cancel" title="Back"></i>
+                </div>
+                <h4>Add New Sensor</h4>
+                <div class="add-sensor-btns">
+                    <i class="fa-solid fa-save" id="add-sensor-save" title="Save New Sensor"></i>
+                </div>
             </div>
-            <h4>Add New Sensor</h4>
-            <div class="add-sensor-btns">
-                <i class="fa-solid fa-save" id="add-sensor-save" title="Save New Sensor"></i>
+            <div class="add-sensor-data">
+                <div class="add-sensor-entry">
+                    <label for="add-sensor-name">Senor Name:</label>
+                    <input type="text" id="add-sensor-name" placeholder="Name" />
+                </div>
+                <div class="add-sensor-entry">
+                    <label for="add-sensor-type">Senor Type:</label>
+                    <select id="add-sensor-type">
+                        <option value="" disabled selected><span class="select-placeholder">Select Sensor Type</span>
+                        </option>
+                        <option value="Solar">Solar</option>
+                        <option value="Wind">Wind</option>
+                        <option value="Battery">Battery</option>
+                    </select>
+                </div>
+                <div class="add-sensor-entry">
+                    <label for="add-sensor-max-power"> Senor Max Power:</label>
+                    <input type="number" id="add-sensor-max-power" placeholder="Max Power (W)" />
+                </div>
+                <div class="add-sensor-entry">
+                    <label for="add-sensor-rating">Sensor Rating:</label>
+                    <input type="number" id="add-sensor-rating" placeholder="Voltage Rating (V)" />
+                </div>
+                <div class="add-sensor-entry">
+                    <label for="add-sensor-address">Senor Name:</label>
+                    <input type="text" id="add-sensor-address" placeholder="I2C Address (hex)" />
+                </div>
             </div>
         </div>
-        <div class="add-sensor-data">
-            <div class="add-sensor-entry">
-                <label for="add-sensor-name">Senor Name:</label>
-                <input type="text" id="add-sensor-name" placeholder="Name"/>
-            </div>
-            <div class="add-sensor-entry">
-                <label for="add-sensor-type">Senor Type:</label>
-                <select id="add-sensor-type">
-                    <option value="" disabled selected><span class="select-placeholder">Select Sensor Type</span></option>
-                    <option value="Solar">Solar</option>
-                    <option value="Wind">Wind</option>
-                    <option value="Battery">Battery</option>
-                </select>
-            </div>
-            <div class="add-sensor-entry">
-                <label for="add-sensor-max-power"> Senor Max Power:</label>
-                <input type="number" id="add-sensor-max-power" placeholder="Max Power (W)"/>
-            </div>
-            <div class="add-sensor-entry">
-                <label for="add-sensor-rating">Sensor Rating:</label>
-                <input type="number" id="add-sensor-rating" placeholder="Voltage Rating (V)"/>
-            </div>
-            <div class="add-sensor-entry">
-                <label for="add-sensor-address">Senor Name:</label>
-                <input type="text" id="add-sensor-address" placeholder="I2C Address (hex)"/>
-            </div>
-        </div>  
     </div>
-</div>
 
     <div class="settings-container hidden" id="settings-container">
         <div id="settings-card" class="settings-card">
             <div class="settings-header">
                 <div class="back-btn">
-                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" id="settings-cancel"></i>
+                    <i class="fa-solid fa-arrow-left" id="settings-cancel"></i>
                 </div>
                 <h4>Settings</h4>
                 <div class="settings-btns">
-                    <i class="fa-solid fa-save" style="cursor:pointer" id="settings-save"></i>
+                    <i class="fa-solid fa-rotate" id="settings-restart" title="Restart Program"></i>
+                    <i class="fa-solid fa-file-export" id="settings-backup" title="Backup Configuration"></i>
+                    <i class="fa-solid fa-file-import" id="settings-restore" title="Restore Configuration"></i>
+                    <i class="fa-solid fa-save" id="settings-save" title="Save Settings"></i>
                 </div>
             </div>
-                
+
             <div class="settings-data">
                 <div class="settings-entry">
                     <label for="max-log">Max Log File Size (MB):</label>
@@ -119,30 +128,74 @@
                 <h5>MQTT</h5>
                 <div class="settings-entry">
                     <label for="mqtt-broker">MQTT Broker:</label>
-                    <input type="text" id="mqtt-broker"/>
+                    <input type="text" id="mqtt-broker" />
                 </div>
                 <div class="settings-entry">
                     <label for="mqtt-port">MQTT Port:</label>
-                    <input type="text" id="mqtt-port"/>
+                    <input type="text" id="mqtt-port" />
                 </div>
                 <h5>Web Server</h5>
                 <div class="settings-entry">
                     <label for="webserver-host">Webserver Host:</label>
-                    <input type="text" id="webserver-host"/>
+                    <input type="text" id="webserver-host" />
                 </div>
                 <div class="settings-entry">
                     <label for="webserver-port">Webserver Port:</label>
-                    <input type="text" id="webserver-port"/>
+                    <input type="text" id="webserver-port" />
                 </div>
                 <h5>GPIO</h5>
                 <div class="settings-entry">
                     <label for="remote-gpio">Remote GPIO:</label>
-                    <input type="checkbox" class="gpio-checkbox" id="remote-gpio"/>
+                    <input type="checkbox" class="gpio-checkbox" id="remote-gpio" />
                 </div>
                 <div class="settings-entry">
                     <label for="gpio-address">GPIO Address:</label>
-                    <input type="text" id="gpio-address"/>
-                </div>                
+                    <input type="text" id="gpio-address" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="backup-restore-container hidden" id="backup-restore-container">
+        <div class="backup-config-card hidden" id="backup-config-card">
+            <div class="backup-config-header">
+                <div class="back-btn">
+                    <i class="fa-solid fa-arrow-left" id="backup-config-cancel" title="Back"></i>
+                </div>
+                <h4>Backup Configuration</h4>
+                <div class="backup-config-btns">
+                    <i class="fa-solid fa-export" id="backup-config-save" title="Restore Configuration"></i>
+                </div>
+            </div>
+            <div class="backup-config-data" id="backup-config-data">
+                <div class="backup-config-entry">
+                    <p>Choose which configuration files you want to include in your backup</p>
+                </div>
+                <div class="backup-config-entry">
+                    <label for="program-config">Program Configuration:</label>
+                    <input type="checkbox" class="program-checkbox" id="program-config" />
+                </div>
+                <div class="backup-config-entry">
+                    <label for="sensor-config">Sensor Configuration:</label>
+                    <input type="checkbox" class="sensor-checkbox" id="sensor-config" />
+                </div>
+            </div>
+        </div>
+        <div class="restore-config-card hidden" id="restore-config-card">
+            <div class="restore-config-header">
+                <div class="back-btn">
+                    <i class="fa-solid fa-arrow-left" id="restore-config-cancel" title="Back"></i>
+                </div>
+                <h4>Restore Configuration</h4>
+                <div class="restore-config-btns">
+                    <i class="fa-solid fa-export" id="restore-config-save" title="Restore Configuration"></i>
+                </div>
+            </div>
+            <div class="restore-config-label">
+                    <p>Choose a backup file to restore</p>
+                </div>
+            <div class="restore-config-data">
+                    Loading backups....
             </div>
         </div>
     </div>
@@ -155,7 +208,7 @@
                 </div>
                 <h4>About</h4>
             </div>
-            
+
             <div class="about-info">
                 <div class="about-content" id="about-content">
                     Loading README...
@@ -176,7 +229,7 @@
                 </div>
             </div>
             <div class="restart-info">
-                <div class="restart-content" id="restart-content">   
+                <div class="restart-content" id="restart-content">
                 </div>
             </div>
         </div>
@@ -197,11 +250,11 @@
             <div class="log-file-data" id="log-file-data">
                 <div class="log-file-entries" id="log-file-entries">
                     Loading...
-                </div>                                              
+                </div>
             </div>
         </div>
     </div>
-    
+
 
     <div id="no-sensors" class="no-sensors {% if sensors %}hidden{% endif %}">
         No sensors detected. Please ensure your INA219 sensors are connected.
@@ -211,4 +264,5 @@
 
     <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
+
 </html>

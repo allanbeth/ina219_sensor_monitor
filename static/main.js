@@ -48,7 +48,41 @@ function setupEventHandlers() {
     document.getElementById("settings-cancel").addEventListener("click", () => {
         document.getElementById("settings-container").classList.add("hidden");
     });
+    document.getElementById("settings-restart").addEventListener("click", () => {
+        document.getElementById("settings-container").classList.add("hidden");
+        document.getElementById("restart-container").classList.remove("hidden");
+        restartConfirmation();
+    });
+    document.getElementById("settings-backup").addEventListener("click", () => {
+        document.getElementById("settings-container").classList.add("hidden");
+        document.getElementById("backup-restore-container").classList.remove("hidden");
+        document.getElementById("backup-config-card").classList.remove("hidden");
+        
+    });
+    document.getElementById("settings-restore").addEventListener("click", () => {
+        document.getElementById("settings-container").classList.add("hidden");
+        document.getElementById("backup-restore-container").classList.remove("hidden");
+        document.getElementById("restore-config-card").classList.remove("hidden");
+    });
     document.getElementById("settings-save").addEventListener("click", saveSettings);
+
+    // Backup Configuration
+    document.getElementById("backup-config-cancel").addEventListener("click", () => {
+    document.getElementById("backup-restore-container").classList.add("hidden");
+    document.getElementById("settings-container").classList.remove("hidden");
+    document.getElementById("backup-config-card").classList.add("hidden");
+    });
+    document.getElementById("backup-config-save").addEventListener("click", backupConfig);
+
+    
+
+    // Restore Configuration
+    document.getElementById("restore-config-cancel").addEventListener("click", () => {
+    document.getElementById("backup-restore-container").classList.add("hidden");
+    document.getElementById("settings-container").classList.remove("hidden");
+    document.getElementById("restore-config-card").classList.add("hidden");
+    });
+    document.getElementById("restore-config-save").addEventListener("click", restoreConfig);
 
     // About
     document.getElementById("about-btn").addEventListener("click", () => {
@@ -60,10 +94,12 @@ function setupEventHandlers() {
     });
 
     // Restart
+    /*
     document.getElementById("restart-btn").addEventListener("click", () => {
         document.getElementById("restart-container").classList.remove("hidden");
         restartConfirmation();
     });
+    */
     document.getElementById("restart-cancel").addEventListener("click", () => {
         document.getElementById("restart-container").classList.add("hidden");
     });
@@ -401,6 +437,41 @@ function updateEditFormI2CInputs() {
     document.querySelectorAll('input[id^="address-"]').forEach(input => {
         input.disabled = !isRemoteGpio;
     });
+}
+
+
+function backupConfig() {
+
+    const programConfig = document.getElementById("program-config").checked ? 1 : 0;
+    const sensorConfig = document.getElementById("sensor-config").checked ? 1 : 0;
+
+    fetch("/backup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            config: programConfig,
+            sensor: sensorConfig,
+        })
+    })
+        .then(res => res.json())
+        .then(() => {
+            document.getElementById("backup-config-data").innerHTML = "Backup Successful" ;
+        });
+
+}
+
+function restoreConfig() {
+
+    fetch("/restore")
+        .then(res => res.text())
+        .then(markdown => {
+            document.getElementById("about-content").innerHTML = marked.parse(markdown);
+        })
+        .catch(error => {
+            document.getElementById("about-content").innerText = "Failed to restore Backup.";
+            console.error("Error restoring Backup:", error);
+        });
+
 }
 
 // --- About/README Functions ---

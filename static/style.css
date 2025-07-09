@@ -42,7 +42,8 @@ body {
 .log-file-header,
 .about-header, 
 .restart-header,
-.add-sensor-header {
+.add-sensor-header,
+.backup-config-header {
     border-bottom: #333 1px solid;
     padding-bottom: 5px;
 }
@@ -122,6 +123,91 @@ body {
 }
 
 .settings-btns {
+    float: right;
+    margin: 0px 4px 0px 4px;
+}
+
+/* ========== Backup and Restore ========== */
+
+.backup-restore-container {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.backup-config-card,
+.restore-config-card {
+    background: #d2d2d2;
+    border-radius: 10px;
+    padding: 2em 2em 1em 2em;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    min-width: 320px;
+    max-width: 90vw;
+}
+
+.backup-config-card,
+.restore-config-card h4 {
+    display: inline;
+    color: #333;
+    margin: 0px 10px 10px 4px;
+}
+
+.backup-config-data,
+.restore-config-data {
+    margin: 1px 0;
+    padding: 4px;
+    width: 100%;
+    margin: 1px 0;
+    padding: 4px;
+    width: 100%;
+    overflow: visible;
+    overflow-y: auto;
+    max-height: 480px;
+}
+
+.backup-config-label,
+.restore-config-label {
+    font-size: 0.8em;
+    width: 100%;
+
+}
+
+.backup-config-entry,
+.restore-config-entry {
+    font-size: 0.6em;
+    width: 100%;
+
+}
+
+.backup-configs-entry {
+    margin: 4px 0px 4px 0px;
+    font-size: 0.8em;
+    display: flex;
+}
+
+.backup-config-entry input{
+    width: 50%;
+    margin-right: 4px;
+}
+
+.backup-config-entry label{
+    width: 50%;
+}
+
+.backup-config-entry input,
+.backup-config-entry label {
+    margin: 1px 0;
+    padding: 4px;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+.backup-config-btns,
+.restore-config-btns{
     float: right;
     margin: 0px 4px 0px 4px;
 }
@@ -766,6 +852,26 @@ meter {
 
 .fa-trash:hover {
     color: #8a1414;
+}
+
+.fa-file-import {
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-file-import:hover {
+    color: #151212;
+}
+
+.fa-file-export {
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-file-export:hover {
+    color: #151212;
 }
 
 /* ========== Responsive Layout ========== */
