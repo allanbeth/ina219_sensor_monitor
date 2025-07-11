@@ -35,7 +35,7 @@
             </div>
             <h1>Energy Monitor</h1>
             <div class="header-btns" id="header-btns">
-                <span id="gpio-status" class="gpio-status"></span>
+                <!-- <span id="gpio-status" class="gpio-status"></span> -->
                 <i class="fa-solid fa-plus" id="add-sensor-btn" title="Add Sensor"></i>
                 <i class="fa-solid fa-gear" id="settings-btn" title="View Logs"></i>
                 <i class="fa-solid fa-book" id="log-file-btn" title="Configuration"></i>
@@ -163,21 +163,21 @@
                     <i class="fa-solid fa-arrow-left" id="backup-config-cancel" title="Back"></i>
                 </div>
                 <h4>Backup Configuration</h4>
-                <div class="backup-config-btns">
+                <div class="backup-config-btns" id="backup-config-btns">
                     <i class="fa-solid fa-file-export" id="backup-config-save" title="Backup Configuration"></i>
                 </div>
             </div>
-            <div class="backup-config-data" id="backup-config-data">
-                <div class="backup-config-entry">
+            <div class="backup-config-text" id="backup-config-text">
                     <p>Choose which configuration files you want to include in your backup</p>
                 </div>
+            <div class="backup-config-data" id="backup-config-data">
                 <div class="backup-config-entry">
                     <label for="program-config">Program Configuration:</label>
-                    <input type="checkbox" class="program-checkbox" id="program-config" />
+                    <input type="checkbox" checked class="program-checkbox" id="program-config" />
                 </div>
                 <div class="backup-config-entry">
                     <label for="sensor-config">Sensor Configuration:</label>
-                    <input type="checkbox" class="sensor-checkbox" id="sensor-config" />
+                    <input type="checkbox" checked class="sensor-checkbox" id="sensor-config" />
                 </div>
             </div>
         </div>
@@ -188,14 +188,14 @@
                 </div>
                 <h4>Restore Configuration</h4>
                 <div class="restore-config-btns">
-                    <i class="fa-solid fa-export" id="restore-config-save" title="Restore Configuration"></i>
+                    <i class="fa-solid fa-file-export" id="restore-config-save" title="Restore Configuration"></i>
                 </div>
             </div>
-            <div class="restore-config-label">
+            <div class="restore-config-text" id="restore-config-text">
                     <p>Choose a backup file to restore</p>
                 </div>
-            <div class="restore-config-data">
-                    Loading backups....
+            <div class="restore-config-data" id="restore-config-data">
+                    
             </div>
         </div>
     </div>

@@ -42,8 +42,7 @@ body {
 .log-file-header,
 .about-header, 
 .restart-header,
-.add-sensor-header,
-.backup-config-header {
+.add-sensor-header {
     border-bottom: #333 1px solid;
     padding-bottom: 5px;
 }
@@ -149,7 +148,7 @@ body {
     max-width: 90vw;
 }
 
-.backup-config-card,
+.backup-config-card h4,
 .restore-config-card h4 {
     display: inline;
     color: #333;
@@ -169,33 +168,28 @@ body {
     max-height: 480px;
 }
 
-.backup-config-label,
-.restore-config-label {
-    font-size: 0.8em;
+.backup-config-text,
+.restore-config-text {
+    font-size: 1em;
     width: 100%;
 
 }
 
 .backup-config-entry,
 .restore-config-entry {
-    font-size: 0.6em;
+    margin: 4px 0px 4px 0px;
+    display: flex;
     width: 100%;
 
 }
 
-.backup-configs-entry {
-    margin: 4px 0px 4px 0px;
-    font-size: 0.8em;
-    display: flex;
-}
-
 .backup-config-entry input{
-    width: 50%;
+    width: 30%;
     margin-right: 4px;
 }
 
 .backup-config-entry label{
-    width: 50%;
+    width: 70%;
 }
 
 .backup-config-entry input,
@@ -206,8 +200,12 @@ body {
     border-radius: 6px;
 }
 
-.backup-config-btns,
-.restore-config-btns{
+.backup-config-btns {
+    float: right;
+    margin: 0px 4px 0px 4px;
+}
+
+.restore-config-btns {
     float: right;
     margin: 0px 4px 0px 4px;
 }

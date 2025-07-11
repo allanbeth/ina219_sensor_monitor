@@ -1,17 +1,19 @@
 # sensor_monitor/config_manager.py
 
-
-
+from pathlib import Path
+from datetime import datetime
+import json
 
 MQTT_TOPIC = "homeassistant/sensor"
 MQTT_DISCOVERY_PREFIX = "homeassistant"
 
+ROOT = Path(__file__).parents[1]
 LOG_FILE = "sensor_monitor.log"
 SENSOR_FILE = "sensors.json"
 CONFIG_FILE = "config.json"
+BACKUP_DIR = ROOT / "backups"
 
 from sensor_monitor.logger import sensor_logger
-import json
 
 class ConfigManager:
     def __init__(self):
@@ -79,12 +81,70 @@ class ConfigManager:
         except Exception as e:
             self.logger.error(f"Failed to save config: {e}")
 
-    def backup_config(self, program, sensor):
-        self.logger.info(f"Backed up {program} {sensor}")
+    def backup_config(self, program_config, sensor_config):
+        
+        BACKUP_DIR.mkdir(exist_ok=True)  # Create directory if it doesn't exist
 
-    def restore_config(self, config_file):
-        self.logger.info(f"Backed up {config_file}")    
+        backup_data = {}
 
+        if program_config:
+            try:
+                with open("config.json", "r") as f:
+                    backup_data["config"] = json.load(f)
+                    self.logger.info("Added config.json to backup")
+            except FileNotFoundError:
+                self.logger.info("config.json not found.")
+                backup_data["config"] = None
+
+        if sensor_config:
+            try:
+                with open("sensors.json", "r") as f:
+                    backup_data["sensors"] = json.load(f)
+                    self.logger.info("Added sensor.json to backup")
+            except FileNotFoundError:
+                self.logger.info("sensors.json not found.")
+                backup_data["sensors"] = None
+
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filepath = BACKUP_DIR / f"backup_{timestamp}.json"
+
+        with open(filepath, "w") as f:
+            json.dump(backup_data, f, indent=2)
+
+        self.logger.info(f"Backup saved to {filepath}")
+        return str(filepath)
+		
+
+    def restore_backup(self, backup_file, restore_config, restore_sensors):
+        self.logger.info(f"Backed up {backup_file}")  
+        file_path = BACKUP_DIR / backup_file
+        if file_path.exists():
+            with open(file_path, "r") as f:
+                backup = json.load(f)
+
+            if restore_config and "config" in backup and backup["config"]:
+                with open(CONFIG_FILE , "w") as f:
+                    json.dump(backup["config"], f, indent=2)
+                    self.logger.info("config.json restored.")
+
+            if restore_sensors and "sensors" in backup and backup["sensors"]:
+                with open(SENSOR_FILE , "w") as f:
+                    json.dump(backup["sensors"], f, indent=2)
+                    self.logger.info("sensors.json restored.")
+
+            self.logger.info("Backup restored successfully.")
+        else:
+            self.logger.error(f"Backup file {backup_file} does not exist in {BACKUP_DIR}.")
+            raise FileNotFoundError(f"Backup file {backup_file} does not exist.")
+        
+    def list_backups(self):
+        if not BACKUP_DIR.exists():
+            self.logger.info("No backups found.")
+            return []
+
+        backups = [f.name for f in BACKUP_DIR.iterdir() if f.is_file() and f.suffix == '.json']
+        self.logger.info(f"Found {len(backups)} backup(s).")
+        return backups
 
     def reload_config (self):
         self.config_data = self.load_config()

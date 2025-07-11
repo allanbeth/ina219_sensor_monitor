@@ -63,6 +63,7 @@ function setupEventHandlers() {
         document.getElementById("settings-container").classList.add("hidden");
         document.getElementById("backup-restore-container").classList.remove("hidden");
         document.getElementById("restore-config-card").classList.remove("hidden");
+        loadBackups() ;
     });
     document.getElementById("settings-save").addEventListener("click", saveSettings);
 
@@ -71,6 +72,11 @@ function setupEventHandlers() {
     document.getElementById("backup-restore-container").classList.add("hidden");
     document.getElementById("settings-container").classList.remove("hidden");
     document.getElementById("backup-config-card").classList.add("hidden");
+    document.getElementById("backup-config-data").classList.remove("hidden");
+    document.getElementById("backup-config-btns").classList.remove("hidden");
+    document.getElementById("backup-config-text").innerHTML = '<p>Choose which configuration files you want to include in your backup</p>';
+    document.getElementById("program-config").checked = true;
+    document.getElementById("sensor-config").checked = true;
     });
     document.getElementById("backup-config-save").addEventListener("click", backupConfig);
 
@@ -81,6 +87,7 @@ function setupEventHandlers() {
     document.getElementById("backup-restore-container").classList.add("hidden");
     document.getElementById("settings-container").classList.remove("hidden");
     document.getElementById("restore-config-card").classList.add("hidden");
+    
     });
     document.getElementById("restore-config-save").addEventListener("click", restoreConfig);
 
@@ -444,19 +451,20 @@ function backupConfig() {
 
     const programConfig = document.getElementById("program-config").checked ? 1 : 0;
     const sensorConfig = document.getElementById("sensor-config").checked ? 1 : 0;
+    const backupMsg = document.getElementById("backup-config-text");
 
     fetch("/backup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            config: programConfig,
-            sensor: sensorConfig,
+            programConfig: programConfig,
+            sensorConfig: sensorConfig,
         })
     })
-        .then(res => res.json())
-        .then(() => {
-            document.getElementById("backup-config-data").innerHTML = "Backup Successful" ;
-        });
+       
+    document.getElementById("backup-config-data").classList.add("hidden");
+    document.getElementById("backup-config-btns").classList.add("hidden");
+    backupMsg.innerHTML = '<p>Backup Successful</p>';
 
 }
 
@@ -464,7 +472,7 @@ function restoreConfig() {
 
     const configFile = document.getElementById("restore-config-file").value;
 
-    fetch("/restore", {
+    fetch("/restore_backup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -481,6 +489,70 @@ function restoreConfig() {
             console.error("Error restoring Backup:", error);
         });
 
+}
+
+function loadBackups() {
+    const backupList = document.getElementById("restore-config-data");
+    backupList.innerHTML = "";
+    fetch("/list_backups")
+        .then(response => response.json())
+        .then(files => {
+            
+            const backupFile = document.getElementById("restore-config-entry");
+
+            files.forEach(filename => {
+                const row = document.createElement('div');
+                row.className = 'restore-config-entry';
+
+                row.innerHTML = `
+                    <span>${filename}</span>
+                    <i class="fas fa-trash" title="Delete"></i>
+                    <i class="fas fa-file-import" title="Restore"></i>
+                `;
+
+            backupList.appendChild(row);
+
+            });
+        });
+    }
+
+async function restoreBackup(filename) {
+    const restoreConfig = confirm("Restore config.json?");
+    const restoreSensors = confirm("Restore sensors.json?");
+
+    const res = await fetch('restore_backup', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            filename,
+            restore_config: restoreConfig,
+            restore_sensors: restoreSensors
+        })
+    });
+
+    const result = await res.json();
+    if (result.success) {
+        alert("Restore successful. Please reload or restart the app.");
+    } else {
+        alert("Restore failed: " + result.error);
+    }
+}
+
+async function deleteBackup(filename) {
+    if (!confirm(`Are you sure you want to delete "${filename}"?`)) return;
+
+    const res = await fetch('/delete_backup', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ filename })
+    });
+
+    const result = await res.json();
+    if (result.success) {
+        loadBackups();
+    } else {
+        alert("Error deleting file.");
+    }
 }
 
 // --- About/README Functions ---

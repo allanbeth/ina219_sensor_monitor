@@ -3,6 +3,7 @@
 from flask import Flask, render_template, request, send_file, abort, jsonify
 from flask_socketio import SocketIO
 from sensor_monitor.live_data import sensor_data
+from sensor_monitor.config_manager import ROOT
 from pathlib import Path
 import json, subprocess
 
@@ -11,11 +12,11 @@ class flaskWrapper:
         self.logger = logger
         self.config_manager = config_manager
         self.sensor_config = sensor_config
-        self.root = Path(__file__).parents[1]
-        self.templatePath = self.root / "templates/"
-        self.stylePath = self.root / "static/"
-        self.readmePath = self.root / "README.md"
-        self.logFilePath = self.root / "sensor_monitor.log"
+        #self.root = Path(__file__).parents[1]
+        self.templatePath = ROOT / "templates/"
+        self.stylePath = ROOT / "static/"
+        self.readmePath = ROOT / "README.md"
+        self.logFilePath = ROOT / "sensor_monitor.log"
         self.app = Flask(__name__, template_folder=self.templatePath, static_folder=self.stylePath)
         self.socketio = SocketIO(self.app, ping_timeout=60,ping_interval=25)
         self.app.route("/", methods=["GET", "POST"])(self.main)
@@ -28,7 +29,9 @@ class flaskWrapper:
         self.app.route("/restart", methods=["POST"])(self.restart_program)
         self.app.route("/add_sensor", methods=["POST"])(self.add_sensor)
         self.app.route("/backup", methods=["POST"])(self.backup_config)
-        self.app.route("/restore", methods=["POST"])(self.restore_config)
+        self.app.route("/delete_backup", methods=["POST"])(self.delete_backup)
+        self.app.route("/restore_backup", methods=["POST"])(self.restore_backup)
+        self.app.route("/list_backups", methods=["GET", "POST"])(self.list_backups)
 
 
     def main(self):
@@ -67,11 +70,24 @@ class flaskWrapper:
 
         self.config_manager.backup_config(program, sensor)
 
-    def restore_config(self):
+    def restore_backup(self):
         self.logger.info("Restoring configuration file(s)")
-        
+        data = request.get_json()
+        filename = data.get("filename")
+        restore_config = data.get("restore_config", True)
+        restore_sensors = data.get("restore_sensors", True)        
 
-        self.config_manager.restore_config()
+        self.config_manager.restore_backup(filename, restore_config, restore_sensors)
+
+    def delete_backup(self):
+        data = request.json
+        filename = data.get("filename")
+        self.config_manager.delete_backup(filename)
+        
+    def list_backups(self):
+        self.logger.info("Listing backup files")
+        backups = self.config_manager.list_backups()
+        return jsonify({"backups": backups})
     
     def delete_sensor(self):
         data = request.get_json()
