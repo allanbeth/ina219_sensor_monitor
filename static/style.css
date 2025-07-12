@@ -221,6 +221,10 @@ body {
     margin: 0px 4px 0px 4px;
 }
 
+.confirm-btns i {
+    font-size: 2.0em;
+}
+
 /* ========== About Card ========== */
 
 .about-container {

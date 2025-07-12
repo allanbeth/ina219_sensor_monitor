@@ -518,7 +518,7 @@ function loadBackups() {
                 deleteIcon.title = "Delete";
                 deleteIcon.setAttribute("data-filename", filename);
                 deleteIcon.addEventListener("click", () => {
-                    deleteBackup(filename);
+                    confirmDeleteBackup(filename);
                 });
 
                 const restoreIcon = document.createElement("i");
@@ -526,7 +526,7 @@ function loadBackups() {
                 restoreIcon.title = "Restore";
                 restoreIcon.setAttribute("data-filename", filename);
                 restoreIcon.addEventListener("click", () => {
-                    restoreBackup(filename);
+                    confirmRestoreBackup(filename);
                 });
 
                 row.appendChild(nameDiv);
@@ -535,6 +535,35 @@ function loadBackups() {
                 backupContainer.appendChild(row);
             });
         });
+}
+
+function confirmRestoreBackup(filename) {
+    const confirmText = document.getElementById("restore-config-text")
+    confirmText.innerHTML = "";
+    confirmText.innerHTML = `        
+        <div class="restore-config-text" id="restore-config-text">
+        <p>Are you sure you want to restore "${filename}"?</p>
+        </div>
+        `;
+
+    
+    const confirmDiv = document.getElementById("restore-config-entries")
+    confirmDiv.innerHTML = "";
+    confirmDiv.innerHTML = `
+        <div class="confirm-btns">
+        <i class="fas fa-xmark" id="cancel-restore" title="Cancel"></i>
+        <i class="fas fa-check" id="confirm-restore" title="Delete"></i>
+        </div>
+        `;
+
+    
+    document.getElementById("cancel-restore").addEventListener("click", () => {
+        loadBackups();
+    });
+    document.getElementById("confirm-restore").addEventListener("click", () => {
+        restoreBackup(filename);
+    });
+
 }
 
 async function restoreBackup(filename) {
@@ -559,8 +588,36 @@ async function restoreBackup(filename) {
     }
 }
 
+function confirmDeleteBackup(filename) {
+    const confirmText = document.getElementById("restore-config-text")
+    confirmText.innerHTML = "";
+    confirmText.innerHTML = `        
+        <div class="restore-config-text" id="restore-config-text">
+        <p>Are you sure you want to delete "${filename}"?</p>
+        </div>
+        `;
+
+    const confirmDiv = document.getElementById("restore-config-entries")
+    confirmDiv.innerHTML = "";
+    confirmDiv.innerHTML = `
+        <div class="confirm-btns">
+        <i class="fas fa-xmark" id="cancel-delete" title="Cancel"></i>
+        <i class="fas fa-check" id="confirm-delete" title="Delete"></i>
+        </div>
+        `;
+
+    
+    document.getElementById("cancel-delete").addEventListener("click", () => {
+        confirmText.innerHTML = 
+        loadBackups();
+    });
+    document.getElementById("confirm-delete").addEventListener("click", () => {
+        deleteBackup(filename);
+    });
+
+}
+
 function deleteBackup(filename) {
-    if (!confirm(`Are you sure you want to delete "${filename}"?`)) return;
 
     fetch('/delete_backup', {
         method: 'POST',
@@ -569,11 +626,11 @@ function deleteBackup(filename) {
     })
         .then(res => res.json())
         .then(() => {
-            document.getElementById("restore-config-data").innerHTML = "Restore Successful" ;
+            document.getElementById("restore-config-entries").innerHTML = "Backup file deleted successful" ;
         })
 
         .catch(error => {
-            document.getElementById("restore-config-data").innerText = "Failed to restore Backup.";
+            document.getElementById("restore-config-data").innerText = "Failed to delete Backup.";
             console.error("Error restoring Backup:", error);
         });
         }
