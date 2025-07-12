@@ -146,6 +146,15 @@ class ConfigManager:
         self.logger.info(f"Found {len(backups)} backup(s).")
         return backups
 
+    def delete_backup(self, filename):
+        file_path = BACKUP_DIR / filename
+        if file_path.exists():
+            file_path.unlink()
+            self.logger.info(f"Deleted backup file {filename}.")
+        else:
+            self.logger.error(f"Backup file {filename} does not exist.")
+            raise FileNotFoundError(f"Backup file {filename} does not exist.")
+        
     def reload_config (self):
         self.config_data = self.load_config()
         self.logger.info("Configuration reloaded from disk.")

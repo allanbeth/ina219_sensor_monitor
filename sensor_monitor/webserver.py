@@ -83,6 +83,7 @@ class flaskWrapper:
         data = request.json
         filename = data.get("filename")
         self.config_manager.delete_backup(filename)
+        return jsonify({"status": "success"})
         
     def list_backups(self):
         self.logger.info("Listing backup files")

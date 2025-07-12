@@ -89,7 +89,7 @@ function setupEventHandlers() {
     document.getElementById("restore-config-card").classList.add("hidden");
     
     });
-    document.getElementById("restore-config-save").addEventListener("click", restoreConfig);
+    
 
     // About
     document.getElementById("about-btn").addEventListener("click", () => {
@@ -448,7 +448,6 @@ function updateEditFormI2CInputs() {
 
 
 function backupConfig() {
-
     const programConfig = document.getElementById("program-config").checked ? 1 : 0;
     const sensorConfig = document.getElementById("sensor-config").checked ? 1 : 0;
     const backupMsg = document.getElementById("backup-config-text");
@@ -492,29 +491,51 @@ function restoreConfig() {
 }
 
 function loadBackups() {
-    const backupList = document.getElementById("restore-config-data");
-    backupList.innerHTML = "";
+    const backupContainer = document.getElementById("restore-config-entries");
+    backupContainer.innerHTML = ""; // clear previous entries
+
     fetch("/list_backups")
         .then(response => response.json())
-        .then(files => {
-            
-            const backupFile = document.getElementById("restore-config-entry");
+        .then(data => {
+            const files = data.backups;  // ✅ access the actual list
+
+            if (!files || files.length === 0) {
+                backupContainer.innerHTML = "<p>No backup files found.</p>";
+                return;
+            }
 
             files.forEach(filename => {
-                const row = document.createElement('div');
-                row.className = 'restore-config-entry';
+                const displayName = filename.replace(/\.json$/, ""); // Clean display
+                const row = document.createElement("div");
+                row.className = "restore-config-entry";
 
-                row.innerHTML = `
-                    <span>${filename}</span>
-                    <i class="fas fa-trash" title="Delete"></i>
-                    <i class="fas fa-file-import" title="Restore"></i>
-                `;
+                const nameDiv = document.createElement("div");
+                nameDiv.className = "restore-config-file-name";
+                nameDiv.innerText = displayName;
 
-            backupList.appendChild(row);
+                const deleteIcon = document.createElement("i");
+                deleteIcon.className = "fas fa-trash";
+                deleteIcon.title = "Delete";
+                deleteIcon.setAttribute("data-filename", filename);
+                deleteIcon.addEventListener("click", () => {
+                    deleteBackup(filename);
+                });
 
+                const restoreIcon = document.createElement("i");
+                restoreIcon.className = "fas fa-file-import";
+                restoreIcon.title = "Restore";
+                restoreIcon.setAttribute("data-filename", filename);
+                restoreIcon.addEventListener("click", () => {
+                    restoreBackup(filename);
+                });
+
+                row.appendChild(nameDiv);
+                row.appendChild(deleteIcon);
+                row.appendChild(restoreIcon);
+                backupContainer.appendChild(row);
             });
         });
-    }
+}
 
 async function restoreBackup(filename) {
     const restoreConfig = confirm("Restore config.json?");
@@ -538,22 +559,24 @@ async function restoreBackup(filename) {
     }
 }
 
-async function deleteBackup(filename) {
+function deleteBackup(filename) {
     if (!confirm(`Are you sure you want to delete "${filename}"?`)) return;
 
-    const res = await fetch('/delete_backup', {
+    fetch('/delete_backup', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ filename })
-    });
+    })
+        .then(res => res.json())
+        .then(() => {
+            document.getElementById("restore-config-data").innerHTML = "Restore Successful" ;
+        })
 
-    const result = await res.json();
-    if (result.success) {
-        loadBackups();
-    } else {
-        alert("Error deleting file.");
-    }
-}
+        .catch(error => {
+            document.getElementById("restore-config-data").innerText = "Failed to restore Backup.";
+            console.error("Error restoring Backup:", error);
+        });
+        }
 
 // --- About/README Functions ---
 function getAbout() {

@@ -157,20 +157,24 @@ body {
 
 .backup-config-data,
 .restore-config-data {
-    margin: 1px 0;
-    padding: 4px;
-    width: 100%;
-    margin: 1px 0;
-    padding: 4px;
-    width: 100%;
-    overflow: visible;
+    margin-top: 10px;
+    overflow: visible; 
+    position: relative;
+    height: 100%;
+    width: 90%;
+}
+
+.restore-config-entries {
     overflow-y: auto;
-    max-height: 480px;
+    height: 170px;
+    border-radius: 10px;
+    width: 100%;
+    margin-top: 10px;
 }
 
 .backup-config-text,
 .restore-config-text {
-    font-size: 1em;
+    font-size: 0.8em;
     width: 100%;
 
 }
@@ -180,7 +184,6 @@ body {
     margin: 4px 0px 4px 0px;
     display: flex;
     width: 100%;
-
 }
 
 .backup-config-entry input{
@@ -190,6 +193,14 @@ body {
 
 .backup-config-entry label{
     width: 70%;
+}
+
+.restore-config-entry {
+    border-bottom: #333 1px solid;
+}
+.restore-config-file-name {
+    font-size: 0.6em;
+    width: 70%
 }
 
 .backup-config-entry input,
