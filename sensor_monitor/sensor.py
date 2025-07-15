@@ -47,6 +47,15 @@ class Sensor:
         except Exception as e:
             self.logger.error(f"Calibration failed for {self.name}: {e}")
 
+    def get_battery_status(self, current):
+        if current > 0.05:  # Charging
+            return "charging"
+        elif current < -0.05:  # Discharging
+            return "discharging"
+        else:
+            return "idle"
+
+
     def is_battery_voltage_valid(self, voltage):
         """
         Check if the voltage is within the valid range for the battery type.
@@ -102,6 +111,7 @@ class Sensor:
 
             if self.type == "Battery":
                 new_readings["state_of_charge"] = self.estimate_soc(voltage)
+                new_readings["status"] = self.get_battery_status(current)
             else:
                 output = float(voltage / self.rating) * 100
                 new_readings["output"] = round(output, 0)
@@ -113,12 +123,14 @@ class Sensor:
                 self.logger.info(f"Outlier detected for {self.name}: {new_readings}")
 
             data = self.smoothed_data(time_stamp)
+
         except Exception as e:
             self.logger.error(f"Error reading sensor {self.name}: {e}")
             data = {
                 "voltage": 0, "current": 0, "power": 0,
                 "time_stamp": datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                 "state_of_charge": 0 if self.type == "Battery" else None,
+                "status": "battery-offline" if self.type == "Battery" else None,
                 "output": 0 if self.type != "Battery" else None,
                 "voltage_trend": 0,
                 "current_trend": 0,
@@ -154,6 +166,7 @@ class Sensor:
             return {
                 "voltage": 0, "current": 0, "power": 0,
                 "time_stamp": "No Data",
+                "status": "" if self.type == "Battery" else None,
                 "state_of_charge": 0 if self.type == "Battery" else None,
                 "output": 0 if self.type != "Battery" else None,
                 "voltage_trend": 0,
@@ -170,6 +183,7 @@ class Sensor:
         }
         if self.type == "Battery":
             averaged["state_of_charge"] = round(sum(r["state_of_charge"] for r in readings) / n, 0)
+            averaged["status"] = readings[-1]["status"] if readings else ""
         else:
             averaged["output"] = round(sum(r["output"] for r in readings) / n, 0)
 
@@ -203,6 +217,7 @@ class Sensor:
             "readings": list(self.readings)
         }
         if self.type == "Battery":
+            data["status"] = latest.get('status', ''),
             data["state_of_charge"] = latest.get("state_of_charge", 1)
         else:
             data["output"] = latest.get("output", 0)

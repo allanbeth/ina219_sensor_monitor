@@ -151,6 +151,23 @@ function handleSensorUpdate(data) {
         const hexAddress = sensor.address ? `0x${parseInt(sensor.address).toString(16).padStart(2, '0')}` : "0x00";
         const logHTML = generateLogHTML(sensor.data.readings ?? []);
         const i2cDisabled = isRemoteGpio ? "" : "disabled";
+        const batteryState = sensor.data.status ?? "";
+
+        // Update the battery state if applicable
+        if (sensor.type === "Battery") {
+
+            // Add current state class
+            if (batteryState == "charging") {
+                iconClass = "battery-charging";
+            } else if (batteryState == "discharging") {
+                iconClass = "battery-discharging";
+            } else if (batteryState == "idle") {
+                iconClass = "battery-idle" ;
+            } else {
+                iconClass = "battery-offline";
+            }
+        }
+       
 
         let content = `
             <div class="sensor-header">
@@ -177,8 +194,8 @@ function handleSensorUpdate(data) {
                     </div>
                     ${sensor.type === "Battery" ? `
                         <div class="data-tile" id="${sensor.type.toLowerCase()}-data-tile">
-                            <span class="icon"><i class="fa-solid fa-battery"></i></span>
-                            <p class="soc">${sensor.data.state_of_charge ?? 0}%</p>
+                            <span class="icon"><i class="fa-solid fa-battery ${iconClass}" id="battery-icon"></i></span>
+                            <p class="soc">${sensor.data.state_of_charge ?? 0}% </p>
                         </div>
                     </div>` : `
                         <div class="data-tile" id="${sensor.type.toLowerCase()}-data-tile">
@@ -255,9 +272,14 @@ function handleSensorUpdate(data) {
                 </div>
             </div>
         `;
+        
 
         card.innerHTML = content;
         container.appendChild(card);
+
+         
+
+  
 
         // Attach event listeners for dynamic buttons
         card.querySelector(".log-btn").addEventListener("click", () => openLog(name));
@@ -323,6 +345,7 @@ function updateAddSensorVisibility() {
         document.getElementById("add-sensor-container").classList.add("hidden");
     }
 }
+
 
 // --- Sensor Edit Functions ---
 function enterEditMode(name) {

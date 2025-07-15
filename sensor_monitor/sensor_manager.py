@@ -182,6 +182,7 @@ class SensorManager:
                         "current": 0,
                         "power": 0,
                         "time_stamp": "Not Updated",
+                        "status": "no data" if self.type == "Battery" else None,
                         "state_of_charge": 0 if s.type == "Battery" else None,
                         "output": 0 if s.type != "Battery" else None,
                         "readings": []

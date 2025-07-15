@@ -47,6 +47,7 @@ body {
     padding-bottom: 5px;
 }
 
+.overview-header,
 .settings-header,
 .log-file-header,
 .about-header, 
@@ -277,6 +278,52 @@ body {
     float: right;
     margin: 0px 4px 0px 4px;
 }
+
+/* ========== overview Container and Cards ========== */
+
+.overview-container {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.overview-card {
+    background: #d2d2d2;
+    border-radius: 10px;
+    padding: 2em 2em 1em 2em;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    min-width: 320px;
+    max-width: 90vw;
+}
+
+.overview-card h4 {
+    display: inline;
+    color: #333;
+    margin: 0px 10px 10px 4px;
+}
+
+.overview-entries {
+    margin: 1px 0;
+    padding: 4px;
+    width: 100%;
+    overflow: visible;
+    overflow-y: auto;
+    max-height: 480px;
+}
+
+.overviewentry {
+    font-size: 0.6em;
+}
+
+.overview-btns {
+    float: right;
+    margin: 0px 4px 0px 4px;
+}
+
 
 /* ========== Log File Container and Cards ========== */
 
@@ -623,6 +670,23 @@ body {
 .icon {
     text-align: center;
     margin: 0px 10px 0px 0px;
+}
+
+
+.battery-charging {
+  color: rgb(0, 255, 0)
+}
+
+.battery-discharging {
+  color: red;
+}
+
+.battery-idle {
+  color: rgb(51, 0, 255);
+}
+
+.battery-offline {
+  color: rgb(255, 140, 0);
 }
 
 .voltage {
