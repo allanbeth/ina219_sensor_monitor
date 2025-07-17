@@ -113,7 +113,7 @@ class Sensor:
                 new_readings["state_of_charge"] = self.estimate_soc(voltage)
                 new_readings["status"] = self.get_battery_status(current)
             else:
-                output = float(voltage / self.rating) * 100
+                output = float(power / self.max_power) * 100
                 new_readings["output"] = round(output, 0)
 
             # Outlier rejection before appending
@@ -122,7 +122,11 @@ class Sensor:
             else:
                 self.logger.info(f"Outlier detected for {self.name}: {new_readings}")
 
-            data = self.smoothed_data(time_stamp)
+            data = self.smoothed_data()
+            if self.type == "Battery":
+               data["status"] = self.get_battery_status(data['current'])
+
+            data["time_stamp"] = self.readings[-1]["time_stamp"] if self.readings else "No Data"
 
         except Exception as e:
             self.logger.error(f"Error reading sensor {self.name}: {e}")
@@ -157,7 +161,7 @@ class Sensor:
                 return False
         return True
 
-    def smoothed_data(self, time_stamp):
+    def smoothed_data(self):
         """
         Return moving average for each value over the last N readings.
         Also adds trend (rate of change) for voltage/current/power.
@@ -179,11 +183,11 @@ class Sensor:
             "voltage": round(sum(r["voltage"] for r in readings) / n, 2),
             "current": round(sum(r["current"] for r in readings) / n, 2),
             "power": round(sum(r["power"] for r in readings) / n, 2),
-            "time_stamp": time_stamp
+            #"time_stamp": time_stamp
         }
         if self.type == "Battery":
             averaged["state_of_charge"] = round(sum(r["state_of_charge"] for r in readings) / n, 0)
-            averaged["status"] = readings[-1]["status"] if readings else ""
+            #averaged["status"] = readings[0]["status"] if readings else ""
         else:
             averaged["output"] = round(sum(r["output"] for r in readings) / n, 0)
 

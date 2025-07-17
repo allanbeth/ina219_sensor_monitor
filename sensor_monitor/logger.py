@@ -33,7 +33,7 @@ class sensor_logger:
 
     def info(self, log_entry):
         self._check_log_size()
-        print(log_entry)
+        #print(log_entry)
         self.logger.info(log_entry)
 
     def warning(self, log_entry):

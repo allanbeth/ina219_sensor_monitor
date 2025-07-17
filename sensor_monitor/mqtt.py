@@ -1,6 +1,15 @@
 # sensor_monitor/mqtt.py
 
-from sensor_monitor.config_manager import MQTT_TOPIC, MQTT_DISCOVERY_PREFIX
+from sensor_monitor.config_manager import MQTT_TOPIC, MQTT_DISCOVERY_PREFIX, MQTT_BASE, VERSION
+
+DEVICE_INFO = {
+    "identifiers": ["ina219_sensor_monitor_hub"],
+    "name": "INA219 Sensor Monitor",
+    "manufacturer": "Custom",
+    "model": "INA219 Multi-Sensor Unit",
+    "suggested_area": "Power Systems",
+    "sw_version": VERSION
+}
 import paho.mqtt.client as mqtt
 import json
 
@@ -19,9 +28,8 @@ class MQTTPublisher:
             self.logger.error(f"Connection to MQTT Broker failed: {e}")
 
     def publish_new_data(self, sensor, readings):
-        
         sensor_clean = sensor.replace(" ", "_")
-        topic = f"{MQTT_TOPIC}/{sensor_clean}"
+        topic = f"{MQTT_BASE}/{sensor_clean}"
         sensor_data = readings
         del sensor_data['readings']
 
@@ -36,36 +44,49 @@ class MQTTPublisher:
     def send_discovery_config(self, sensor_name, sensor_type):
         sensor_clean = sensor_name.replace(" ", "_")
         base_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_clean}"
-        state_topic = f"{MQTT_TOPIC}/{sensor_clean}"
+        state_topic = f"{MQTT_BASE}/{sensor_clean}"
 
         measurements = [
-            ("voltage", "V", "voltage"),
-            ("current", "A", "current"),
+            ("voltage", "V", "voltage", "mdi:flash", "measurement"),
+            ("current", "A", "current", "mdi:current-dc", "measurement"),
+            ("power", "W", "power", "mdi:lightning-bolt", "measurement"),
         ]
 
-        if sensor_type != "Battery":
-            measurements.append(("power", "W", "power"))
+        if sensor_type == "Solar":
+            sensor_icon = "mdi:solar-power"
+        elif sensor_type == "Wind":
+            sensor_icon = "mdi:weather-windy"
+        elif sensor_type == "Battery":
+            measurements.append(("state_of_charge", "%", "battery", "mdi:battery-high", "measurement"))
+            measurements.append(("state", None, None, "mdi:battery", "diagnostic"))
+            sensor_icon = "mdi:car-battery"
         else:
-            measurements.append(("state_of_charge", "%", "battery"))
+            sensor_icon = "mdi:chip"
 
-        for measurement, unit, device_class in measurements:
+        for measurement, unit, device_class, icon, entity_category in measurements:
+
+            if icon is None:
+                icon = sensor_icon
             config_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_clean}_{measurement}/config"
+
             payload = {
                 "name": f"{sensor_name} {measurement.replace('_', ' ').capitalize()}",
                 "state_topic": state_topic,
                 "value_template": f"{{{{ value_json.{measurement} }}}}",
-                "unit_of_measurement": unit,
-                "device_class": device_class,
                 "unique_id": f"{sensor_clean}_{measurement}",
                 "availability_topic": f"{base_topic}/availability",
-                "device": {
-                    "identifiers": [sensor_clean],
-                    "name": sensor_name,
-                    "manufacturer": "Custom",
-                    "model": "INA219 Sensor"
-                }
+                "device": DEVICE_INFO,
+                "icon": icon,
+                "entity_category": entity_category,
             }
+
+            if unit:
+                payload["unit_of_measurement"] = unit
+            if device_class:
+                payload["device_class"] = device_class
+
             self.client.publish(config_topic, json.dumps(payload), retain=True)
+
 
     def remove_discovery_config(self, sensor_name, sensor_type="generic"):
         sensor_clean = sensor_name.replace(" ", "_")

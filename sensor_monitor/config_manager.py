@@ -6,12 +6,14 @@ import json
 
 MQTT_TOPIC = "homeassistant/sensor"
 MQTT_DISCOVERY_PREFIX = "homeassistant"
+MQTT_BASE = "ina219_sensor_monitor"
 
 ROOT = Path(__file__).parents[1]
 LOG_FILE = "sensor_monitor.log"
 SENSOR_FILE = "sensors.json"
 CONFIG_FILE = "config.json"
 BACKUP_DIR = ROOT / "backups"
+VERSION = "1.0.1"
 
 from sensor_monitor.logger import sensor_logger
 
