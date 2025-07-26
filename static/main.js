@@ -100,13 +100,6 @@ function setupEventHandlers() {
         document.getElementById("about-container").classList.add("hidden");
     });
 
-    // Restart
-    /*
-    document.getElementById("restart-btn").addEventListener("click", () => {
-        document.getElementById("restart-container").classList.remove("hidden");
-        restartConfirmation();
-    });
-    */
     document.getElementById("restart-cancel").addEventListener("click", () => {
         document.getElementById("restart-container").classList.add("hidden");
     });
@@ -130,6 +123,8 @@ function setupEventHandlers() {
 function handleSensorUpdate(data) {
     socket.emit("sensor_update_request");
     if (paused) return;
+
+    updateHeaderTotals(data);
 
     const container = document.getElementById("sensor-container");
     container.innerHTML = "";
@@ -277,10 +272,6 @@ function handleSensorUpdate(data) {
         card.innerHTML = content;
         container.appendChild(card);
 
-         
-
-  
-
         // Attach event listeners for dynamic buttons
         card.querySelector(".log-btn").addEventListener("click", () => openLog(name));
         card.querySelector(".edit-btn").addEventListener("click", () => enterEditMode(name));
@@ -344,6 +335,26 @@ function updateAddSensorVisibility() {
         addBtn.classList.add("hidden");
         document.getElementById("add-sensor-container").classList.add("hidden");
     }
+}
+
+function updateHeaderTotals(data) {
+    // Calculate totals
+    let solar = 0, wind = 0, battery_in = 0, battery_out = 0;
+    for (let [name, sensor] of Object.entries(data)) {
+        if (sensor.type === "Solar") solar += sensor.data?.power ?? 0;
+        if (sensor.type === "Wind") wind += sensor.data?.power ?? 0;
+        if (sensor.type === "Battery") {
+            let p = sensor.data?.power ?? 0;
+            if ((sensor.data?.status ?? "") === "charging" || p > 0) battery_in += Math.abs(p);
+            else if ((sensor.data?.status ?? "") === "discharging" || p < 0) battery_out += Math.abs(p);
+        }
+    }
+    document.getElementById("header-totals").innerHTML = `
+        <span title="Solar Total"><i class="fa-solid fa-solar-panel totals-data"></i> ${solar.toFixed(1)}W</span>
+        <span title="Wind Total"><i class="fa-solid fa-wind totals-data"></i> ${wind.toFixed(1)}W</span>
+        <span title="Battery In"><i class="fa-solid fa-battery-full totals-data"></i> ${battery_in.toFixed(1)}W</span>
+        <span title="Battery Out"><i class="fa-solid fa-battery-empty totals-data"></i> ${battery_out.toFixed(1)}W</span>
+    `;
 }
 
 

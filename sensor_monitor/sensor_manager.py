@@ -155,8 +155,10 @@ class SensorManager:
         # Initialize totals
         solar_total = 0.0
         wind_total = 0.0
+        battery_soc_total = 0.0
         battery_in_total = 0.0
         battery_out_total = 0.0
+        battery_count = 0
 
         for s in self.sensors:
 
@@ -189,16 +191,22 @@ class SensorManager:
                 elif s.type == "Battery":
                     power = data[s.name]['data'].get("power", 0.0)
                     status = data[s.name]['data'].get("status", "")
+                    soc = data[s.name]['data'].get("state_of_charge", 0.0)
+                    # Sum SoC for all batteries
+                    battery_soc_total += soc
+                    battery_count += 1
                     # Assume positive power means charging, negative means discharging
                     if status == "charging" or power > 0:
                         battery_in_total += abs(power)
                     elif status == "discharging" or power < 0:
                         battery_out_total += abs(power)
 
+                average_battery_soc = (battery_soc_total / battery_count) if battery_count > 0 else 0.0
                 # --- Publish totals to MQTT ---
                 totals_dict = {
                     "solar_total": round(solar_total, 2),
                     "wind_total": round(wind_total, 2),
+                    "battery_soc_total": round(average_battery_soc, 2),
                     "battery_in_total": round(battery_in_total, 2),
                     "battery_out_total": round(battery_out_total, 2)
                 }

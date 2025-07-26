@@ -72,6 +72,7 @@ class MQTTPublisher:
         totals = [
             ("solar_total", "Solar Total Generated", "W", "power", "mdi:solar-power"),
             ("wind_total", "Wind Total Generated", "W", "power", "mdi:weather-windy"),
+            ("battery_soc_total", "Battery Total SoC", "%", "battery", "mdi:battery"),
             ("battery_in_total", "Battery Total Charge In", "Wh", "energy", "mdi:battery-plus"),
             ("battery_out_total", "Battery Total Discharge Out", "Wh", "energy", "mdi:battery-minus"),
         ]
