@@ -34,8 +34,6 @@ class MQTTPublisher:
         try:
             self.client.connect(self.mqtt_broker, self.mqtt_port, 60)
             self.logger.info("Connected to MQTT Broker")
-            #self.publish_hub_device()
-            #self.publish_totals_device()
             self.client.publish(f"{MQTT_BASE}/ina219_hub_status", "online", retain=True)
             self.client.publish(f"{MQTT_DISCOVERY_PREFIX}/sensor/ina219_hub_status/availability", "online", retain=True)
             self.logger.info("Published Hub Status as online")

@@ -77,8 +77,6 @@ class SensorManager:
         self.sensors = self.load_sensors()      
         self.sensor_config.sensors = self.sensors
         self.mqtt = MQTTPublisher(self.logger, self.mqtt_config)
-        #self.mqtt.publish_hub_device()
-        #self.mqtt.publish_totals_device()
         self.webserver = flaskWrapper(self.logger, self.config, self.sensor_config)  
         self.mqtt.publish_hub_device()
         self.load_mqtt_discovery()  
