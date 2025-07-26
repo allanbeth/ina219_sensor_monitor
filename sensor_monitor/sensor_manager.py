@@ -77,7 +77,10 @@ class SensorManager:
         self.sensors = self.load_sensors()      
         self.sensor_config.sensors = self.sensors
         self.mqtt = MQTTPublisher(self.logger, self.mqtt_config)
+        #self.mqtt.publish_hub_device()
+        #self.mqtt.publish_totals_device()
         self.webserver = flaskWrapper(self.logger, self.config, self.sensor_config)  
+        self.mqtt.publish_hub_device()
         self.load_mqtt_discovery()  
 
     def set_config(self):
@@ -139,6 +142,7 @@ class SensorManager:
     
 
     def load_mqtt_discovery(self):
+        self.mqtt.publish_totals_device()
         try:
             for sensor in self.sensors:
                 self.mqtt.send_discovery_config(sensor.name, sensor.type)   
@@ -149,6 +153,12 @@ class SensorManager:
     def get_data(self):
         current_time = time.time()
         data = {}
+
+        # Initialize totals
+        solar_total = 0.0
+        wind_total = 0.0
+        battery_in_total = 0.0
+        battery_out_total = 0.0
 
         for s in self.sensors:
 
@@ -171,6 +181,30 @@ class SensorManager:
                 self.mqtt.publish_new_data(s.name, sensor_data)
                 data[s.name]['data'] = sensor_data
                 self.webserver.broadcast_sensor_data()
+                # --- Calculate totals ---
+                # Solar and Wind totals: sum their power
+                if s.type == "Solar":
+                    solar_total += data[s.name]['data'].get("power", 0.0)
+                elif s.type == "Wind":
+                    wind_total += data[s.name]['data'].get("power", 0.0)
+                # Battery totals: sum charge/discharge based on status
+                elif s.type == "Battery":
+                    power = data[s.name]['data'].get("power", 0.0)
+                    status = data[s.name]['data'].get("status", "")
+                    # Assume positive power means charging, negative means discharging
+                    if status == "charging" or power > 0:
+                        battery_in_total += abs(power)
+                    elif status == "discharging" or power < 0:
+                        battery_out_total += abs(power)
+
+                # --- Publish totals to MQTT ---
+                totals_dict = {
+                    "solar_total": round(solar_total, 2),
+                    "wind_total": round(wind_total, 2),
+                    "battery_in_total": round(battery_in_total, 2),
+                    "battery_out_total": round(battery_out_total, 2)
+                }
+                self.mqtt.publish_totals_data(totals_dict)
             else:
                 if s.readings:
                     sensor_data = s.current_data()
@@ -187,6 +221,9 @@ class SensorManager:
                         "output": 0 if s.type != "Battery" else None,
                         "readings": []
                     }
+                    
+
+            
 
             
 
