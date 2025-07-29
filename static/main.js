@@ -123,8 +123,7 @@ function setupEventHandlers() {
 function handleSensorUpdate(data) {
     socket.emit("sensor_update_request");
     if (paused) return;
-
-    updateHeaderTotals(data);
+    updateHeaderTotals(data.totals);
 
     const container = document.getElementById("sensor-container");
     container.innerHTML = "";
@@ -338,24 +337,30 @@ function updateAddSensorVisibility() {
 }
 
 function updateHeaderTotals(data) {
-    // Calculate totals
-    let solar = 0, wind = 0, battery_in = 0, battery_out = 0;
-    for (let [name, sensor] of Object.entries(data)) {
-        if (sensor.type === "Solar") solar += sensor.data?.power ?? 0;
-        if (sensor.type === "Wind") wind += sensor.data?.power ?? 0;
-        if (sensor.type === "Battery") {
-            let p = sensor.data?.power ?? 0;
-            if ((sensor.data?.status ?? "") === "charging" || p > 0) battery_in += Math.abs(p);
-            else if ((sensor.data?.status ?? "") === "discharging" || p < 0) battery_out += Math.abs(p);
-        }
+    const dataContainer = document.getElementById("header-totals");
+    if (!dataContainer) {
+        console.error("Header totals container not found");
+        return;
     }
-    document.getElementById("header-totals").innerHTML = `
-        <span title="Solar Total"><i class="fa-solid fa-solar-panel totals-data"></i> ${solar.toFixed(1)}W</span>
-        <span title="Wind Total"><i class="fa-solid fa-wind totals-data"></i> ${wind.toFixed(1)}W</span>
-        <span title="Battery In"><i class="fa-solid fa-battery-full totals-data"></i> ${battery_in.toFixed(1)}W</span>
-        <span title="Battery Out"><i class="fa-solid fa-battery-empty totals-data"></i> ${battery_out.toFixed(1)}W</span>
+
+    const batteryNet = data.battery_in_total - data.battery_out_total;
+
+    let html = `
+        <span class="totals-data" title="Solar Total"><i class="fa-solid fa-solar-panel"></i> ${data.solar_total.toFixed(1)}W</span>
+        <span class="totals-data" title="Wind Total"><i class="fa-solid fa-wind"></i> ${data.wind_total.toFixed(1)}W</span>
+        <span class="totals-data" title="Total SoC"><i class="fa-solid fa-car-battery "></i> ${data.battery_soc_total.toFixed(0)}%</span>
     `;
+
+    if (batteryNet > 0) {
+        html += `<span class="totals-data" title="Battery In"><i class="fa-solid fa-arrow-up"></i> ${data.battery_in_total.toFixed(1)}W</span>`;
+    } else if (batteryNet < 0) {
+        html += `<span class="totals-data" title="Battery Out"><i class="fa-solid fa-arrow-down"></i> ${data.battery_out_total.toFixed(1)}W</span>`;
+    } else if (batteryNet == 0) {
+        html += `<span class="totals-data" title="Battery Idle"><i class="fa-solid fa-battery-full"></i> Idle</span>`;
+    }
+    dataContainer.innerHTML = html;
 }
+
 
 
 // --- Sensor Edit Functions ---

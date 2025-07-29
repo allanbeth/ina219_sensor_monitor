@@ -64,15 +64,15 @@ body {
 }
 
 .header-card i {
-    font-size: 1.6em;
+    font-size: 1.2em;
     transition: color 0.2s;
     margin: 0px 3px 0px 3px;
 }
 
 .totals-data {
-    font-size: 1.6em;
+    font-size: 1.4em;
     transition: color 0.2s;
-    margin: 0px 5px 0px 5px;
+    margin: 0px 15px 0px 8px;
 }
 
 .settings-header,
