@@ -4,6 +4,7 @@
 
 // --- Global Variables ---
 const socket = io({ reconnection: true });
+let devices = {};
 let paused = false;
 let undoTimers = {};
 let isRemoteGpio = false;
@@ -13,8 +14,20 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch("/get_settings")
         .then(res => res.json())
         .then(data => {
-            isRemoteGpio = data.remote_gpio == 1;
-            updateGpioStatus();
+            devices = data.devices || {};
+            remoteCount = 0;
+            for (const device of Object.values(devices)) { 
+                console.log(`Device loaded: ${device.id} - ${device.name}`);
+                if (device.remote_gpio === 1) {
+                    remoteCount++;
+                }
+            }
+            console.log(`Total remote GPIO devices: ${remoteCount}`);
+            if (remoteCount > 0) {
+                isRemoteGpio = true;
+            }
+            updateAddSensorVisibility();
+            
         });
 
     setupEventHandlers();
@@ -143,9 +156,29 @@ function handleSensorUpdate(data) {
         const maxPower = sensor.max_power ?? "";
         const rating = sensor.rating ?? "";
         const hexAddress = sensor.address ? `0x${parseInt(sensor.address).toString(16).padStart(2, '0')}` : "0x00";
+        
         const logHTML = generateLogHTML(sensor.data.readings ?? []);
         const i2cDisabled = isRemoteGpio ? "" : "disabled";
         const batteryState = sensor.data.status ?? "";
+        let deviceName  = "Default Device"
+        let remoteGpio = 0;
+
+
+            // set device information
+        for (const device of Object.values(devices)) {
+            if (device.id === sensor.device_id) {
+                console.log(`Matched device for ${name}: ${device.id}`);
+                deviceName = device.name || `Device ${device.id}`;
+                remoteGpio = device.remote_gpio;
+                break;
+            }
+        }
+        
+
+
+        
+        
+
 
         // Update the battery state if applicable
         if (sensor.type === "Battery") {
@@ -165,6 +198,7 @@ function handleSensorUpdate(data) {
 
         let content = `
             <div class="sensor-header">
+                <span id="${name}-gpio-status" class="sensor-gpio-status"></span>           
                 <span class="sensor-type ${typeClass}">${sensor.type} ${rating}V</span>
                 <span class="sensor-name">${name}</span>
                 <div class="type-edit-container" id="btns-${name}">
@@ -236,6 +270,10 @@ function handleSensorUpdate(data) {
                         <label>i2c Address:</label>
                         <input type="text" id="address-${name}" value="${hexAddress}" ${i2cDisabled}>
                     </div>
+                    <div class="edit-entry">
+                        <label>Device:</label>
+                        <input type="text" id="device-${name}" value="${deviceName}">
+                    </div>
                 </div>
             </div>
             <div id="log-${name}" class="log-data hidden">
@@ -270,6 +308,9 @@ function handleSensorUpdate(data) {
 
         card.innerHTML = content;
         container.appendChild(card);
+
+        // Update the GPIO status badge
+        updateSensorGpioStatus(name, remoteGpio, deviceName);
 
         // Attach event listeners for dynamic buttons
         card.querySelector(".log-btn").addEventListener("click", () => openLog(name));
@@ -314,6 +355,22 @@ function addSensor() {
 }
 
 // --- GPIO Status Badge ---
+
+function updateSensorGpioStatus(name, remoteGpio, deviceName) {
+    let gpioStatusSpan = document.getElementById(`${name}-gpio-status`);
+    console.log(`Updating GPIO status for ${name}: ${remoteGpio} on device ${deviceName}`);
+    let html = '';
+    if (remoteGpio === 1) {
+        html = `<i class="fa-solid fa-wifi" title="${deviceName}"></i>`;
+        gpioStatusSpan.classList.add("remote");
+    } else {
+        html = `<i class="fa-solid fa-network-wired" title="${deviceName}"></i>`;
+        gpioStatusSpan.classList.add("local");
+    }
+    gpioStatusSpan.innerHTML = html;
+
+}
+
 function updateGpioStatus() {
     const statusSpan = document.getElementById("gpio-status");
     if (isRemoteGpio) {
@@ -330,9 +387,11 @@ function updateAddSensorVisibility() {
     const addBtn = document.getElementById("add-sensor-btn");
     if (isRemoteGpio) {
         addBtn.classList.remove("hidden");
+        console.log("Remote GPIO enabled, showing Add Sensor button");
     } else {
         addBtn.classList.add("hidden");
         document.getElementById("add-sensor-container").classList.add("hidden");
+        console.log("Remote GPIO disabled, hiding Add Sensor button");
     }
 }
 
@@ -346,17 +405,29 @@ function updateHeaderTotals(data) {
     const batteryNet = data.battery_in_total - data.battery_out_total;
 
     let html = `
-        <span class="totals-data" title="Solar Total"><i class="fa-solid fa-solar-panel"></i> ${data.solar_total.toFixed(1)}W</span>
-        <span class="totals-data" title="Wind Total"><i class="fa-solid fa-wind"></i> ${data.wind_total.toFixed(1)}W</span>
-        <span class="totals-data" title="Total SoC"><i class="fa-solid fa-car-battery "></i> ${data.battery_soc_total.toFixed(0)}%</span>
+        <span class="totals-data" title="Solar Total"><i class="fa-solid fa-solar-panel"></i><span class="totals-text"> ${data.solar_total.toFixed(1)}W</span></span>
+        <span class="totals-data" title="Wind Total"><i class="fa-solid fa-wind"></i><span class="totals-text"> ${data.wind_total.toFixed(1)}W</span></span>
     `;
+    
 
+    if (data.battery_soc_total < 5) {
+        html += `<span class="totals-data battery-empty" title="Total SoC"><i class="fa-solid fa-car-battery"></i><span class="totals-text"> ${data.battery_soc_total.toFixed(0)}%</span></span>`;
+    } else if (data.battery_soc_total < 25) {
+        html += `<span class="totals-data battery-low" title="Total SoC"><i class="fa-solid fa-car-battery"></i><span class="totals-text"> ${data.battery_soc_total.toFixed(0)}%</span></span>`;
+    } else if (data.battery_soc_total < 50) {
+        html += `<span class="totals-data battery-medium" title="Total SoC"><i class="fa-solid fa-car-battery"></i><span class="totals-text"> ${data.battery_soc_total.toFixed(0)}%</span></span>`;
+    } else if (data.battery_soc_total < 75) {
+        html += `<span class="totals-data battery-high" title="Total SoC"><i class="fa-solid fa-car-battery"></i><span class="totals-text"> ${data.battery_soc_total.toFixed(0)}%</span></span>`;
+    } else {
+        html += `<span class="totals-data battery-full" title="Total SoC"><i class="fa-solid fa-car-battery"></i><span class="totals-text"> ${data.battery_soc_total.toFixed(0)}%</span></span>`;
+    }
+    
     if (batteryNet > 0) {
-        html += `<span class="totals-data" title="Battery In"><i class="fa-solid fa-arrow-up"></i> ${data.battery_in_total.toFixed(1)}W</span>`;
+        html += `<span class="totals-data battery-charging" title="Battery In"><i class="fa-solid fa-arrow-down"></i><span class="totals-text"> ${data.battery_in_total.toFixed(1)}W</span></span>`;
     } else if (batteryNet < 0) {
-        html += `<span class="totals-data" title="Battery Out"><i class="fa-solid fa-arrow-down"></i> ${data.battery_out_total.toFixed(1)}W</span>`;
+        html += `<span class="totals-data battery-discharging" title="Battery Out"><i class="fa-solid fa-arrow-up"></i><span class="totals-text"> ${data.battery_out_total.toFixed(1)}W</span></span>`;
     } else if (batteryNet == 0) {
-        html += `<span class="totals-data" title="Battery Idle"><i class="fa-solid fa-battery-full"></i> Idle</span>`;
+        html += `<span class="totals-data battery-idle" title="Battery Idle"><i class="fa-solid fa-pause"></i><span class="totals-text"> Idle</span></span>`;
     }
     dataContainer.innerHTML = html;
 }

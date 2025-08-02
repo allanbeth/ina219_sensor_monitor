@@ -11,13 +11,14 @@ CALIBRATION_REGISTER = 0x05
 DEFAULT_CALIBRATION = 4191
 
 class Sensor:
-    def __init__(self, name, address, sensor_type, max_power, rating, max_readings, i2c=None, pi=None):
+    def __init__(self, name, address, sensor_type, max_power, rating, max_readings, device_id, i2c=None, pi=None):
         self.name = name
         self.logger = sensor_logger()
         self.type = sensor_type
         self.max_power = max_power
         self.address = address
         self.rating = rating
+        self.device_id = device_id
         self.max_readings = max_readings
         self.readings = deque(maxlen=self.max_readings)
         self.pi = pi

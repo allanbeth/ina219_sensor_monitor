@@ -61,18 +61,26 @@ body {
     min-width: 0;
     justify-content: flex-end;
     flex: 1;
+    font-size: 1.1em;
 }
 
-.header-card i {
-    font-size: 1.2em;
+.header-card i {  
     transition: color 0.2s;
     margin: 0px 3px 0px 3px;
 }
 
 .totals-data {
-    font-size: 1.4em;
-    transition: color 0.2s;
-    margin: 0px 15px 0px 8px;
+    margin: 0px 15px 0px 15px;
+}
+.totals-data i {
+    font-size: 1.5em;
+    margin-right: 5px;
+}
+
+.totals-text {
+    font-size: 0.8em;
+    color: #555;
+    
 }
 
 .settings-header,
@@ -953,7 +961,7 @@ meter {
 }
 
 .fa-wifi {
-    color: #00ff6e8f;
+    color: #00ff6e;
     transition: color 0.2s;
 }
 
@@ -991,6 +999,48 @@ meter {
 .fa-file-export:hover {
     color: #151212;
 }
+
+.fa-car-battery {
+    color: #5c6bc0;
+    transition: color 0.2s;
+}
+.fa-car-battery:hover {
+    color: #151212;
+}
+
+.fa-battery-empty,
+.fa-battery-quarter,
+.fa-battery-half,
+.fa-battery-three-quarters,
+.fa-battery-full {
+    color: #666;
+    transition: color 0.2s;
+    
+}
+
+.fa-battery-empty:hover,
+.fa-battery-quarter:hover,
+.fa-battery-half:hover,
+.fa-battery-three-quarters:hover,
+.fa-battery-full:hover {
+    color: #151212;
+}
+
+.fa-solar-panel {
+    color: #ffa500;
+}
+.fa-solar-panel:hover {
+    color: #ffa500;
+}
+
+.fa-wind {
+    color: #00aaff;
+}
+.fa-wind:hover {
+    color: #00aaff;
+}
+
+
 
 /* ========== Responsive Layout ========== */
 @media (max-width: 599px) {

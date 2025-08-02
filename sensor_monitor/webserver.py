@@ -12,13 +12,12 @@ class flaskWrapper:
         self.logger = logger
         self.config_manager = config_manager
         self.sensor_config = sensor_config
-        #self.root = Path(__file__).parents[1]
         self.templatePath = ROOT / "templates/"
         self.stylePath = ROOT / "static/"
         self.readmePath = ROOT / "README.md"
         self.logFilePath = ROOT / "sensor_monitor.log"
         self.app = Flask(__name__, template_folder=self.templatePath, static_folder=self.stylePath)
-        self.socketio = SocketIO(self.app, ping_timeout=60,ping_interval=25)
+        self.socketio = SocketIO(self.app, async_mode='threading', ping_timeout=60,ping_interval=25)
         self.app.route("/", methods=["GET", "POST"])(self.main)
         self.app.route('/get_settings', methods=["GET", "POST"])(self.get_settings) 
         self.app.route('/update_settings', methods=["GET", "POST"])(self.update_settings) 
@@ -165,4 +164,4 @@ class flaskWrapper:
 
     def run_webserver(self): 
 
-        self.socketio.run(self.app, host=self.config_manager.config_data['webserver_host'], port=self.config_manager.config_data['webserver_port'], debug=False, allow_unsafe_werkzeug=True, use_reloader=False)
+        self.socketio.run(self.app, host=self.config_manager.config_data['webserver_host'], port=self.config_manager.config_data['webserver_port'], debug=False, use_reloader=False, allow_unsafe_werkzeug=True)

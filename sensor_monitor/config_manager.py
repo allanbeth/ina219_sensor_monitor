@@ -31,20 +31,31 @@ class ConfigManager:
         except FileNotFoundError:
             self.logger.warning("Config file not found, creating default config.")
             default_config = {
+                "devices": [
+                    {
+                        "name": "Default Device",
+                        "id": "0",
+                        "remote_gpio": 0,
+                        "gpio_address": "localhost"
+                    }
+                ],
                 "poll_intervals": {
                     "Wind": 7,
                     "Solar": 5,
                     "Battery": 10
                     },
-                    "max_log": 5,
-                    "max_readings": 5,
-                    "mqtt_broker": "localhost",
-                    "mqtt_port": 1883,
-                    "webserver_host": "0.0.0.0",
-                    "webserver_port": 5000,
-                    "remote_gpio": 0,
-                    "gpio_address": "localhost"
-                }  
+                "max_log": 5,
+                "max_readings": 5,
+                "mqtt_broker": "localhost",
+                "mqtt_port": 1883,
+                "webserver_host": "0.0.0.0",
+                "webserver_port": 5000,
+                "remote_gpio": 0,
+                "gpio_address": "localhost",
+                
+                }
+
+    
             try:
                 with open(CONFIG_FILE, "w") as f:
                     json.dump(default_config, f, indent=4)
@@ -59,6 +70,7 @@ class ConfigManager:
         self.logger.info(f"Saving config file at {CONFIG_FILE}.")
 
         new_config = {
+            "devices": config['devices'],
             "poll_intervals": {
                 "Wind": int(config['wind_interval']),
                 "Solar": int(config['solar_interval']),

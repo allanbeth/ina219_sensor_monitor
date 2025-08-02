@@ -81,7 +81,7 @@
                     <input type="number" id="add-sensor-rating" placeholder="Voltage Rating (V)" />
                 </div>
                 <div class="add-sensor-entry">
-                    <label for="add-sensor-address">Senor Name:</label>
+                    <label for="add-sensor-address">Senor Address:</label>
                     <input type="text" id="add-sensor-address" placeholder="I2C Address (hex)" />
                 </div>
             </div>
@@ -260,7 +260,8 @@
         No sensors detected. Please ensure your INA219 sensors are connected.
     </div>
 
-    <div class="sensor-container" id="sensor-container"></div>
+    <div class="sensor-container" id="sensor-container">Loading sensors...</div>
+    
 
     <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
