@@ -21,7 +21,7 @@ class Device:
         self.logger = logger
         self.pi = None
         self.i2c = None
-        self.logger.info(f"Initializing Device: {self.name} (ID: {self.id} : Remote GPIO: {self.remote_gpio})")
+        self.logger.info(f"Initializing Device: {self.name} (ID: {self.id} Remote GPIO: {self.remote_gpio})")
 
     def connect(self):
         if self.remote_gpio:
@@ -142,8 +142,6 @@ class SensorManager:
                 self.logger.info(f"Loading sensors from {SENSOR_FILE}")
                 sensor_data = json.load(f)
                 for s in sensor_data:
-                    self
-                    # Default to None; override when we find a matching device
                     i2c = None
                     pi = None
                     device_id = s.get("device_id", 0)
@@ -151,8 +149,12 @@ class SensorManager:
 
                     for device in self.devices:
                         if device.id == device_id:
+                            self.logger.info(f"Found device {device.name} for sensor {s['name']}")
+                            if device.remote_gpio:
+                                self.logger.info(f"Using remote GPIO for sensor {s['name']}")
                             i2c = device.i2c
                             pi = device.pi
+                            self.logger.info(f"Found matching device for sensor {s['name']}: {device.name}")
                             break
 
                     sensor = Sensor(
@@ -166,6 +168,7 @@ class SensorManager:
                         i2c=i2c,
                         pi=pi
                     )
+                    self.logger.info(f"Creating Sensor: {sensor.name} of type {sensor.type} with address {sensor.address}")
                     sensors.append(sensor)
 
                     if sensor.type == "Battery":

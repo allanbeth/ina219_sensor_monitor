@@ -31,7 +31,7 @@
     <div class="header-container">
         <div class="header-card">
             <div class="header-left">
-                <span id="gpio-status" class="gpio-status"></span>
+                
                 <span class="header-totals" id="header-totals">
                     loading totals......
                 </span>
@@ -96,10 +96,10 @@
                 </div>
                 <h4>Settings</h4>
                 <div class="settings-btns">
-                    <i class="fa-solid fa-rotate" id="settings-restart" title="Restart Program"></i>
-                    <i class="fa-solid fa-file-export" id="settings-backup" title="Backup Configuration"></i>
-                    <i class="fa-solid fa-file-import" id="settings-restore" title="Restore Configuration"></i>
-                    <i class="fa-solid fa-save" id="settings-save" title="Save Settings"></i>
+                    <i class="fa-solid fa-rotate settings-btn" id="settings-restart" title="Restart Program"></i>
+                    <i class="fa-solid fa-file-export settings-btn" id="settings-backup" title="Backup Configuration"></i>
+                    <i class="fa-solid fa-file-import settings-btn" id="settings-restore" title="Restore Configuration"></i>
+                    <i class="fa-solid fa-save settings-btn" id="settings-save" title="Save Settings"></i>
                 </div>
             </div>
 
@@ -144,7 +144,9 @@
                     <label for="webserver-port">Webserver Port:</label>
                     <input type="text" id="webserver-port" />
                 </div>
-                <h5>GPIO</h5>
+                <h5>Devices</h5>
+                <div class="devices-settings" id="devices-settings"></div>
+                <!-- <h5>GPIO</h5>
                 <div class="settings-entry">
                     <label for="remote-gpio">Remote GPIO:</label>
                     <input type="checkbox" class="gpio-checkbox" id="remote-gpio" />
@@ -152,7 +154,7 @@
                 <div class="settings-entry">
                     <label for="gpio-address">GPIO Address:</label>
                     <input type="text" id="gpio-address" />
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

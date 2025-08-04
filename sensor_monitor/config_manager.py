@@ -68,9 +68,21 @@ class ConfigManager:
             
     def save_config(self, config):
         self.logger.info(f"Saving config file at {CONFIG_FILE}.")
+        devices = []
+        device_data = config['devices']
+        for device in device_data:
+            device_info = {
+                "name": device.get("name", "Unnamed Device"),
+                "id": device.get("id", "0"),
+                "remote_gpio": int(device.get("remote_gpio", 0)),
+                "gpio_address": device.get("gpio_address", "localhost")
+            }
+            devices.append(device_info)
+
+
 
         new_config = {
-            "devices": config['devices'],
+            "devices": devices,
             "poll_intervals": {
                 "Wind": int(config['wind_interval']),
                 "Solar": int(config['solar_interval']),

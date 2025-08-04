@@ -162,24 +162,20 @@ function handleSensorUpdate(data) {
         const batteryState = sensor.data.status ?? "";
         let deviceName  = "Default Device"
         let remoteGpio = 0;
+        let deviceID = 0;
 
 
             // set device information
         for (const device of Object.values(devices)) {
             if (device.id === sensor.device_id) {
                 console.log(`Matched device for ${name}: ${device.id}`);
+                deviceID = device.id;
                 deviceName = device.name || `Device ${device.id}`;
                 remoteGpio = device.remote_gpio;
                 break;
             }
         }
-        
-
-
-        
-        
-
-
+     
         // Update the battery state if applicable
         if (sensor.type === "Battery") {
 
@@ -194,13 +190,25 @@ function handleSensorUpdate(data) {
                 iconClass = "battery-offline";
             }
         }
+
+        // Set type icon class
+        if (sensor.type === "Solar") {
+            iconType = "fa-solar-panel";
+        } else if (sensor.type === "Wind") {
+            iconType = "fa-wind";
+        } else if (sensor.type === "Battery") {
+            iconType = "fa-car-battery";
+        } 
+
        
 
         let content = `
             <div class="sensor-header">
-                <span id="${name}-gpio-status" class="sensor-gpio-status"></span>           
-                <span class="sensor-type ${typeClass}">${sensor.type} ${rating}V</span>
-                <span class="sensor-name">${name}</span>
+            <div class="sensor-header-left">
+                <span id="${name}-gpio-status" class="sensor-gpio-status"></span>
+                <span class="sensor-icon"><i class="fa-solid ${iconType}"></i></span>
+                <span class="sensor-name name-${typeClass}">${name}</span> 
+            </div>
                 <div class="type-edit-container" id="btns-${name}">
                     <i class="fa-solid fa-book log-btn" data-name="${name}" title="Log"></i>
                     <i class="fa-solid fa-gear edit-btn" data-name="${name}" title="Edit"></i>
@@ -272,7 +280,8 @@ function handleSensorUpdate(data) {
                     </div>
                     <div class="edit-entry">
                         <label>Device:</label>
-                        <input type="text" id="device-${name}" value="${deviceName}">
+                        <input type="text" id="device-${name}" value="${deviceName}" disabled>
+                        <input type="text" id="device-id-${name}" value="${deviceID}" hidden>
                     </div>
                 </div>
             </div>
@@ -401,15 +410,11 @@ function updateHeaderTotals(data) {
         console.error("Header totals container not found");
         return;
     }
-
     const batteryNet = data.battery_in_total - data.battery_out_total;
-
     let html = `
         <span class="totals-data" title="Solar Total"><i class="fa-solid fa-solar-panel"></i><span class="totals-text"> ${data.solar_total.toFixed(1)}W</span></span>
         <span class="totals-data" title="Wind Total"><i class="fa-solid fa-wind"></i><span class="totals-text"> ${data.wind_total.toFixed(1)}W</span></span>
     `;
-    
-
     if (data.battery_soc_total < 5) {
         html += `<span class="totals-data battery-empty" title="Total SoC"><i class="fa-solid fa-car-battery"></i><span class="totals-text"> ${data.battery_soc_total.toFixed(0)}%</span></span>`;
     } else if (data.battery_soc_total < 25) {
@@ -457,6 +462,7 @@ function saveSensor(originalName) {
     const maxPower = document.getElementById(`maxPower-${originalName}`).value;
     const rating = document.getElementById(`rating-${originalName}`).value;
     const hexAddress = document.getElementById(`address-${originalName}`).value;
+    const deviceID = document.getElementById(`device-id-${originalName}`).value;
     const address = parseInt(hexAddress, 16);
 
     fetch("/update_sensor", {
@@ -468,7 +474,8 @@ function saveSensor(originalName) {
             type: newType,
             max_power: maxPower,
             rating: rating,
-            address: address
+            address: address,
+            device_id: deviceID
         })
     })
         .then(res => res.json())
@@ -494,19 +501,62 @@ function getSettings() {
             document.getElementById("mqtt-port").value = data.mqtt_port ?? "";
             document.getElementById("webserver-host").value = data.webserver_host ?? "";
             document.getElementById("webserver-port").value = data.webserver_port ?? "";
-            document.getElementById("remote-gpio").checked = data.remote_gpio == 1;
-            document.getElementById("gpio-address").value = data.gpio_address ?? "";
+            // document.getElementById("remote-gpio").checked = data.remote_gpio == 1;
+            // document.getElementById("gpio-address").value = data.gpio_address ?? "";
 
-            isRemoteGpio = data.remote_gpio == 1;
-            updateGpioStatus();
+            // Add device information
+            const deviceSettings = document.getElementById("devices-settings");
+            deviceSettings.innerHTML = ""; // Clear previous entries
+            let html = "";
+            // Loop through devices and create settings entries
+            // If remote GPIO is enabled, disable the input field
+            for (const device of Object.values(devices)) {
+                const checked = device.remote_gpio === 1 ? "checked" : "";
+                const disabled = device.remote_gpio === 1 ? "disabled" : "";
+                
+                html += `
+                    <h5> -- Device ID: ${device.id}</h5>
+                    <div class="settings-entry">
+                        <label for="device-name">Device Name:</label>
+                        <input type="text" class="gpio-address-${device.id}" id="device-name" value="${device.name}"/>
+                     </div>
+                    <div class="settings-entry">
+                        <label for="remote-gpio">Remote GPIO:</label>
+                        <input type="checkbox" class="gpio-checkbox-${device.id}" id="remote-gpio" ${checked}/>
+                    </div>
+                    <div class="settings-entry">
+                        <label for="gpio-address">GPIO Address:</label>
+                        <input type="text" class="gpio-address-${device.id}" id="gpio-address" value="${device.gpio_address}" ${disabled}/>
+                    </div>
+                `;
 
-            // Enable/disable i2c address input based on remote gpio
-            const i2cInput = document.getElementById("gpio-address");
-            const remoteGpioCheckbox = document.getElementById("remote-gpio");
-            i2cInput.disabled = !remoteGpioCheckbox.checked;
-            remoteGpioCheckbox.addEventListener("change", function () {
-                i2cInput.disabled = !this.checked;
-            });
+            } 
+            deviceSettings.innerHTML = html;
+            
+
+            // Enable/disable remote GPIO based on checkbox
+            for (const device of Object.values(devices)) {
+                const remoteGpioCheckbox = document.querySelector(`.gpio-checkbox-${device.id}`);
+                const i2cInput = document.querySelector(`.gpio-address-${device.id}`);
+                if (remoteGpioCheckbox) {
+                    remoteGpioCheckbox.addEventListener("change", function () {
+                        i2cInput.disabled = !this.checked;
+                    });
+                    // Set initial state
+                    i2cInput.disabled = !remoteGpioCheckbox.checked;
+                }
+            }
+
+            // isRemoteGpio = data.remote_gpio == 1;
+            // updateGpioStatus();
+
+            // // Enable/disable i2c address input based on remote gpio
+            // const i2cInput = document.getElementById("gpio-address");
+            // const remoteGpioCheckbox = document.getElementById("remote-gpio");
+            // i2cInput.disabled = !remoteGpioCheckbox.checked;
+            // remoteGpioCheckbox.addEventListener("change", function () {
+            //     i2cInput.disabled = !this.checked;
+            // });
         });
 }
 
@@ -520,8 +570,24 @@ function saveSettings() {
     const mqttPort = document.getElementById("mqtt-port").value;
     const webserverHost = document.getElementById("webserver-host").value;
     const webserverPort = document.getElementById("webserver-port").value;
-    const remoteGpio = document.getElementById("remote-gpio").checked ? 1 : 0;
-    const gpioAddress = document.getElementById("gpio-address").value;
+    // const remoteGpio = document.getElementById("remote-gpio").checked ? 1 : 0;
+    // const gpioAddress = document.getElementById("gpio-address").value;
+
+    const deviceSettings = {};
+    for (const device of Object.values(devices)) {
+        const deviceNameInput = document.querySelector(`.device-name-${device.id}`);
+        const gpioCheckbox = document.querySelector(`.gpio-checkbox-${device.id}`);
+        const gpioAddrInput = document.querySelector(`.gpio-address-${device.id}`);
+
+        if (deviceNameInput && gpioCheckbox && gpioAddrInput) {
+            deviceSettings[device.id] = {
+                name: deviceNameInput.value.trim(),
+                remote_gpio: gpioCheckbox.checked ? 1 : 0,
+                gpio_address: gpioAddrInput.value.trim()
+            };
+        }
+    }
+
 
     fetch("/update_settings", {
         method: "POST",
@@ -536,8 +602,9 @@ function saveSettings() {
             mqtt_port: mqttPort,
             webserver_host: webserverHost,
             webserver_port: webserverPort,
-            remote_gpio: remoteGpio,
-            gpio_address: gpioAddress,
+            // remote_gpio: remoteGpio,
+            // gpio_address: gpioAddress,
+            devices: deviceSettings
         })
     })
         .then(res => res.json())
@@ -545,8 +612,9 @@ function saveSettings() {
             socket.emit("sensor_update_request");
         });
 
-    updateEditFormI2CInputs();
-    updateGpioStatus();
+    // updateEditFormI2CInputs();
+    // updateSensorGpioStatus(name, remoteGpio, deviceName)
+    // updateGpioStatus();
     document.getElementById("settings-container").classList.add("hidden");
 }
 

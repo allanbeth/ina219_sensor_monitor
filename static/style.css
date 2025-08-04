@@ -80,6 +80,7 @@ body {
 .totals-text {
     font-size: 0.8em;
     color: #555;
+    margin-bottom: 4px;
     
 }
 
@@ -103,8 +104,8 @@ body {
     margin: 0px 1px 15px 6px;
 }
 
-.gpio-status2 {
-    margin-right: 10px;
+.sensor-gpio-status {
+    margin-right: 3px;
 }
 
 /* ========== Settings container and Card ========== */
@@ -131,6 +132,10 @@ body {
     display: inline;
     color: #333;
     margin: 0px 10px 10px 4px;
+}
+
+.settings-header i {
+    margin: 0px 0px 0px 12px;
 }
 
 .settings-data {
@@ -488,22 +493,53 @@ body {
 }
 
 .sensor-header i {
-    font-size: 1.4em;
+    font-size: 1.2em;
     float: right;
-    margin: 4px 2px 0px 2px;
+    margin: 4px 8px 0px 0px;
+    
+}
+
+.sensor-header-left {
+    display: flex;
+    align-items: left;
+    min-width: 0;
+    justify-content: flex-start;
 }
 
 .sensor-name {
-    font-size: 1.2em;
-    color: #222;
+    font-size: 1.0em;
     font-weight: bold;
+    margin-top: 4px;
 }
+
+.name-type-Solar {
+    color:#ffa500;
+}
+.name-type-Wind {
+    color: #00aaff;
+}
+.name-type-Battery {
+    color: #5c6bc0;
+}
+
+.sensor-icon i {
+    font-size: 1.2em;
+    margin-right: 10px;
+}
+
+.sensor-rating-text {
+    font-size: 0.8em;
+    margin-left: 10px;
+    color: #666;
+}
+
 
 .sensor-type {
     padding: 4px 10px;
     border-radius: 15px;
     font-size: 0.9em;
     color: white;
+
 }
 
 .sensor-btns {
@@ -535,13 +571,17 @@ body {
     background-color: #ffa500;
 }
 
+
 .type-Wind {
     background-color: #00aaff;
 }
 
+
 .type-Battery {
     background-color: #5c6bc0;
 }
+
+
 
 
 /* ========== Logs ========== */
@@ -786,7 +826,6 @@ meter {
 
 /* ========== Edit Form ========== */
 .edit-form {
-    margin-top: 10px;
     overflow: visible; 
     position: relative;
     height: 100%;
@@ -799,9 +838,9 @@ meter {
 
 .edit-data {
     overflow-y: auto;
-    max-height: 160px;
+    max-height: 180px;
     width: 100%;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
 .edit-entry {
