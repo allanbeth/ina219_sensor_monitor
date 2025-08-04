@@ -134,8 +134,14 @@ body {
     margin: 0px 10px 10px 4px;
 }
 
+.settings-card h5 {
+    font-size: 0.9em;
+    margin: 9px 0px 6px 0px
+}
+
 .settings-header i {
-    margin: 0px 0px 0px 12px;
+    margin: 0px 0px 0px 8px;
+    font-size: 0.8em;
 }
 
 .settings-data {
@@ -176,6 +182,12 @@ body {
     float: right;
     margin: 0px 4px 0px 4px;
 }
+
+.divider {
+    border: none;
+    border-top: 1px solid #333;
+    margin: 0px 5px 8px 5px ;
+  }
 
 /* ========== Backup and Restore ========== */
 

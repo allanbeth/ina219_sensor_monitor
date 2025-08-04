@@ -512,20 +512,24 @@ function getSettings() {
             // If remote GPIO is enabled, disable the input field
             for (const device of Object.values(devices)) {
                 const checked = device.remote_gpio === 1 ? "checked" : "";
-                const disabled = device.remote_gpio === 1 ? "disabled" : "";
+                const disabled = device.remote_gpio === 0 ? "disabled" : "";
                 
                 html += `
-                    <h5> -- Device ID: ${device.id}</h5>
+                    <hr class="divider">
                     <div class="settings-entry">
-                        <label for="device-name">Device Name:</label>
+                        <label for="device-id"> Device ID:</label>
+                        <input type="text" class="device-id-${device.id}" id="device-id" value="${device.id}" disabled/>
+                     </div>
+                    <div class="settings-entry">
+                        <label for="device-name"> Device Name:</label>
                         <input type="text" class="gpio-address-${device.id}" id="device-name" value="${device.name}"/>
                      </div>
                     <div class="settings-entry">
-                        <label for="remote-gpio">Remote GPIO:</label>
+                        <label for="remote-gpio"> Remote GPIO:</label>
                         <input type="checkbox" class="gpio-checkbox-${device.id}" id="remote-gpio" ${checked}/>
                     </div>
                     <div class="settings-entry">
-                        <label for="gpio-address">GPIO Address:</label>
+                        <label for="gpio-address"> GPIO Address:</label>
                         <input type="text" class="gpio-address-${device.id}" id="gpio-address" value="${device.gpio_address}" ${disabled}/>
                     </div>
                 `;
@@ -542,8 +546,7 @@ function getSettings() {
                     remoteGpioCheckbox.addEventListener("change", function () {
                         i2cInput.disabled = !this.checked;
                     });
-                    // Set initial state
-                    i2cInput.disabled = !remoteGpioCheckbox.checked;
+                    
                 }
             }
 
