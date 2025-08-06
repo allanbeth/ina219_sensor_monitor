@@ -159,7 +159,8 @@ function handleSensorUpdate(data) {
         
         const logHTML = generateLogHTML(sensor.data.readings ?? []);
         const i2cDisabled = isRemoteGpio ? "" : "disabled";
-        const batteryState = sensor.data.status ?? "";
+        let batteryState = sensor.data.status || "offline";
+        let batterySoc = "fa-battery-empty"; // Default icon
         let deviceName  = "Default Device"
         let remoteGpio = 0;
         let deviceID = 0;
@@ -178,6 +179,19 @@ function handleSensorUpdate(data) {
      
         // Update the battery state if applicable
         if (sensor.type === "Battery") {
+            
+
+            if (sensor.data.state_of_charge < 5) {
+                batterySoc = "fa-battery-empty";
+            } else if (sensor.data.state_of_charge < 25) {
+                batterySoc = "fa-battery-quarter";
+            } else if (sensor.data.state_of_charge < 50) {
+                batterySoc = "fa-battery-half";
+            } else if (sensor.data.state_of_charge < 75) {
+                batterySoc = "fa-battery-three-quarters";
+            } else {
+                batterySoc = "fa-battery-full";
+            }
 
             // Add current state class
             if (batteryState == "charging") {
@@ -199,7 +213,6 @@ function handleSensorUpdate(data) {
         } else if (sensor.type === "Battery") {
             iconType = "fa-car-battery";
         } 
-
        
 
         let content = `
@@ -230,7 +243,7 @@ function handleSensorUpdate(data) {
                     </div>
                     ${sensor.type === "Battery" ? `
                         <div class="data-tile" id="${sensor.type.toLowerCase()}-data-tile">
-                            <span class="icon"><i class="fa-solid fa-battery ${iconClass}" id="battery-icon"></i></span>
+                            <span class="icon"><i class="fa-solid ${batterySoc} ${iconClass}" id="battery-icon"></i></span>
                             <p class="soc">${sensor.data.state_of_charge ?? 0}% </p>
                         </div>
                     </div>` : `

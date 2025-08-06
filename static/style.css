@@ -1065,18 +1065,17 @@ meter {
 .fa-battery-half,
 .fa-battery-three-quarters,
 .fa-battery-full {
-    color: #666;
     transition: color 0.2s;
     
 }
 
-.fa-battery-empty:hover,
+/* .fa-battery-empty:hover,
 .fa-battery-quarter:hover,
 .fa-battery-half:hover,
 .fa-battery-three-quarters:hover,
 .fa-battery-full:hover {
-    color: #151212;
-}
+    color: #fff;
+} */
 
 .fa-solar-panel {
     color: #ffa500;
