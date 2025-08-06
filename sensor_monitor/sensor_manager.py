@@ -252,6 +252,19 @@ class SensorManager:
                         battery_in_total += abs(power)
                     elif status == "discharging" or power < 0:
                         battery_out_total += abs(power)
+
+                    if self.battery_count > 0:
+                        average_battery_soc = average_battery_soc / self.battery_count
+
+                self.totals_data = {
+                    "solar_total": round(solar_total, 2),
+                    "wind_total": round(wind_total, 2),
+                    "battery_soc_total": round(average_battery_soc, 2),
+                    "battery_in_total": round(battery_in_total, 2),
+                    "battery_out_total": round(battery_out_total, 2)
+                }
+
+                self.mqtt.publish_totals_data(self.totals_data)
             else:
                 if s.readings:
                     sensor_data = s.current_data()
@@ -269,17 +282,6 @@ class SensorManager:
                     }
                     data[s.name]['data'] = sensor_data
 
-        if self.battery_count > 0:
-            average_battery_soc = average_battery_soc / self.battery_count
-
-        self.totals_data = {
-            "solar_total": round(solar_total, 2),
-            "wind_total": round(wind_total, 2),
-            "battery_soc_total": round(average_battery_soc, 2),
-            "battery_in_total": round(battery_in_total, 2),
-            "battery_out_total": round(battery_out_total, 2)
-        }
-
-        self.mqtt.publish_totals_data(self.totals_data)
+        
         data["totals"] = self.totals_data
         return data
