@@ -1,49 +1,49 @@
 # sensor_monitor/logger.py
 
-import logging, time, os
-from sensor_monitor.config_manager import LOG_FILE
+import logging
+import os
 
+# Shared logger instance
+file = "sensor_monitor.log"
+logger = logging.getLogger("sensor_monitor")
+max_log_size = 1000 * 1024 * 1024  # 1000 MB default
 
-class sensor_logger:
-        
-    def __init__(self):
-        self.logger = logging.getLogger("sensor_monitor")
-        self.max_log_size = 1000 * 1024 * 1024
-        if not self.logger.handlers:
-            handler = logging.FileHandler(LOG_FILE)
-            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-            handler.setFormatter(formatter)
-            self.logger.addHandler(handler)
-            self.logger.setLevel(logging.INFO)
-            self.logger.propagate = False
+# Configure logger only once
+if not logger.handlers:
+    handler = logging.FileHandler(file)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
 
-    def set_log_size(self, max):
-        self.max_log_size = max * 1024 * 1024
-        self.info(f"Log file Size Set Sucessfully")
+def _check_log_size():
+    if os.path.exists(file) and os.path.getsize(file) > max_log_size:
+        with open(file, 'w'): 
+            pass  # Clears the file
+        logger.info("Log file reset due to size limit.")
 
-    def _check_log_size(self):
-        if os.path.exists(LOG_FILE) and os.path.getsize(LOG_FILE) > self.max_log_size:
-            with open(LOG_FILE, 'w') as f:
-                pass  
-            self.info("Log file reset due to size limit.")
+def set_log_size(mb):
+    global max_log_size
+    max_log_size = mb * 1024 * 1024
+    info("Log file size set successfully.")
 
-    def debug(self, log_entry):
-        self._check_log_size()
-        self.logger.debug(log_entry)
+def debug(msg): 
+    _check_log_size() 
+    logger.debug(msg)
 
-    def info(self, log_entry):
-        self._check_log_size()
-        #print(log_entry)
-        self.logger.info(log_entry)
+def info(msg): 
+    _check_log_size()
+    logger.info(msg)
 
-    def warning(self, log_entry):
-        self._check_log_size()
-        self.logger.warning(log_entry)
+def warning(msg): 
+    _check_log_size()
+    logger.warning(msg)
 
-    def error(self, log_entry):
-        self._check_log_size()
-        self.logger.error(log_entry)
+def error(msg): 
+    _check_log_size()
+    logger.error(msg)
 
-    def critical(self, log_entry):
-        self._check_log_size()
-        self.logger.critical(log_entry)
+def critical(msg): 
+    _check_log_size()
+    logger.critical(msg)

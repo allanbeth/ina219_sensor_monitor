@@ -1,11 +1,15 @@
-from adafruit_ina219 import INA219
-from collections import deque
-from sensor_monitor.logger import sensor_logger
+# sensor_monitor/sensor.py
+import sys
 import board
 import busio
 import datetime
-import logging
-import math
+try:
+    from adafruit_ina219 import INA219
+    from collections import deque
+    from sensor_monitor.logger import logger
+except Exception as ex:
+    print("Error loading config: " + str(ex))
+    sys.exit()
 
 CALIBRATION_REGISTER = 0x05
 DEFAULT_CALIBRATION = 4191
@@ -13,7 +17,6 @@ DEFAULT_CALIBRATION = 4191
 class Sensor:
     def __init__(self, name, address, sensor_type, max_power, rating, max_readings, device_id, i2c=None, pi=None):
         self.name = name
-        self.logger = sensor_logger()
         self.type = sensor_type
         self.max_power = max_power
         self.address = address
@@ -27,16 +30,16 @@ class Sensor:
 
         if self.pi:
             self.handle = self.pi.i2c_open(1, self.address)
-            self.logger.info(f"Sensor {self.name}: Remote I2C handle {self.handle} opened at address {hex(self.address)}")
+            logger.info(f"Sensor {self.name}: Remote I2C handle {self.handle} opened at address {hex(self.address)}")
             self.calibrate()  # Calibrate when using remote GPIO
         else:
             try:
                 self.i2c = i2c or busio.I2C(board.SCL, board.SDA)
                 self.ina = INA219(self.i2c)
                 self.ina.i2c_device.device_address = self.address
-                self.logger.info(f"INA219 sensor connected on address {hex(self.address)}")
+                logger.info(f"INA219 sensor connected on address {hex(self.address)}")
             except Exception as e:
-                self.logger.warning("INA219 sensor not detected: %s", str(e))
+                logger.warning("INA219 sensor not detected: %s", str(e))
                 self.ina = None
 
     def calibrate(self, value=DEFAULT_CALIBRATION):
@@ -44,9 +47,9 @@ class Sensor:
             if self.pi and hasattr(self, 'handle'):
                 # Write value as big-endian (high byte first)
                 self.pi.i2c_write_word_data(self.handle, CALIBRATION_REGISTER, value)
-                self.logger.info(f"Calibrated {self.name} with value {value}")
+                logger.info(f"Calibrated {self.name} with value {value}")
         except Exception as e:
-            self.logger.error(f"Calibration failed for {self.name}: {e}")
+            logger.error(f"Calibration failed for {self.name}: {e}")
 
     def get_battery_status(self, current):
         if current > 0.05:  # Charging
@@ -84,7 +87,7 @@ class Sensor:
         Returns the (possibly clamped) voltage.
         """
         if not self.is_battery_voltage_valid(voltage):
-            self.logger.warning(
+            logger.warning(
                 f"{self.name}: Battery voltage {voltage}V out of range for {self.rating}V system. Clamping."
             )
             return self.clamp_battery_voltage(voltage)
@@ -121,7 +124,7 @@ class Sensor:
             if self.is_valid_reading(new_readings):
                 self.readings.append(new_readings)
             else:
-                self.logger.info(f"Outlier detected for {self.name}: {new_readings}")
+                logger.info(f"Outlier detected for {self.name}: {new_readings}")
 
             data = self.smoothed_data()
             if self.type == "Battery":
@@ -130,7 +133,7 @@ class Sensor:
             data["time_stamp"] = self.readings[-1]["time_stamp"] if self.readings else "No Data"
 
         except Exception as e:
-            self.logger.error(f"Error reading sensor {self.name}: {e}")
+            logger.error(f"Error reading sensor {self.name}: {e}")
             data = {
                 "voltage": 0, "current": 0, "power": 0,
                 "time_stamp": datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
@@ -289,13 +292,13 @@ class Sensor:
             # Convert to signed 16-bit
             if value & 0x8000:
                 value -= 0x10000
-            self.logger.debug(f"Read register {reg} from {self.name}: {value}")
+            logger.debug(f"Read register {reg} from {self.name}: {value}")
             if reg == CALIBRATION_REGISTER and value == 0:
                 self.calibrate()  # Recalibrate if calibration register is zero
             elif reg == CALIBRATION_REGISTER and value != DEFAULT_CALIBRATION:
-                self.logger.warning(f"Calibration register {reg} for {self.name} has unexpected value {value}, recalibrating.")
+                logger.warning(f"Calibration register {reg} for {self.name} has unexpected value {value}, recalibrating.")
                 self.calibrate(DEFAULT_CALIBRATION)
             return value
         except Exception as e:
-            self.logger.error(f"Failed to read register {reg} from {self.name}: {e}")
+            logger.error(f"Failed to read register {reg} from {self.name}: {e}")
             return 0

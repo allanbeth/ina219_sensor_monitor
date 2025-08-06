@@ -132,6 +132,7 @@ body {
     display: inline;
     color: #333;
     margin: 0px 10px 10px 4px;
+    font-size: 0.9em;
 }
 
 .settings-card h5 {
@@ -224,7 +225,7 @@ body {
     overflow: visible; 
     position: relative;
     height: 100%;
-    width: 90%;
+    width: 100%;
 }
 
 .restore-config-entries {
@@ -237,7 +238,7 @@ body {
 
 .backup-config-text,
 .restore-config-text {
-    font-size: 0.8em;
+    font-size: 0.9em;
     width: 100%;
 
 }
@@ -262,7 +263,7 @@ body {
     border-bottom: #333 1px solid;
 }
 .restore-config-file-name {
-    font-size: 0.6em;
+    font-size: 0.8em;
     width: 70%
 }
 
@@ -567,7 +568,7 @@ body {
 
 .sensor-btns,
 .back-btn i {
-    font-size: 1.1em;
+    font-size: 0.8em;
     transition: color 0.2s;
     margin: 0px 1px 0px 6px;
 }

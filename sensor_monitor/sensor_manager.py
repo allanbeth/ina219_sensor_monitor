@@ -4,59 +4,60 @@ import json
 import time
 import pigpio
 import board
-
-from sensor_monitor.sensor import Sensor
-from sensor_monitor.config_manager import SENSOR_FILE
-from sensor_monitor.mqtt import MQTTPublisher
-from sensor_monitor.logger import sensor_logger
-from sensor_monitor.webserver import flaskWrapper
-
+import sys
+try:
+    from sensor_monitor.sensor import Sensor
+    from sensor_monitor.config_manager import SENSOR_FILE
+    from sensor_monitor.mqtt import MQTTPublisher
+    from sensor_monitor.webserver import flaskWrapper
+    from sensor_monitor.logger import logger
+except Exception as ex:
+    print("Error loading config: " + str(ex))
+    sys.exit()
 
 class Device:
-    def __init__(self, name, id, remote_gpio=False, gpio_address=None, logger=None):
+    def __init__(self, name, id, remote_gpio=False, gpio_address=None):
         self.name = name
         self.id = id
         self.remote_gpio = remote_gpio
         self.gpio_address = gpio_address
-        self.logger = logger
         self.pi = None
         self.i2c = None
-        self.logger.info(f"Initializing Device: {self.name} (ID: {self.id} Remote GPIO: {self.remote_gpio})")
+        logger.info(f"Initializing Device: {self.name} (ID: {self.id} Remote GPIO: {self.remote_gpio})")
 
     def connect(self):
         if self.remote_gpio:
-            self.logger.info(f"{self.name}: Establishing remote GPIO connection at {self.gpio_address}")
+            logger.info(f"{self.name}: Establishing remote GPIO connection at {self.gpio_address}")
             self.pi = pigpio.pi(self.gpio_address)
             if not self.pi.connected:
                 raise RuntimeError(f"{self.name}: Could not connect to remote GPIO at {self.gpio_address}")
-            self.logger.info(f"{self.name}: Remote GPIO connection established")
+            logger.info(f"{self.name}: Remote GPIO connection established")
         else:
-            self.logger.info(f"{self.name}: Establishing local GPIO connection")
+            logger.info(f"{self.name}: Establishing local GPIO connection")
             self.i2c = board.I2C()
-            self.logger.info(f"{self.name}: Local GPIO connection established")
+            logger.info(f"{self.name}: Local GPIO connection established")
 
     def detect_sensors(self):
         if self.remote_gpio:
-            self.logger.warning(f"{self.name}: Remote GPIO sensor detection not implemented; assuming config is correct.")
+            logger.warning(f"{self.name}: Remote GPIO sensor detection not implemented; assuming config is correct.")
             return []
         if not self.i2c:
-            self.logger.warning(f"{self.name}: I2C not initialized.")
+            logger.warning(f"{self.name}: I2C not initialized.")
             return []
         while not self.i2c.try_lock():
             pass
         try:
             addresses = self.i2c.scan()
             for addr in addresses:
-                self.logger.info(f"{self.name}: I2C Sensor detected at {hex(addr)}")
+                logger.info(f"{self.name}: I2C Sensor detected at {hex(addr)}")
             return addresses
         finally:
             self.i2c.unlock()
 
 
 class sensor_config:
-    def __init__(self, logger=None, mqtt=None):
+    def __init__(self, mqtt=None):
         self.sensors = []
-        self.logger = logger
         self.mqtt = mqtt
 
     def save_sensors(self, sensors=None):
@@ -86,20 +87,20 @@ class sensor_config:
             self.sensors.remove(sensor_to_remove)
             self.save_sensors()
             self.mqtt.remove_discovery_config(sensor_to_remove.name, sensor_to_remove.type)
-            self.logger.info(f"Removed sensor: {sensor_to_remove.name}")
+            logger.info(f"Removed sensor: {sensor_to_remove.name}")
             return True
-        self.logger.warning(f"Tried to remove non-existent sensor: {name}")
+        logger.warning(f"Tried to remove non-existent sensor: {name}")
         return False
 
 
 class SensorManager:
     def __init__(self, config):
         self.config = config
-        self.logger = sensor_logger()
+        #logger = sensor_logger()
         self.set_config()
 
-        self.mqtt = MQTTPublisher(self.logger, self.mqtt_config)
-        self.sensor_config = sensor_config(self.logger, self.mqtt)
+        self.mqtt = MQTTPublisher(self.mqtt_config)
+        self.sensor_config = sensor_config( self.mqtt)
 
         self.devices = []
         for d in self.device_configs:
@@ -107,8 +108,7 @@ class SensorManager:
                 name=d['name'],
                 id=d.get('id', 0),
                 remote_gpio=d.get('remote_gpio', 0) == 1,
-                gpio_address=d.get('gpio_address'),
-                logger=self.logger
+                gpio_address=d.get('gpio_address')
             )
             
             device.connect()
@@ -117,16 +117,16 @@ class SensorManager:
         self.sensors = self.load_sensors()
         self.sensor_config.sensors = self.sensors
 
-        self.webserver = flaskWrapper(self.logger, self.config, self.sensor_config)
+        self.webserver = flaskWrapper(self.config, self.sensor_config)
 
         self.mqtt.publish_hub_device()
         self.load_mqtt_discovery()
 
     def set_config(self):
         self.device_configs = self.config.config_data["devices"]
-        self.logger.info(f"Sensor Manager initialized with {len(self.device_configs)} devices")
+        logger.info(f"Sensor Manager initialized with {len(self.device_configs)} devices")
         self.poll_intervals = self.config.config_data.get("poll_intervals", {})
-        self.logger.set_log_size(self.config.config_data["max_log"])
+        logger.max_log_size = self.config.config_data["max_log"]
         self.last_poll_times = {}
         self.mqtt_config = {
             "mqtt_broker": self.config.config_data['mqtt_broker'],
@@ -139,22 +139,22 @@ class SensorManager:
         sensors = []
         try:
             with open(SENSOR_FILE, "r") as f:
-                self.logger.info(f"Loading sensors from {SENSOR_FILE}")
+                logger.info(f"Loading sensors from {SENSOR_FILE}")
                 sensor_data = json.load(f)
                 for s in sensor_data:
                     i2c = None
                     pi = None
                     device_id = s.get("device_id", 0)
-                    self.logger.info(f"Loading sensor: {s['name']} at address {s['address']} on device ID {device_id}")
+                    logger.info(f"Loading sensor: {s['name']} at address {s['address']} on device ID {device_id}")
 
                     for device in self.devices:
                         if device.id == device_id:
-                            self.logger.info(f"Found device {device.name} for sensor {s['name']}")
+                            logger.info(f"Found device {device.name} for sensor {s['name']}")
                             if device.remote_gpio:
-                                self.logger.info(f"Using remote GPIO for sensor {s['name']}")
+                                logger.info(f"Using remote GPIO for sensor {s['name']}")
                             i2c = device.i2c
                             pi = device.pi
-                            self.logger.info(f"Found matching device for sensor {s['name']}: {device.name}")
+                            logger.info(f"Found matching device for sensor {s['name']}: {device.name}")
                             break
 
                     sensor = Sensor(
@@ -168,15 +168,15 @@ class SensorManager:
                         i2c=i2c,
                         pi=pi
                     )
-                    self.logger.info(f"Creating Sensor: {sensor.name} of type {sensor.type} with address {sensor.address}")
+                    logger.info(f"Creating Sensor: {sensor.name} of type {sensor.type} with address {sensor.address}")
                     sensors.append(sensor)
 
                     if sensor.type == "Battery":
                         self.battery_count += 1
 
-                    self.logger.info(f"Configured Sensor: {sensor.name}")
+                    logger.info(f"Configured Sensor: {sensor.name}")
         except Exception as e:
-            self.logger.warning(f"Failed to load sensors from file: {e}")
+            logger.warning(f"Failed to load sensors from file: {e}")
 
         for device in self.devices:
             if not device.remote_gpio:
@@ -198,9 +198,9 @@ class SensorManager:
         for sensor in self.sensors:
             try:
                 self.mqtt.send_discovery_config(sensor.name, sensor.type)
-                self.logger.info(f"MQTT discovery published for {sensor.name}")
+                logger.info(f"MQTT discovery published for {sensor.name}")
             except Exception as e:
-                self.logger.error(f"MQTT discovery failed for {sensor.name}: {e}")
+                logger.error(f"MQTT discovery failed for {sensor.name}: {e}")
 
     def get_data(self):
         current_time = time.time()
@@ -229,7 +229,7 @@ class SensorManager:
                 self.last_poll_times[s.name] = current_time
                 data[s.name]['data'] = sensor_data
 
-                self.logger.info(f"New Reading - {s.name}: {sensor_data}")
+                logger.info(f"New Reading - {s.name}: {sensor_data}")
                 self.mqtt.publish_new_data(s.name, sensor_data)
                 self.webserver.broadcast_sensor_data()
 

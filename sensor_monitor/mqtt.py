@@ -1,6 +1,11 @@
 # sensor_monitor/mqtt.py
-
-from sensor_monitor.config_manager import MQTT_TOPIC, MQTT_DISCOVERY_PREFIX, MQTT_BASE, VERSION
+import sys
+try:
+    from sensor_monitor.config_manager import MQTT_DISCOVERY_PREFIX, MQTT_BASE, VERSION
+    from sensor_monitor.logger import logger
+except Exception as ex:
+    print("Error loading config: " + str(ex))
+    sys.exit()
 
 DEVICE_INFO = {
     "identifiers": ["ina219_sensor_monitor_hub"],
@@ -19,27 +24,30 @@ DEVICE_PAYLOAD = {
             "icon": "mdi:flash",
             "device": DEVICE_INFO,
         }
-
-import paho.mqtt.client as mqtt
-import json
+try:
+    import paho.mqtt.client as mqtt
+    import json
+except Exception as ex:
+    print("Error loading config: " + str(ex))
+    sys.exit()
 
 class MQTTPublisher:
-    def __init__(self, logger, mqtt_config):
+    def __init__(self, mqtt_config):
+        logger.info("Initializing MQTT Publisher")
         self.mqtt_broker = mqtt_config['mqtt_broker']
         self.mqtt_port = int(mqtt_config['mqtt_port'])
-        self.logger = logger
+        #self.logger = logger
         self.client = mqtt.Client()
         self.client.loop_start()
 
         try:
             self.client.connect(self.mqtt_broker, self.mqtt_port, 60)
-            self.logger.info("Connected to MQTT Broker")
+            logger.info("Connected to MQTT Broker")
             self.client.publish(f"{MQTT_BASE}/ina219_hub_status", "online", retain=True)
             self.client.publish(f"{MQTT_DISCOVERY_PREFIX}/sensor/ina219_hub_status/availability", "online", retain=True)
-            self.logger.info("Published Hub Status as online")
+            logger.info("Published Hub Status as online")
         except Exception as e:
-            self.logger.error(f"Connection to MQTT Broker failed: {e}")
-
+            logger.error(f"Connection to MQTT Broker failed: {e}")
 
     def publish_hub_device(self):
         payload = {
@@ -50,16 +58,13 @@ class MQTTPublisher:
             "icon": "mdi:flash",
             "device": DEVICE_INFO,
         }
-
         config_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/ina219_hub_status/config"
-
-        self.logger.info(f'Publishing MQTT Hub Device Config - {config_topic} with payload: {payload}')
+        logger.info(f'Publishing MQTT Hub Device Config - {config_topic} with payload: {payload}')
         self.client.publish(config_topic, json.dumps(payload), retain=True)
-
         # Publish the state and availability topics for the hub device
         self.client.publish(f"{MQTT_BASE}/ina219_hub_status", "online", retain=True)
         self.client.publish(f"{MQTT_DISCOVERY_PREFIX}/sensor/ina219_hub_status/availability", "online", retain=True)
-        self.logger.info(f'MQTT Hub Device Published - {MQTT_DISCOVERY_PREFIX}/sensor/ina219_hub_status/availability as online')
+        logger.info(f'MQTT Hub Device Published - {MQTT_DISCOVERY_PREFIX}/sensor/ina219_hub_status/availability as online')
 
     def publish_totals_device(self):
         """
@@ -76,7 +81,6 @@ class MQTTPublisher:
             ("battery_in_total", "Battery Total Charge In", "Wh", "energy", "mdi:battery-plus"),
             ("battery_out_total", "Battery Total Discharge Out", "Wh", "energy", "mdi:battery-minus"),
         ]
-
         device_info = {
             "identifiers": ["ina219_sensor_totals"],
             "name": "INA219 Sensor Totals",
@@ -86,11 +90,10 @@ class MQTTPublisher:
             "via_device": "ina219_sensor_monitor_hub",
             "suggested_area": "Power Systems",
         }
-                
 
         for key, name, unit, device_class, icon in totals:
             config_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/totals_{key}/config"
-            self.logger.info(f"Publishing MQTT discovery for Totals ({key}) to {config_topic}")
+            logger.info(f"Publishing MQTT discovery for Totals ({key}) to {config_topic}")
 
             payload = {
                 "name": name,        
@@ -104,9 +107,9 @@ class MQTTPublisher:
                 "device": device_info,
             }
             
-            self.logger.info(f"Publishing MQTT payload for ({key}): {payload}")
+            logger.info(f"Publishing MQTT payload for ({key}): {payload}")
             self.client.publish(config_topic, json.dumps(payload), retain=True)
-            self.logger.info(f'MQTT Totals Discovery Config Published - {config_topic}')
+            logger.info(f'MQTT Totals Discovery Config Published - {config_topic}')
 
         # Publish the availability topic for the totals device
         self.client.publish(f"{base_topic}/availability", "online", retain=True)
@@ -149,7 +152,7 @@ class MQTTPublisher:
         # Publish all standard measurements
         for measurement, unit, device_class, icon, entity_category in measurements:
             config_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_clean}_{measurement}/config"
-            self.logger.info(f"Publishing MQTT discovery for {sensor_name} ({sensor_type}) to {config_topic}")
+            logger.info(f"Publishing MQTT discovery for {sensor_name} ({sensor_type}) to {config_topic}")
 
             payload = {
                 "name": f"{sensor_name} {measurement.replace('_', ' ').capitalize()}",
@@ -162,9 +165,9 @@ class MQTTPublisher:
                 "device": device_info,
             }
 
-            self.logger.info(f"Publishing MQTT payload for ({sensor_name}): {payload}")
+            logger.info(f"Publishing MQTT payload for ({sensor_name}): {payload}")
             self.client.publish(config_topic, json.dumps(payload), retain=True)
-            self.logger.info(f'MQTT Discovery Config Published - {config_topic}')
+            logger.info(f'MQTT Discovery Config Published - {config_topic}')
 
         # For battery type, publish status as a separate enum entity
         if sensor_type == "Battery":
@@ -182,7 +185,7 @@ class MQTTPublisher:
                 "options": ["charging", "discharging", "idle"]
             }
             self.client.publish(status_config_topic, json.dumps(status_payload), retain=True)
-            self.logger.info(f'MQTT Discovery Config Published - {status_config_topic}')
+            logger.info(f'MQTT Discovery Config Published - {status_config_topic}')
 
 
 
@@ -211,7 +214,7 @@ class MQTTPublisher:
 
         payload = json.dumps(sensor_data)
         self.client.publish(topic, payload, retain=True)
-        self.logger.info(f'MQTT Published - {topic}: {payload}')
+        logger.info(f'MQTT Published - {topic}: {payload}')
 
         availability_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/{sensor_clean}/availability"
         self.client.publish(availability_topic, "online", retain=True)
@@ -224,7 +227,7 @@ class MQTTPublisher:
         topic = f"{MQTT_BASE}/totals"
         payload = json.dumps(totals_dict)
         self.client.publish(topic, payload, retain=True)
-        self.logger.info(f'MQTT Published Totals - {topic}: {payload}')
+        logger.info(f'MQTT Published Totals - {topic}: {payload}')
 
         availability_topic = f"{MQTT_DISCOVERY_PREFIX}/sensor/totals/availability"
         self.client.publish(availability_topic, "online", retain=True)

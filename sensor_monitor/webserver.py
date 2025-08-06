@@ -1,15 +1,20 @@
 # sensor_monitor/webserver.py
 
-from flask import Flask, render_template, request, send_file, abort, jsonify
-from flask_socketio import SocketIO
-from sensor_monitor.live_data import sensor_data
-from sensor_monitor.config_manager import ROOT
-from pathlib import Path
-import json, subprocess
+import json
+import subprocess
+import sys
+try:
+    from flask import Flask, render_template, request, send_file, abort, jsonify
+    from flask_socketio import SocketIO
+    from sensor_monitor.live_data import sensor_data
+    from sensor_monitor.config_manager import ROOT
+    from sensor_monitor.logger import logger
+except Exception as ex:
+    print("Error loading config: " + str(ex))
+    sys.exit()
 
 class flaskWrapper:
-    def __init__(self, logger, config_manager, sensor_config):
-        self.logger = logger
+    def __init__(self, config_manager, sensor_config):
         self.config_manager = config_manager
         self.sensor_config = sensor_config
         self.templatePath = ROOT / "templates/"
@@ -34,7 +39,7 @@ class flaskWrapper:
 
 
     def main(self):
-        self.logger.info("Loading index.html")
+        logger.info("Loading index.html")
         self.broadcast_sensor_data()
 
         return render_template("index.html", sensors=sensor_data)
@@ -53,7 +58,7 @@ class flaskWrapper:
 
         
     def get_settings(self):
-            self.logger.info("Requesting config data")
+            logger.info("Requesting config data")
             
             return self.config_manager.config_data
 
@@ -62,7 +67,7 @@ class flaskWrapper:
         self.config_manager.save_config(data)
 
     def backup_config(self):
-        self.logger.info("Backing up configuration file(s)")
+        logger.info("Backing up configuration file(s)")
         data = request.get_json()
         program = data["programConfig"]
         sensor = data["sensorConfig"]
@@ -70,7 +75,7 @@ class flaskWrapper:
         self.config_manager.backup_config(program, sensor)
 
     def restore_backup(self):
-        self.logger.info("Restoring configuration file(s)")
+        logger.info("Restoring configuration file(s)")
         data = request.get_json()
         filename = data.get("filename")
         restore_config = data.get("restore_config", True)
@@ -85,7 +90,7 @@ class flaskWrapper:
         return jsonify({"status": "success"})
         
     def list_backups(self):
-        self.logger.info("Listing backup files")
+        logger.info("Listing backup files")
         backups = self.config_manager.list_backups()
         return jsonify({"backups": backups})
     
@@ -110,13 +115,13 @@ class flaskWrapper:
             return jsonify({"logs": []})
             
         try:
-            self.logger.info("Retrieving Logs")
+            logger.info("Retrieving Logs")
             with open(self.logFilePath, "r") as f:
                 lines = f.readlines()
 
             # Return last N lines (e.g., 100)
             logs = [{"logs": line.strip()} for line in lines[-100:]][::-1]
-            self.logger.info("Loaded logs")
+            logger.info("Loaded logs")
             return jsonify({"logs": logs})
         except Exception as e:
             return jsonify({"error": str(e), "logs": []}), 500
@@ -126,12 +131,12 @@ class flaskWrapper:
 
     def restart_program(self):
         try:
-            self.logger.info("Restarting.....")
+            logger.info("Restarting.....")
             subprocess.Popen(["sudo", "systemctl", "restart", "sensor_monitor.service"])
-            self.logger.info("Restarted Sucessfully ")
+            logger.info("Restarted Sucessfully ")
             return jsonify({"status": "restarting"}), 200
         except Exception as e:
-            self.logger.info("Failed to restart")
+            logger.info("Failed to restart")
             return jsonify({"status": "error", "message": str(e)}), 500
 
     def add_sensor(self):
@@ -156,10 +161,10 @@ class flaskWrapper:
             sensors.append(new_sensor)
             with open(self.config_manager.SENSOR_FILE, "w") as f:
                 json.dump(sensors, f)
-            self.logger.info(f"Added new sensor: {name}")
+            logger.info(f"Added new sensor: {name}")
             return jsonify({"status": "success"})
         except Exception as e:
-            self.logger.error(f"Failed to add sensor: {e}")
+            logger.error(f"Failed to add sensor: {e}")
             return jsonify({"status": "error", "message": str(e)}), 500
 
     def run_webserver(self): 
