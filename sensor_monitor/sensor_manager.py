@@ -137,10 +137,13 @@ class SensorManager:
 
     def load_sensors(self):
         sensors = []
+        loaded_from_file = False
         try:
             with open(SENSOR_FILE, "r") as f:
                 logger.info(f"Loading sensors from {SENSOR_FILE}")
                 sensor_data = json.load(f)
+                loaded_from_file = True  # Mark successful load
+
                 for s in sensor_data:
                     i2c = None
                     pi = None
@@ -190,7 +193,9 @@ class SensorManager:
                         )
                         sensors.append(default_sensor)
 
-        self.sensor_config.save_sensors(sensors)
+        # Save only if sensors list is not empty OR sensor file was successfully loaded
+        if sensors or loaded_from_file:
+            self.sensor_config.save_sensors(sensors)
         return sensors
 
     def load_mqtt_discovery(self):

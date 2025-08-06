@@ -336,7 +336,7 @@ function handleSensorUpdate(data) {
         card.querySelector(".save-btn").addEventListener("click", () => saveSensor(name));
         card.querySelector(".delete-btn").addEventListener("click", () => showDeleteConfirmation(name));
         card.querySelector(".log-back-btn").addEventListener("click", () => closeLog(name));
-        card.querySelector(".refresh-log-btn").addEventListener("click", () => refreshLog(name));
+        
     }
 }
 
@@ -852,10 +852,6 @@ function generateLogHTML(readings) {
 function getLogFile() {
 
     const logContainer = document.getElementById("log-file-entries");
-    // logContainer.innerHTML = "<p>Loading logs...</p>";
-
-    
-
     fetch("/get_log_file")
         .then(res => res.json())
         .then(data => {
@@ -907,8 +903,10 @@ function refreshLog(name) {
     fetch(`/get_sensor_log?name=${encodeURIComponent(name)}`)
         .then(res => res.json())
         .then(data => {
+            const logContainer = document.getElementById(`log-entries-${name}`);
             const logHTML = generateLogHTML(data.readings ?? []);
-            document.getElementById(`log-entries-${name}`).innerHTML = logHTML;
+            logContainer.innerHTML = "";
+            logContainer.innerHTML =  logHTML;
         })
         .catch(error => {
             document.getElementById(`log-entries-${name}`).innerHTML = "<p>Failed to load logs.</p>";

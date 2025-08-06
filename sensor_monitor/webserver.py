@@ -52,8 +52,9 @@ class flaskWrapper:
         max_power = int(data.get("max_power", 100))
         rating = int(data.get("rating", 100))
         address = data.get("address", sensor_data[original_name]["address"])
+        device_id = data.get("device_id", sensor_data[original_name]["device_id"])
 
-        self.sensor_config.update_sensor(original_name, new_name, new_type, max_power, rating, address)
+        self.sensor_config.update_sensor(original_name, new_name, new_type, max_power, rating, address, device_id)
         return jsonify({"status": "success"})
 
         
