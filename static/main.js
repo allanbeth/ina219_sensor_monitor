@@ -441,11 +441,11 @@ function updateHeaderTotals(data) {
     }
     
     if (batteryNet > 0) {
-        html += `<span class="totals-data battery-charging" title="Battery In"><i class="fa-solid fa-arrow-down"></i><span class="totals-text"> ${data.battery_in_total.toFixed(1)}W</span></span>`;
+        html += `<span class="totals-data battery-charging" title="Batteries Charging"><i class="fa-solid fa-arrow-down"></i><span class="totals-text"> ${data.battery_in_total.toFixed(1)}W</span></span>`;
     } else if (batteryNet < 0) {
-        html += `<span class="totals-data battery-discharging" title="Battery Out"><i class="fa-solid fa-arrow-up"></i><span class="totals-text"> ${data.battery_out_total.toFixed(1)}W</span></span>`;
+        html += `<span class="totals-data battery-discharging" title="Batteries Discharging"><i class="fa-solid fa-arrow-up"></i><span class="totals-text"> ${data.battery_out_total.toFixed(1)}W</span></span>`;
     } else if (batteryNet == 0) {
-        html += `<span class="totals-data battery-idle" title="Battery Idle"><i class="fa-solid fa-pause"></i><span class="totals-text"> Idle</span></span>`;
+        html += `<span class="totals-data battery-idle" title="Batteries Idle"><i class="fa-solid fa-pause"></i><span class="totals-text"> Idle</span></span>`;
     }
     dataContainer.innerHTML = html;
 }
