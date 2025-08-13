@@ -3,7 +3,8 @@
 // ==========================
 
 import { deviceList } from './globals.js';
-import { escapeHTML } from './utils.js';
+import { escapeHTML, sleep} from './utils.js';
+
 
 
 // Fetch the settings from the server
@@ -120,7 +121,6 @@ export function closeRestart() {
     restartBtns.innerHTML = '<button class="cancel-btn">Cancel</button><button class="save-btn">Confirm</button>';
     document.getElementById("sensor-container").classList.remove("hidden");
     document.getElementById("header-btns").classList.remove("hidden");
-    paused = false;
 }
 // Restart Application
 export async function restartApplication() {

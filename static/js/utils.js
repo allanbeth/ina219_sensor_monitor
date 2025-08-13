@@ -50,6 +50,7 @@ export function setDeviceInfo() {
             }
             updateAddNewVisibility();
             
+            
         });
 }
 

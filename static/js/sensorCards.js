@@ -3,7 +3,7 @@
 // ==============================
 
 import { formatNumber } from './utils.js';
-import { deviceList, isRemoteGpio, isPaused, setPaused } from './globals.js';
+import { deviceList, isRemoteGpio, isPaused, setPaused, initialLoad, setInitialLoad } from './globals.js';
 import { updateHeaderTotals, updateSensorGpioStatus, generateLogHTML } from './utils.js';
 
 export function handleSensorUpdate(data) {
@@ -16,6 +16,9 @@ export function handleSensorUpdate(data) {
         return;
     }
     for (let [name, sensor] of Object.entries(data)) {
+        
+
+        if (name === 'totals') continue; // Skip totals object
 
         // Device info
         let deviceName = 'Default Device';
@@ -34,8 +37,10 @@ export function handleSensorUpdate(data) {
         container.appendChild(card);
 
         // Update GPIO status
-        updateSensorGpioStatus(name, remoteGpio, deviceName);
-        
+        if (initialLoad) {
+            updateSensorGpioStatus(name, remoteGpio, deviceName);
+            
+        }
 
         // Attach event listeners for dynamic buttons
         // Sensor edit card
@@ -51,6 +56,8 @@ export function handleSensorUpdate(data) {
         card.querySelector(".log-back-btn").addEventListener("click", () => closeLog(name));
         // card.querySelector(".refresh-log-btn").addEventListener("click", () => refreshLog(name, sensor.data.readings ?? []));
     }
+    // Update initial load state
+    setInitialLoad(false);
 }
 
 
@@ -82,7 +89,7 @@ export function renderSensorCard(name, sensor, deviceName, deviceID) {
     let iconClass = '';
     let batteryState = sensor.data?.battery_state || 'offline';
     if (sensor.type === 'Battery') {
-        const soc = sensor.data.state_of_charge ?? 0;
+    const soc = sensor.data && sensor.data.state_of_charge !== undefined ? sensor.data.state_of_charge : 0;
         if (soc < 5) batterySoc = 'fa-battery-empty';
         else if (soc < 25) batterySoc = 'fa-battery-quarter';
         else if (soc < 50) batterySoc = 'fa-battery-half';
@@ -116,31 +123,31 @@ export function renderSensorCard(name, sensor, deviceName, deviceID) {
         </div>
         <div id="view-${name}">
             <div class="sensor-readings">
-                <div class="data-tile" id="${sensor.type.toLowerCase()}-data-tile">
+                <div class="data-tile" id="${sensor.type ? sensor.type.toLowerCase() : 'unknown'}-data-tile">
                     <span class="icon"><i class="fa-solid fa-wave-square"></i></span>
-                    <p class="voltage">${sensor.data.voltage ?? "N/A"} V</p>
+                    <p class="voltage">${sensor.data && sensor.data.voltage !== undefined ? sensor.data.voltage : "N/A"} V</p>
                 </div>
-                <div class="data-tile" id="${sensor.type.toLowerCase()}-data-tile">
+                <div class="data-tile" id="${sensor.type ? sensor.type.toLowerCase() : 'unknown'}-data-tile">
                     <span class="icon"><i class="fa-solid fa-industry"></i></span>
-                    <p class="current">${sensor.data.current ?? "N/A"} A</p>
+                    <p class="current">${sensor.data && sensor.data.current !== undefined ? sensor.data.current : "N/A"} A</p>
                 </div>
-                <div class="data-tile" id="${sensor.type.toLowerCase()}-data-tile">
+                <div class="data-tile" id="${sensor.type ? sensor.type.toLowerCase() : 'unknown'}-data-tile">
                     <span class="icon"><i class="fa-solid fa-bolt"></i></span>
-                    <p class="power">${sensor.data.power ?? "N/A"} W</p>
+                    <p class="power">${sensor.data && sensor.data.power !== undefined ? sensor.data.power : "N/A"} W</p>
                 </div>
                 ${sensor.type === "Battery" ? `
-                <div class="data-tile" id="${sensor.type.toLowerCase()}-data-tile">
+                <div class="data-tile" id="${sensor.type ? sensor.type.toLowerCase() : 'unknown'}-data-tile">
                     <span class="icon"><i class="fa-solid ${batterySoc} ${iconClass}" id="battery-icon"></i></span>
-                    <p class="soc">${sensor.data.state_of_charge ?? 0}% </p>
+                    <p class="soc">${sensor.data && sensor.data.state_of_charge !== undefined ? sensor.data.state_of_charge : 0}% </p>
                 </div>
                 ` : `
-                <div class="data-tile" id="${sensor.type.toLowerCase()}-data-tile">
+                <div class="data-tile" id="${sensor.type ? sensor.type.toLowerCase() : 'unknown'}-data-tile">
                     <span class="icon"><i class="fa-solid fa-plug"></i></span>
                     <p class="output">${sensor.max_power ?? 0} W</p>
                 </div>
                 `}
             </div>
-                <div class="timestamp" id="timestamp-${name}">Last Updated: ${sensor.data.time_stamp}</div>
+                <div class="timestamp" id="timestamp-${name}">Last Updated: ${sensor.data && sensor.data.time_stamp ? sensor.data.time_stamp : "N/A"}</div>
             </div>
         </div>
         <div id="edit-${name}" class="edit-form hidden">

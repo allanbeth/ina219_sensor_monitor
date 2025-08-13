@@ -112,16 +112,14 @@ class flaskWrapper:
         
  
     def get_log_file(self):
+        from collections import deque
         if not self.logFilePath.exists():
             return jsonify({"logs": []})
-            
         try:
             logger.info("Retrieving Logs")
-            with open(self.logFilePath, "r") as f:
-                lines = f.readlines()
-
-            # Return last N lines (e.g., 100)
-            logs = [{"logs": line.strip()} for line in lines[-100:]][::-1]
+            with open(self.logFilePath, "r", encoding="utf-8", errors="replace") as f:
+                lines = deque(f, maxlen=100)
+            logs = [{"logs": line.strip()} for line in reversed(lines)]
             logger.info("Loaded logs")
             return jsonify({"logs": logs})
         except Exception as e:
