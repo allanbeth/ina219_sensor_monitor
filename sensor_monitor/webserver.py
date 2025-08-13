@@ -118,7 +118,7 @@ class flaskWrapper:
         try:
             logger.info("Retrieving Logs")
             with open(self.logFilePath, "r", encoding="utf-8", errors="replace") as f:
-                lines = deque(f, maxlen=100)
+                lines = deque(f, maxlen=50)
             logs = [{"logs": line.strip()} for line in reversed(lines)]
             logger.info("Loaded logs")
             return jsonify({"logs": logs})

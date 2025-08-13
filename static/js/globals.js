@@ -10,6 +10,7 @@ export let undoTimers = {};
 export let isRemoteGpio = false;
 export let remoteGPIOCount = 0;
 export let initialLoad = true;
+export let deviceCount  = 0;
 
 // Additional globals from old main.js
 // Note: remoteCount has been removed as per refactoring
@@ -20,3 +21,4 @@ export function setPaused(paused) { isPaused = paused; }
 export function setUndoTimers(timers) { undoTimers = timers; }
 export function setRemoteGpio(remote) { isRemoteGpio = remote; }
 export function setInitialLoad(load) { initialLoad = load; }
+export function setDeviceCount(count) { deviceCount = count; }

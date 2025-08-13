@@ -3,13 +3,14 @@
 // ==============================
 
 import { formatNumber } from './utils.js';
-import { deviceList, isRemoteGpio, isPaused, setPaused, initialLoad, setInitialLoad } from './globals.js';
+import { deviceList, isRemoteGpio, isPaused, setPaused, initialLoad, deviceCount } from './globals.js';
 import { updateHeaderTotals, updateSensorGpioStatus, generateLogHTML } from './utils.js';
 
 export function handleSensorUpdate(data) {
     if (isPaused) return;
     updateHeaderTotals(data.totals);
     const container = document.getElementById('sensor-container');
+    let count = 0;
     container.innerHTML = '';
     if (Object.keys(data).length === 0) {
         document.getElementById('no-sensors').classList.remove('hidden');
@@ -24,23 +25,31 @@ export function handleSensorUpdate(data) {
         let deviceName = 'Default Device';
         let remoteGpio = 0;
         let deviceID = 0;
+        
         for (const device of Object.values(deviceList)) {
+            
             if (device.id === sensor.device_id) {
                 deviceID = device.id;
                 deviceName = device.name || `Device ${device.id}`;
                 remoteGpio = device.remote_gpio;
-                break;
+
             }
     }
         
         const card = renderSensorCard(name, sensor, deviceName, deviceID);
         container.appendChild(card);
+        
 
         // Update GPIO status
-        if (initialLoad) {
+        // let deviceCount = Object.keys(deviceList).length;
+
+        if (count <= deviceCount) {
             updateSensorGpioStatus(name, remoteGpio, deviceName);
-            
+            count++;
+            console.log(count);
+            console.log(deviceCount);
         }
+
 
         // Attach event listeners for dynamic buttons
         // Sensor edit card
@@ -56,8 +65,6 @@ export function handleSensorUpdate(data) {
         card.querySelector(".log-back-btn").addEventListener("click", () => closeLog(name));
         // card.querySelector(".refresh-log-btn").addEventListener("click", () => refreshLog(name, sensor.data.readings ?? []));
     }
-    // Update initial load state
-    setInitialLoad(false);
 }
 
 

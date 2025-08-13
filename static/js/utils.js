@@ -2,7 +2,7 @@
 // Energy Monitor Utilities JS
 // ===========================
 
-import { deviceList, remoteGPIOCount, setDeviceList, setRemoteGpio } from './globals.js';
+import { deviceList, remoteGPIOCount, setDeviceList, setRemoteGpio, setDeviceCount, deviceCount } from './globals.js';
 
 export function formatNumber(num, decimals = 2) {
     return Number(num).toFixed(decimals);
@@ -17,6 +17,7 @@ export function getElement(id) {
 }
 
 export function updateSensorGpioStatus(name, remoteGpio, deviceName) {
+
     let gpioStatusSpan = document.getElementById(`${name}-gpio-status`);
     console.log(`Updating GPIO status for ${name}: ${remoteGpio} on device ${deviceName}`);
     let html = '';
@@ -28,6 +29,9 @@ export function updateSensorGpioStatus(name, remoteGpio, deviceName) {
         gpioStatusSpan.classList.add("local");
     }
     gpioStatusSpan.innerHTML = html;
+
+    // setInitialLoad(false);
+  
 
 }
 
@@ -49,8 +53,11 @@ export function setDeviceInfo() {
                 // isRemoteGpio = true;
             }
             updateAddNewVisibility();
-            
-            
+
+            setDeviceCount(Object.keys(deviceList).length);
+            console.log(`Total devices: ${deviceCount}`);
+            console.log("Device list updated:", deviceList);
+
         });
 }
 
