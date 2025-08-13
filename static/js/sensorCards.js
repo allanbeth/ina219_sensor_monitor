@@ -10,7 +10,7 @@ export function handleSensorUpdate(data) {
     if (isPaused) return;
     updateHeaderTotals(data.totals);
     const container = document.getElementById('sensor-container');
-    let count = 0;
+   
     container.innerHTML = '';
     if (Object.keys(data).length === 0) {
         document.getElementById('no-sensors').classList.remove('hidden');
@@ -25,7 +25,7 @@ export function handleSensorUpdate(data) {
         let deviceName = 'Default Device';
         let remoteGpio = 0;
         let deviceID = 0;
-        
+        let count = 0;
         for (const device of Object.values(deviceList)) {
             
             if (device.id === sensor.device_id) {
