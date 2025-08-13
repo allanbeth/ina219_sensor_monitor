@@ -49,7 +49,7 @@ export function handleSensorUpdate(data) {
         // Sensor Log card
         card.querySelector(".log-btn").addEventListener("click", () => openLog(name));
         card.querySelector(".log-back-btn").addEventListener("click", () => closeLog(name));
-        card.querySelector(".refresh-log-btn").addEventListener("click", () => refreshLog(name));
+        // card.querySelector(".refresh-log-btn").addEventListener("click", () => refreshLog(name, sensor.data.readings ?? []));
     }
 }
 
@@ -139,6 +139,7 @@ export function renderSensorCard(name, sensor, deviceName, deviceID) {
                     <p class="output">${sensor.max_power ?? 0} W</p>
                 </div>
                 `}
+            </div>
                 <div class="timestamp" id="timestamp-${name}">Last Updated: ${sensor.data.time_stamp}</div>
             </div>
         </div>
@@ -191,12 +192,12 @@ export function renderSensorCard(name, sensor, deviceName, deviceID) {
                     <i class="fa-solid fa-arrow-left log-back-btn" data-name="${name}" title="Back"></i>
                 </div>
                 <h4>Readings</h4>
-                <div class="sensor-btns">
+                <div class="sensor-btns" hidden>
                     <i class="fa-solid fa-sync-alt refresh-log-btn" data-name="${name}" title="Refresh"></i>
                 </div>
             </div>
             <div class="log-entries" id="log-entries-${name}">
-                <!-- Log entries will be populated dynamically -->
+                ${logHTML}
             </div>
         </div>
         <div id="delete-${name}" class="delete-confirmation hidden">
@@ -214,8 +215,6 @@ export function renderSensorCard(name, sensor, deviceName, deviceID) {
         </div>
     `;
     return card;
-
-    
 }
 
 export function sensorEdit(name) {
@@ -278,21 +277,12 @@ export function closeLog(name) {
     document.getElementById(`btns-${name}`).classList.remove("hidden");
     setPaused(false);
 }
-
-export function refreshLog(name) {
-    fetch(`/get_sensor_log?name=${encodeURIComponent(name)}`)
-        .then(res => res.json())
-        .then(data => {
-            const logContainer = document.getElementById(`log-entries-${name}`);
-            const logHTML = generateLogHTML(data.readings ?? []);
-            logContainer.innerHTML = "";
-            logContainer.innerHTML =  logHTML;
-        })
-        .catch(error => {
-            document.getElementById(`log-entries-${name}`).innerHTML = "<p>Failed to load logs.</p>";
-            console.error("Error refreshing logs:", error);
-        });
-}
+// export function refreshLog(name, readings) {
+//     let logContainer = document.getElementById(`log-entries-${name}`);
+//     let logHTML = generateLogHTML(readings ?? []);
+//     logContainer.innerHTML = "";
+//     logContainer.innerHTML =  logHTML;
+// }
 
 // --- Sensor Delete Functions ---
 export function showDeleteConfirmation(name) {

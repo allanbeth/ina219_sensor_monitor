@@ -137,47 +137,4 @@ export function updateHeaderTotals(data) {
     dataContainer.innerHTML = html;
 }
 
-export function getAbout() {
-    fetch('/readme')
-        .then(res => res.text())
-        .then(markdown => {
-            document.getElementById('about-content').innerHTML = marked.parse(markdown);
-        })
-        .catch(error => {
-            document.getElementById('about-content').innerText = 'Failed to load README.';
-            console.error('Error loading README:', error);
-        });
-}
 
-export function getLogFile() {
-    const logContainer = document.getElementById('log-file-entries');
-    fetch('/get_log_file')
-        .then(res => res.json())
-        .then(data => {
-            const logEntries = data.logs ?? [];
-            if (logEntries.length === 0) {
-                logContainer.innerHTML = '<p>No log data found.</p>';
-                return;
-            }
-            const logFileHTML = logEntries.map(entry => {
-                const logText = entry.logs.trim();
-                const match = logText.match(/^\s*[\d\-:, ]+\s+([A-Z]+)\s+(.*)$/);
-                if (match) {
-                    const logType = match[1];
-                    const logMessage = match[2];
-                    return `
-                        <div class="log-file-entry">
-                            <p><strong style="color:green;">${escapeHTML(logType)}</strong> ${escapeHTML(logMessage)}</p>
-                        </div>
-                    `;
-                } else {
-                    return `<div class="log-file-entry"><p>${escapeHTML(logText)}</p></div>`;
-                }
-            }).join('');
-            logContainer.innerHTML = logFileHTML;
-        })
-        .catch(error => {
-            logContainer.innerHTML = '<p>Failed to load logs.</p>';
-            console.error('Log fetch error:', error);
-        });
-}
