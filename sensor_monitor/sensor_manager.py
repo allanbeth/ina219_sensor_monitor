@@ -263,14 +263,14 @@ class SensorManager:
                     "battery_in_total": round(battery_in_total, 2),
                     "battery_out_total": round(battery_out_total, 2)
                 }
-                data["totals"] = self.totals_data
+                #data["totals"] = self.totals_data
 
                 self.mqtt.publish_totals_data(self.totals_data)
             else:
                 if s.readings:
                     sensor_data = s.current_data()
                     data[s.name]['data'] = sensor_data
-                    data["totals"] = self.totals_data
+                    #data["totals"] = self.totals_data
                 else:
                     sensor_data = {
                         "voltage": 0,
@@ -283,8 +283,8 @@ class SensorManager:
                         "readings": []
                     }
                     data[s.name]['data'] = sensor_data
-                    data["totals"] = self.totals_data
+                    #data["totals"] = self.totals_data
 
         
-        # data["totals"] = self.totals_data
+        data["totals"] = self.totals_data
         return data
