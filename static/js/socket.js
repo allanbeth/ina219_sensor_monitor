@@ -3,7 +3,7 @@
 // ========================
 
 import { setSocket } from './globals.js';
-import { handleSensorUpdate } from './sensorCards.js';
+import { loadSensorCards, handleSensorReadingsUpdate } from './sensorCards.js';
 
 export function initializeSocket(url) {
     const socketInstance = io(url, { reconnection: true });
@@ -11,6 +11,9 @@ export function initializeSocket(url) {
     socketInstance.on('connect', () => {
         console.log('Socket Connected:', socketInstance.id);
     });
-    socketInstance.on('sensor_update', handleSensorUpdate);
+    // On first update, render all cards
+    socketInstance.once('sensor_update', loadSensorCards);
+    // On subsequent updates, only update readings (and respect pause)
+    socketInstance.on('sensor_update', handleSensorReadingsUpdate);
     return socketInstance;
 }

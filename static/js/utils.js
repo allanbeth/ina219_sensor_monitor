@@ -40,7 +40,7 @@ export function setDeviceInfo() {
         .then(res => res.json())
         .then(data => {
             setDeviceList(data.devices);
-            // remoteGPIOCount = 0;
+             let remoteGPIOCount = 0;
             for (const device of Object.values(deviceList)) {
                 console.log(`Device loaded: ${device.id} - ${device.name}`);
                 if (device.remote_gpio === 1) {

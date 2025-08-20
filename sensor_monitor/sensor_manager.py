@@ -216,6 +216,7 @@ class SensorManager:
         average_battery_soc = 0.0
         battery_in_total = 0.0
         battery_out_total = 0.0
+        battery_count = 0
 
         for s in self.sensors:
             data[s.name] = {
@@ -237,40 +238,10 @@ class SensorManager:
                 logger.info(f"New Reading - {s.name}: {data[s.name]['data']['voltage']}V, ")
                 self.mqtt.publish_new_data(s.name, sensor_data)
                 self.webserver.broadcast_sensor_data()
-
-                if s.type == "Solar":
-                    solar_total += sensor_data.get("power", 0.0)
-                elif s.type == "Wind":
-                    wind_total += sensor_data.get("power", 0.0)
-                elif s.type == "Battery":
-                    soc = sensor_data.get("state_of_charge", 0.0)
-                    power = sensor_data.get("power", 0.0)
-                    status = sensor_data.get("status", "")
-
-                    average_battery_soc += soc
-                    if status == "charging" or power > 0:
-                        battery_in_total += abs(power)
-                    elif status == "discharging" or power < 0:
-                        battery_out_total += abs(power)
-
-                    if self.battery_count > 0:
-                        average_battery_soc = average_battery_soc / self.battery_count
-
-                self.totals_data = {
-                    "solar_total": round(solar_total, 2),
-                    "wind_total": round(wind_total, 2),
-                    "battery_soc_total": round(average_battery_soc, 2),
-                    "battery_in_total": round(battery_in_total, 2),
-                    "battery_out_total": round(battery_out_total, 2)
-                }
-                #data["totals"] = self.totals_data
-
-                self.mqtt.publish_totals_data(self.totals_data)
             else:
                 if s.readings:
                     sensor_data = s.current_data()
                     data[s.name]['data'] = sensor_data
-                    #data["totals"] = self.totals_data
                 else:
                     sensor_data = {
                         "voltage": 0,
@@ -283,8 +254,35 @@ class SensorManager:
                         "readings": []
                     }
                     data[s.name]['data'] = sensor_data
-                    #data["totals"] = self.totals_data
 
-        
+                # --- Calculate totals for all sensors, using latest data ---
+            if s.type == "Solar":
+                solar_total += data[s.name]['data'].get("power", 0.0)
+            elif s.type == "Wind":
+                wind_total += data[s.name]['data'].get("power", 0.0)
+            elif s.type == "Battery":
+                soc = data[s.name]['data'].get("state_of_charge", 0.0)
+                power = data[s.name]['data'].get("power", 0.0)
+                status = data[s.name]['data'].get("status", "")
+                average_battery_soc += soc
+                battery_count += 1
+                if status == "charging" or power > 0:
+                    battery_in_total += abs(power)
+                elif status == "discharging" or power < 0:
+                    battery_out_total += abs(power)
+
+        # Calculate average SoC
+        if battery_count > 0:
+            average_battery_soc = average_battery_soc / battery_count
+
+        self.totals_data = {
+            "solar_total": round(solar_total, 2),
+            "wind_total": round(wind_total, 2),
+            "battery_soc_total": round(average_battery_soc, 2),
+            "battery_in_total": round(battery_in_total, 2),
+            "battery_out_total": round(battery_out_total, 2)
+        }
+
+        self.mqtt.publish_totals_data(self.totals_data)
         data["totals"] = self.totals_data
         return data
