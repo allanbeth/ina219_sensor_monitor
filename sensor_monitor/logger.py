@@ -6,7 +6,8 @@ import os
 # Shared logger instance
 file = "sensor_monitor.log"
 logger = logging.getLogger("sensor_monitor")
-max_log_size = 1 * 1024 * 1024  # 1000 MB default
+global max_log_size 
+max_log_size = 5 * 1024 * 1024  # Default to 5 MB
 
 # Configure logger only once
 if not logger.handlers:
@@ -22,11 +23,13 @@ def _check_log_size():
         with open(file, 'w'): 
             pass  # Clears the file
         logger.info("Log file reset due to size limit.")
+    else:
+        logger.info(f"Log file size: {os.path.getsize(file) / (1024 * 1024):.2f} MB")
 
 def set_log_size(mb):
     global max_log_size
     max_log_size = mb * 1024 * 1024
-    info("Log file size set successfully.")
+    logger.info("Log file size set successfully.")
     print(f"Log file size set to {mb} MB.")
 
 def debug(msg): 
