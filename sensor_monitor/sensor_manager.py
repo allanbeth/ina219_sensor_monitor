@@ -126,7 +126,7 @@ class SensorManager:
         self.device_configs = self.config.config_data["devices"]
         logger.info(f"Sensor Manager initialized with {len(self.device_configs)} devices")
         self.poll_intervals = self.config.config_data.get("poll_intervals", {})
-        logger.max_log_size = self.config.config_data["max_log"]
+        # logger.max_log_size = self.config.config_data["max_log"]
         self.last_poll_times = {}
         self.mqtt_config = {
             "mqtt_broker": self.config.config_data['mqtt_broker'],

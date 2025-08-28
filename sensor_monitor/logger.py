@@ -1,53 +1,81 @@
-# sensor_monitor/logger.py
-
 import logging
 import os
 
-# Shared logger instance
-file = "sensor_monitor.log"
-logger = logging.getLogger("sensor_monitor")
-global max_log_size 
-max_log_size = 5 * 1024 * 1024  # Default to 5 MB
+class SensorMonitorLogger:
+    _instance = None
 
-# Configure logger only once
-if not logger.handlers:
-    handler = logging.FileHandler(file)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(SensorMonitorLogger, cls).__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
 
-def _check_log_size():
-    if os.path.exists(file) and os.path.getsize(file) > max_log_size:
-        with open(file, 'w'): 
-            pass  # Clears the file
-        logger.info("Log file reset due to size limit.")
-    else:
-        logger.info(f"Log file size: {os.path.getsize(file) / (1024 * 1024):.2f} MB")
+    def __init__(self, log_file="sensor_monitor.log", max_log_size_mb=10):
+        if self._initialized:
+            return
+        self.log_file = log_file
+        self.max_log_size = max_log_size_mb * 1024 * 1024  # bytes
+        self.logger = logging.getLogger("sensor_monitor")
+        self.logger.setLevel(logging.INFO)
+        self.logger.propagate = False
+        self._attach_handler()
+        self._initialized = True
 
-def set_log_size(mb):
-    global max_log_size
-    max_log_size = mb * 1024 * 1024
-    logger.info("Log file size set successfully.")
-    print(f"Log file size set to {mb} MB.")
+    def _attach_handler(self):
+        # Remove all handlers first
+        for handler in self.logger.handlers[:]:
+            self.logger.removeHandler(handler)
+            handler.close()
+        handler = logging.FileHandler(self.log_file)
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
 
-def debug(msg): 
-    _check_log_size() 
-    logger.debug(msg)
+    def set_log_size(self, mb):
+        self.max_log_size = mb * 1024 * 1024
+        self.info(f"Log file size set to {mb} MB.")
 
-def info(msg): 
-    _check_log_size()
-    logger.info(msg)
+    def _check_log_size(self):
+        if os.path.exists(self.log_file) and os.path.getsize(self.log_file) > self.max_log_size:
+            # Remove and close all handlers before truncating
+            for handler in self.logger.handlers[:]:
+                self.logger.removeHandler(handler)
+                handler.close()
+            # Truncate the file
+            with open(self.log_file, 'w'):
+                pass
+            # Re-attach handler
+            self._attach_handler()
+            self.logger.info("Log file reset due to size limit.")
 
-def warning(msg): 
-    _check_log_size()
-    logger.warning(msg)
+    def debug(self, msg):
+        self._check_log_size()
+        self.logger.debug(msg)
+        self._flush()
 
-def error(msg): 
-    _check_log_size()
-    logger.error(msg)
+    def info(self, msg):
+        self._check_log_size()
+        self.logger.info(msg)
+        self._flush()
 
-def critical(msg): 
-    _check_log_size()
-    logger.critical(msg)
+    def warning(self, msg):
+        self._check_log_size()
+        self.logger.warning(msg)
+        self._flush()
+
+    def error(self, msg):
+        self._check_log_size()
+        self.logger.error(msg)
+        self._flush()
+
+    def critical(self, msg):
+        self._check_log_size()
+        self.logger.critical(msg)
+        self._flush()
+
+    def _flush(self):
+        for handler in self.logger.handlers:
+            handler.flush()
+
+# Create a single shared logger instance
+logger = SensorMonitorLogger()

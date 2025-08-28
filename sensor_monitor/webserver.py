@@ -111,14 +111,14 @@ class flaskWrapper:
             return abort(404, "README.md not found")
         
  
-    def get_log_file(self):
+    def get_log_file(self, length=100):
         from collections import deque
         if not self.logFilePath.exists():
             return jsonify({"logs": []})
         try:
             logger.info("Retrieving Logs")
             with open(self.logFilePath, "r", encoding="utf-8", errors="replace") as f:
-                lines = deque(f, maxlen=50)
+                lines = deque(f, maxlen=length)
             logs = [{"logs": line.strip()} for line in reversed(lines)]
             logger.info("Loaded logs")
             return jsonify({"logs": logs})

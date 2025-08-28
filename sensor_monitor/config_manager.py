@@ -24,8 +24,8 @@ VERSION = "1.0.1"
 
 class ConfigManager:
     def __init__(self):       
-         self.config_data = self.load_config()
-         self.set_log_size()
+        self.config_data = self.load_config()
+        logger.set_log_size(int(self.config_data.get("max_log", 10)))
 
     def load_config(self):
         try:
@@ -66,10 +66,11 @@ class ConfigManager:
             
             return default_config
         
-    def set_log_size(self):
+    def set_config(self):
+        # Set logger configuration
         try:
-            self.max_log_size = self.config_data.get("max_log_size", 1) 
-            logger.max_log_size = self.max_log_size
+            log_size = int(self.config_data.get("max_log", 10))
+            logger.set_log_size(log_size)
         except ValueError:
             logger.error("Invalid log size value.") 
 

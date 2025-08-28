@@ -36,7 +36,6 @@ class MQTTPublisher:
         logger.info("Initializing MQTT Publisher")
         self.mqtt_broker = mqtt_config['mqtt_broker']
         self.mqtt_port = int(mqtt_config['mqtt_port'])
-        #self.logger = logger
         self.client = mqtt.Client()
         self.client.loop_start()
 
