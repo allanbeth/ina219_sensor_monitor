@@ -104,6 +104,7 @@ export function saveSettings() {
             window.socket.emit('sensor_update_request');
         });
     document.getElementById('settings-container').classList.add('hidden');
+    document.getElementById('sensor-container').classList.add('hidden');
 }
 
 // Restart Confirmation

@@ -16,16 +16,19 @@ export function setupEventHandlers() {
     });
     // Settings
     document.getElementById('settings-btn').addEventListener('click', () => {
+        document.getElementById('sensor-container').classList.add('hidden');
         document.getElementById('settings-container').classList.remove('hidden');
         config.fetchSettings();
     });
     // Log File
     document.getElementById('log-file-btn').addEventListener('click', () => {
+        document.getElementById('sensor-container').classList.add('hidden');
         document.getElementById('log-file-container').classList.remove('hidden');
         config.getLogFile();
     });
     // About
     document.getElementById('about-btn').addEventListener('click', () => {
+        document.getElementById('sensor-container').classList.add('hidden');
         document.getElementById('about-container').classList.remove('hidden');
         config.getAbout();
     });
@@ -48,6 +51,7 @@ export function setupEventHandlers() {
     // Close Settings Card
     document.getElementById('settings-cancel').addEventListener('click', () => {
         document.getElementById('settings-container').classList.add('hidden');
+        document.getElementById('sensor-container').classList.remove('hidden');
     });
     // Restart Applicastion
     document.getElementById('settings-restart').addEventListener('click', () => {
@@ -77,6 +81,7 @@ export function setupEventHandlers() {
     // Close Log file Card
     document.getElementById('log-file-cancel').addEventListener('click', () => {
         document.getElementById('log-file-container').classList.add('hidden');
+        document.getElementById('sensor-container').classList.remove('hidden');
     });
     // Refresh Log File Card
     document.getElementById('log-file-refresh').addEventListener('click', () => {
@@ -89,6 +94,7 @@ export function setupEventHandlers() {
     // Close About Card
     document.getElementById("about-cancel").addEventListener("click", () => {
         document.getElementById("about-container").classList.add("hidden");
+        document.getElementById('sensor-container').classList.remove('hidden');
     });
     
     // Refresh Application Card Buttons

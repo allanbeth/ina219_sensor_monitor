@@ -235,7 +235,7 @@ class SensorManager:
                 self.last_poll_times[s.name] = current_time
                 data[s.name]['data'] = sensor_data
 
-                logger.info(f"New Reading - {s.name}: {data[s.name]['data']['voltage']}V, ")
+                logger.info(f"New Reading - {s.name}: {data[s.name]['data']['voltage']}V, {data[s.name]['data']['current']}A, {data[s.name]['data']['power']}W")
                 self.mqtt.publish_new_data(s.name, sensor_data)
                 self.webserver.broadcast_sensor_data()
             else:

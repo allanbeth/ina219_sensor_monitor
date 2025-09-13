@@ -10,7 +10,7 @@ body {
 .header-container {
     display: flex;
     justify-content: center;
-    padding: 10px 0 20px;
+    padding-bottom: 5px;
 }
 
 .header-card2 {
@@ -110,9 +110,9 @@ body {
 
 /* ========== Settings container and Card ========== */
 .settings-container {
-    position: fixed;
+    /* position: fixed; */
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.3);
+    /* background: rgba(0,0,0,0.3); */
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -295,9 +295,9 @@ body {
 /* ========== About Card ========== */
 
 .about-container {
-    position: fixed;
+    /* position: fixed; */
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.3);
+    /* background: rgba(0,0,0,0.3); */
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -391,9 +391,9 @@ body {
 /* ========== Log File Container and Cards ========== */
 
 .log-file-container {
-    position: fixed;
+    /* position: fixed; */
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.3);
+    /* background: rgba(0,0,0,0.3); */
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -1134,6 +1134,10 @@ meter {
         justify-content: center;
         text-align: center;
         width: 100%;
+    }
+    .header-btns i {
+        font-size: 1.3em;
+        gap: 0.5em;
     }
 }
 
