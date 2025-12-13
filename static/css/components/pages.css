@@ -1,0 +1,126 @@
+/* ========== Dashboard Page ========== */
+
+/* ========== Sensor Monitor Page ========== */
+
+.timestamp {
+    width: 100%;
+    margin-top: var(--spacing-md);
+    text-align: center;
+}
+
+.sensor-logs {
+    margin-top: var(--spacing-sm);
+    height: auto;
+}
+
+.sensor-log-entries {
+    border-radius: var(--radius-md);
+    width: 95%;
+    margin-top: var(--spacing-xs);
+    background: rgba(0, 0, 0, 0.02);
+    padding: var(--spacing-sm);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* ========== Settings Page ========== */
+
+.status-value {
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 4px 12px;
+    background: rgba(72, 187, 120, 0.1);
+    border-radius: var(--radius-md);
+}
+
+.status-value.status-connected {
+    background: rgba(72, 187, 120, 0.1);
+    color: #38a169;
+}
+
+.status-value.status-disconnected {
+    background: rgba(245, 101, 101, 0.1);
+    color: #e53e3e;
+}
+
+.status-value.status-partial {
+    background: rgba(237, 137, 54, 0.1);
+    color: #ed8936;
+}
+
+.delete-file-name,
+.restore-file-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-left: var(--spacing-sm);
+    font-size: 0.7em;
+}
+
+.restart-entry {
+    margin:auto;
+}
+
+.restart-label {
+    background: rgba(255, 45, 45, 0.1);
+    color: #e53e3e;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.1em;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm);
+    cursor: pointer;
+}
+
+.restart-confirmation,
+.restart-message {
+    margin-top: var(--spacing-md);
+    text-align: center;
+}
+
+.settings-action i {
+    font-size: 1.3em;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.settings-action i:hover {  
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    transform: scale(1.1);
+}
+
+/* ========== Log File Page ========== */
+
+.log-file-data {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow: visible;
+}
+
+.log-file-overflow {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-height: 500px;
+}
+
+.log-file-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* ========== About Page ========== */
+
+.about-file-overflow {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-height: 500px;
+}

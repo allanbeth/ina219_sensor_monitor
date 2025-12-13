@@ -36,6 +36,7 @@ class flaskWrapper:
         self.app.route("/delete_backup", methods=["POST"])(self.delete_backup)
         self.app.route("/restore_backup", methods=["POST"])(self.restore_backup)
         self.app.route("/list_backups", methods=["GET", "POST"])(self.list_backups)
+        self.app.route("/debug", methods=["GET"])(self.serve_debug)
 
 
     def main(self):
@@ -109,6 +110,13 @@ class flaskWrapper:
             return send_file(self.readmePath, mimetype="text/markdown")
         else:
             return abort(404, "README.md not found")
+
+    def serve_debug(self):
+        debugPath = ROOT / "debug.html"
+        if debugPath.exists():
+            return send_file(debugPath, mimetype="text/html")
+        else:
+            return abort(404, "Debug page not found")
         
  
     def get_log_file(self, length=100):

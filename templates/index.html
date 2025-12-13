@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -19,7 +19,7 @@
     <link rel="icon" type="image/png" sizes="512x512"
         href="{{ url_for('static', filename='icons/android-chrome-512x512.png') }}">
     <link rel="manifest" href="{{ url_for('static', filename='icons/site.webmanifest') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
@@ -28,22 +28,395 @@
 </head>
 
 <body>
-    <div class="header-container">
-        <div class="header-card">
-            <div class="header-left">
-                
-                <span class="header-totals" id="header-totals">
-                    loading totals......
-                </span>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Energy Monitor</div>
+        <div class="loading-subtext">Initializing dashboard...</div>
+    </div>
+        
+    <div class="dashboard sidebar-collapsed">
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <div class="sidebar collapsed">
+            <div class="sidebar-header">
+                <h2><i class="fa-solid fa-bolt"></i> Energy Monitor</h2>
+                <i class="fa-solid fa-bars burger-menu" id="burger-menu" title="Toggle Menu"></i>
             </div>
-            <div class="header-btns" id="header-btns">
-                <i class="fa-solid fa-plus" id="add-sensor-btn" title="Add Sensor"></i>
-                <i class="fa-solid fa-gear" id="settings-btn" title="View Logs"></i>
-                <i class="fa-solid fa-book" id="log-file-btn" title="Configuration"></i>
-                <i class="fa-solid fa-question" id="about-btn" title="About"></i>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" id="dashboard-link">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="sensors-link">
+                        <i class="fa-solid fa-microchip"></i>
+                        <p>Sensors</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="settings-btn">
+                        <i class="fa-solid fa-gear"></i>
+                        <p>Settings</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="log-file-btn">
+                        <i class="fa-solid fa-book"></i>
+                        <p>Logs</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="about-btn">
+                        <i class="fa-solid fa-question"></i>
+                        <p>About</p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="header-container">
+                <div class="header-card">
+                    <div class="header-left">
+                        <h2 class="page-heading" id="page-heading">Dashboard</h2>
+                        <span class="header-totals hidden" id="header-totals">
+                            loading totals......
+                        </span>
+                    </div>
+                    <div class="action-btns header-btn" id="header-btns">
+                        <i class="fa-solid fa-plus hidden" id="add-sensor-header-btn" title="Add Sensor"></i>
+                        <i class="fa-solid fa-save hidden" id="settings-save-header-btn" title="Save Settings"></i>
+                        <i class="fa-solid fa-sync-alt hidden" id="refresh-logs-header-btn" title="Refresh Logs"></i>
+                        
+                        <div class="header-count-display" id="device-count-display" title="Connected Devices">
+                            <i class="fa-solid fa-server"></i>
+                        </div>
+                        <div class="header-count-display" id="sensor-count-display" title="Active Sensors">
+                            <i class="fa-solid fa-microchip"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Stats Section -->
+            <div class="dashboard-container" id="dashboard-container">
+                <div class="dashboard-cards-grid" id="dashboard-cards-grid">
+                    <!-- Stats cards will be dynamically populated -->
+                </div>
+            </div>
+            
+            <div id="no-sensors" class="no-sensors hidden">
+                <div class="empty-state">
+                    <i class="fa-solid fa-exclamation-triangle"></i>
+                    <h3>No sensors detected</h3>
+                    <p>Please ensure your INA219 sensors are connected and configured properly.</p>
+                </div>
+            </div>
+
+            <div class="sensor-container hidden" id="sensor-container">
+                <div class="sensor-cards-grid" id="sensor-cards-grid">
+                    <!-- Sensor cards will be dynamically populated -->
+                </div>
+            </div>
+            
+            <!-- Settings Page -->
+            <div class="settings-container hidden" id="settings-container">
+                <div class="settings-cards-grid">
+                    <!-- Status Information Card (moved to first position) -->
+                    <div class="settings-card status-info" id="status-info-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon">
+                                <i class="fa-solid fa-info-circle"></i>
+                            </div>
+                            <div class="settings-card-title">
+                                <h3>System Status</h3>
+                                <p>Current operational information</p>
+                            </div>
+                        </div>
+                        <div class="settings-card-content">
+                            <div class="status-card-content" id="status-card-content">
+                                <!-- Status information will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Settings Card -->
+                    <div class="settings-card system-settings" id="system-settings-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon">
+                                <i class="fa-solid fa-cog"></i>
+                            </div>
+                            <div class="settings-card-title">
+                                <h3>System Configuration</h3>
+                                <p>Core system settings and logging</p>
+                            </div>
+                            <div class="action-btns save-btn" id="system-action-btn">
+                                <i class="fa-solid fa-save" id="system-save-btn" title="Save System Settings"></i>
+                            </div>
+                        </div>
+                        <div class="settings-card-content">
+                            <div class="system-card-content" id="system-card-content">
+                                <!-- System settings will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Polling Intervals Card -->
+                    <div class="settings-card polling-settings" id="polling-settings-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div class="settings-card-title">
+                                <h3>Polling Intervals</h3>
+                                <p>Sensor data collection frequency</p>
+                            </div>
+                            <div class="action-btns save-btn" id="polling-action-btn">
+                                <i class="fa-solid fa-save" id="polling-save-btn" title="Save Polling Settings"></i>
+                            </div>
+                        </div>
+                        <div class="settings-card-content">
+                            <div class="polling-card-content" id="polling-card-content">
+                                <!-- Polling settings will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MQTT Settings Card -->
+                    <div class="settings-card mqtt-settings" id="mqtt-settings-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon">
+                                <i class="fa-solid fa-network-wired"></i>
+                            </div>
+                            <div class="settings-card-title">
+                                <h3>MQTT Configuration</h3>
+                                <p>Message broker connectivity</p>
+                            </div>
+                            <div class="action-btns save-btn" id="mqtt-action-btn">
+                                <i class="fa-solid fa-save" id="mqtt-save-btn" title="Save MQTT Settings"></i>
+                            </div>
+                        </div>
+                        <div class="settings-card-content">
+                            <div class="mqtt-card-content" id="mqtt-card-content">
+                                <!-- MQTT settings will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Web Server Settings Card -->
+                    <div class="settings-card webserver-settings" id="webserver-settings-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon">
+                                <i class="fa-solid fa-server"></i>
+                            </div>
+                            <div class="settings-card-title">
+                                <h3>Web Server</h3>
+                                <p>Dashboard access configuration</p>
+                            </div>
+                            <div class="action-btns save-btn" id="webserver-action-btn">
+                                <i class="fa-solid fa-save" id="webserver-save-btn" title="Save Web Server Settings"></i>
+                            </div>
+                        </div>
+                        <div class="settings-card-content">
+                            <div class="webserver-card-content" id="webserver-card-content">
+                                <!-- Web server settings will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Device Settings Card -->
+                    <div class="settings-card device-settings" id="device-settings-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon">
+                                <i class="fa-solid fa-microchip"></i>
+                            </div>
+                            <div class="settings-card-title">
+                                <h3>Hardware Devices</h3>
+                                <p>GPIO and sensor device configuration</p>
+                            </div>
+                            <div class="action-btns device-config-btns" id="device-config-btns">
+                                <i class="fa-solid fa-plus" id="device-config-add" title="New Device"></i>
+                                <i class="fa-solid fa-xmark hidden" id="device-config-cancel" title="Cancel"></i>
+                                <i class="fa-solid fa-save hidden" id="device-config-save" title="Save"></i>
+                                <i class="fa-solid fa-check hidden" id="device-config-complete" title="Complete"></i>
+                            </div>
+                        </div>
+                        <div class="settings-card-content">
+                            <div class="device-card-content" id="device-card-content">
+                                <!-- Device configurations will be populated here -->
+                            </div>
+               
+                            <div class="device-config hidden" id="device-config">
+                               <!-- Device configuration form will be populated here -->
+                            </div>
+                            <div class="device-add hidden" id="device-add">
+                                
+                            </div>
+                        </div>
+                        <div class="settings-entry hidden" id="action-message">
+                                <label id="device-config-save-result">
+                                    <!-- Backup result message -->
+                                </label>                              
+                            </div>
+                            
+                    </div>
+
+                    <!-- Action Cards (moved to end) -->
+                    <div class="settings-card action-card backup-action" id="settings-backup-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon">
+                                <i class="fa-solid fa-file-export"></i>
+                            </div>
+                            <div class="settings-card-title">
+                                <h3>Backup Config</h3>
+                                <p>Export configuration files</p>
+                            </div>
+                            <div class="action-btns backup-config-btns" id="backup-config-btns">
+                                <i class="fa-solid fa-download" id="run-backup" title="Backup Now"></i>
+                                <i class="fa-solid fa-xmark hidden" id="backup-cancel" title="Cancel Backup"></i>
+                                <i class="fa-solid fa-check hidden" id="backup-confirm" title="Confirm Backup"></i>
+                                <i class="fa-solid fa-check hidden" id="backup-complete" title="Backup Complete"></i>
+                            </div>
+                        </div>
+                        <div class="settings-card-content" id="backup-card-content">
+                            <div class="settings-entry" id="backup-program-selection">
+                                <label class="settings-label" for="program-config">Program Configuration:</label>
+                                <input type="checkbox" checked class="program-checkbox" id="program-config" />
+                            </div>
+                            <div class="settings-entry" id="backup-sensor-selection">
+                                <label class="settings-label" for="sensor-config">Sensor Configuration:</label>
+                                <input type="checkbox" checked class="sensor-checkbox" id="sensor-config" />
+                            </div>
+                            <div class="settings-entry hidden" id="backup-confirmation">
+                                <label>Are you sure you want to backup the selected Configuration?</label>
+                                <span class="backup-configuration">
+                                    <!-- Selected backup file name will be shown here -->
+                                </span>
+                            </div>
+                            <div class="settings-entry hidden" id="backup-message">
+                                <label id="backup-result">
+                                    <!-- Backup result message -->
+                                </label>                              
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <div class="settings-card action-card restore-action" id="settings-restore-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon">
+                                <i class="fa-solid fa-file-import"></i>
+                            </div>
+                            <div class="settings-card-title">
+                                <h3>Restore Config</h3>
+                                <p>Import configuration files</p>
+                            </div>
+                            <div class="action-btns config-action-btns hidden" id="config-action-btns">
+                                <i class="fa-solid fa-xmark hidden" id="delete-config-cancel" title="Cancel Delete"></i>
+                                <i class="fa-solid fa-check hidden" id="delete-config-confirm" title="Confirm Delete"></i>
+                                <i class="fa-solid fa-xmark hidden" id="restore-config-cancel" title="Cancel Restore"></i>
+                                <i class="fa-solid fa-check hidden" id="restore-config-confirm" title="Confirm Restore"></i>
+                                <i class="fa-solid fa-check hidden" id="config-action-complete" title="Action Complete"></i>
+                            </div>
+                        </div>
+                        <div class="settings-card-content" id="restore-card-content">
+                            <div class="settings-entries settings-overflow" id="config-file-selection">
+                                <!-- Backup selection will be populated here -->
+                            </div>
+                            <div class="settings-entry delete-action hidden" id="delete-config-confirmation">
+                                <label>Are you sure you want to restore the selected backup?</label>
+                                <span class="delete-file-name" id="delete-file-name">
+                                    <!-- Selected backup file name will be shown here -->
+                                </span>
+                            </div>
+                            <div class="settings-entry restore-action hidden" id="restore-config-confirmation">
+                                <label>Are you sure you want to restore the selected backup?</label>
+                                <span class="restore-file-name" id="restore-file-name">
+                                    <!-- Selected backup file name will be shown here -->
+                                </span>
+                            </div>
+                            <div class="settings-entry hidden" id="config-action-message">
+                                <label id="config-action-result">
+                                    <!-- Restore result message -->
+                                </label>                              
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card action-card restart-action" id="settings-restart-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon">
+                                <i class="fa-solid fa-rotate"></i>
+                            </div>
+                            <div class="settings-card-title">
+                                <h3>Restart Service</h3>
+                                <p>Restart the monitoring service</p>
+                            </div>
+                            <div class="action-btns restart-action-btns hidden" id="restart-action-btns">
+                                <i class="fa-solid fa-xmark" id="restart-close" title="Cancel Restart"></i>
+                                <i class="fa-solid fa-check" id="restart-confirm" title="Confirm Restart"></i>
+                            </div>
+                        </div>
+                        <div class="settings-card-content" id="restart-card-content">
+                            <div class="settings-entry restart-entry" id="restart-action">
+                                <label class="settings-label restart-label" id="restart-btn">Restart Now</label>
+                            </div>
+                            <div class="settings-entry hidden" id="restart-confirmation">
+                                <label class="settings-label restart-confirmation">Are you sure you want to restart the service?</label>
+                            </div>
+                            <div class="settings-entry hidden" id="restart-message">
+                                <!-- Restart success message -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device Page -->
+            <div class="devices-container hidden" id="devices-container">
+                <!-- Device cards will be dynamically populated -->
+            </div>
+            
+            <!-- About Page -->
+            <div class="about-container hidden" id="about-container">
+                <div id="about-card" class="about-card">
+                    <div class="about-card-content about-file-overflow" id="about-card-content">
+                        <div class="about-file" id="about-file">
+                            Loading README...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Logs Page -->
+            <div class="log-file-container hidden" id="log-file-container">
+                <div id="log-file-card" class="log-file-card">
+                    <div class="log-file-content" id="log-file-data">
+                        <div class="log-file-entries log-file-overflow" id="log-file-entries">
+                            Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dialog-container hidden" id="dialog-container">
+                <div class="dialog-card" id="dialog-card">
+                    <div class="dialog-card-header">
+                        <div class="dialog-card-icon">
+                            <i class="fa-solid fa-info-circle"></i>
+                        </div>
+                    </div>
+                    <div class="dialog-card-content" id="dialog-content">
+                        <!-- Dialog content will be populated here -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    
 
     <div class="add-sensor-container hidden" id="add-sensor-container">
         <div class="add-sensor-card">
@@ -51,8 +424,10 @@
                 <div class="back-btn">
                     <i class="fa-solid fa-arrow-left" id="add-sensor-cancel" title="Back"></i>
                 </div>
+                <div class="sensor-card-title">
                 <h4>Add New Sensor</h4>
-                <div class="add-sensor-btns">
+                </div>
+                <div class="action-btns save-btn">
                     <i class="fa-solid fa-save" id="add-sensor-save" title="Save New Sensor"></i>
                 </div>
             </div>
@@ -88,173 +463,7 @@
     </div>
 
 
-    <div class="settings-container hidden" id="settings-container">
-        <div id="settings-card" class="settings-card">
-            <div class="settings-header">
-                <div class="back-btn">
-                    <i class="fa-solid fa-arrow-left" id="settings-cancel"></i>
-                </div>
-                <h4>Settings</h4>
-                <div class="settings-btns">
-                    <i class="fa-solid fa-rotate settings-btn" id="settings-restart" title="Restart Program"></i>
-                    <i class="fa-solid fa-plus settings-btn" id="settings-add-device" title="Add Device"></i>
-                    <i class="fa-solid fa-file-export settings-btn" id="settings-backup" title="Backup Configuration"></i>
-                    <i class="fa-solid fa-file-import settings-btn" id="settings-restore" title="Restore Configuration"></i>
-                    <i class="fa-solid fa-save settings-btn" id="settings-save" title="Save Settings"></i>
-                </div>
-            </div>
-
-            <div class="settings-data">
-                <div class="settings-entry">
-                    <label for="max-log">Max Log File Size (MB):</label>
-                    <input type="number" id="max-log" min="1" step="1" />
-                </div>
-                <h5>Polling Intervals</h5>
-                <div class="settings-entry">
-                    <label for="solar-interval">SolarInterval (sec):</label>
-                    <input type="number" id="solar-interval" min="1" step="1" />
-                </div>
-                <div class="settings-entry">
-                    <label for="wind-interval">Wind Interval (sec):</label>
-                    <input type="number" id="wind-interval" min="1" step="1" />
-                </div>
-                <div class="settings-entry">
-                    <label for="battery-interval">Battery Interval (sec):</label>
-                    <input type="number" id="battery-interval" min="1" step="1" />
-                </div>
-                <h5>Readings</h5>
-                <div class="settings-entry">
-                    <label for="max-readings">Max No of Readings:</label>
-                    <input type="number" id="max-readings" min="1" step="1" />
-                </div>
-                <h5>MQTT</h5>
-                <div class="settings-entry">
-                    <label for="mqtt-broker">MQTT Broker:</label>
-                    <input type="text" id="mqtt-broker" />
-                </div>
-                <div class="settings-entry">
-                    <label for="mqtt-port">MQTT Port:</label>
-                    <input type="text" id="mqtt-port" />
-                </div>
-                <h5>Web Server</h5>
-                <div class="settings-entry">
-                    <label for="webserver-host">Webserver Host:</label>
-                    <input type="text" id="webserver-host" />
-                </div>
-                <div class="settings-entry">
-                    <label for="webserver-port">Webserver Port:</label>
-                    <input type="text" id="webserver-port" />
-                </div>
-                <h5>Devices</h5>
-                <div class="devices-settings" id="devices-settings"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="backup-restore-container hidden" id="backup-restore-container">
-        <div class="backup-config-card hidden" id="backup-config-card">
-            <div class="backup-config-header">
-                <div class="back-btn">
-                    <i class="fa-solid fa-arrow-left" id="backup-config-cancel" title="Back"></i>
-                </div>
-                <h4>Backup Configuration</h4>
-                <div class="backup-config-btns" id="backup-config-btns">
-                    <i class="fa-solid fa-file-export" id="backup-config-save" title="Backup Configuration"></i>
-                </div>
-            </div>
-            <div class="backup-config-text" id="backup-config-text">
-                    <p>Choose which configuration files you want to include in your backup</p>
-                </div>
-            <div class="backup-config-data" id="backup-config-data">
-                <div class="backup-config-entry">
-                    <label for="program-config">Program Configuration:</label>
-                    <input type="checkbox" checked class="program-checkbox" id="program-config" />
-                </div>
-                <div class="backup-config-entry">
-                    <label for="sensor-config">Sensor Configuration:</label>
-                    <input type="checkbox" checked class="sensor-checkbox" id="sensor-config" />
-                </div>
-            </div>
-        </div>
-        <div class="restore-config-card hidden" id="restore-config-card">
-            <div class="restore-config-header">
-                <div class="back-btn">
-                    <i class="fa-solid fa-arrow-left" id="restore-config-cancel" title="Back"></i>
-                </div>
-                <h4>Restore Configuration</h4>
-            </div>
-            <div class="restore-config-text" id="restore-config-text">
-                    <p>Choose a backup file to restore</p>
-                </div>
-            <div class="restore-config-data" id="restore-config-data">
-                <div class="restore-config-entries" id="restore-config-entries">
-                    Loading backups....
-                </div>    
-            </div>
-        </div>
-    </div>
-
-    <div class="about-container hidden" id="about-container">
-        <div id="about-card" class="about-card">
-            <div class="about-header">
-                <div class="back-btn">
-                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" id="about-cancel"></i>
-                </div>
-                <h4>About</h4>
-            </div>
-
-            <div class="about-info">
-                <div class="about-content" id="about-content">
-                    Loading README...
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="restart-container hidden" id="restart-container">
-        <div id="restart-card" class="restart-card">
-            <div class="restart-header">
-                <div class="back-btn">
-                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" id="restart-cancel"></i>
-                </div>
-                <h4>Restart</h4>
-                <div class="restart-btns">
-                    <i class="fa-solid fa-check" style="cursor:pointer" id="restart-confirm"></i>
-                </div>
-            </div>
-            <div class="restart-info">
-                <div class="restart-content" id="restart-content">
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="log-file-container hidden" id="log-file-container">
-        <div id="log-file-card" class="log-file-card">
-            <div class="log-file-header">
-                <div class="back-btn">
-                    <i class="fa-solid fa-arrow-left" style="cursor:pointer" id="log-file-cancel"></i>
-                </div>
-                <h4>Logs</h4>
-                <div class="log-file-btns">
-                    <i class="fa-solid fa-sync-alt" style="cursor:pointer" id="log-file-refresh"></i>
-                </div>
-            </div>
-            <div class="log-file-data" id="log-file-data">
-                <div class="log-file-entries" id="log-file-entries">
-                    Loading...
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div id="no-sensors" class="no-sensors {% if sensors %}hidden{% endif %}">
-        No sensors detected. Please ensure your INA219 sensors are connected.
-    </div>
-
-    <div class="sensor-container" id="sensor-container">Loading sensors...</div>
+    
     
 
     <script src="{{ url_for('static', filename='js/main.js') }}" type="module"></script>

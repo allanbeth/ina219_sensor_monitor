@@ -39,7 +39,7 @@ class Sensor:
                 self.ina.i2c_device.device_address = self.address
                 logger.info(f"INA219 sensor connected on address {hex(self.address)}")
             except Exception as e:
-                logger.warning("INA219 sensor not detected: %s", str(e))
+                logger.warning(f"INA219 sensor not detected: {str(e)}")
                 self.ina = None
 
     def calibrate(self, value=DEFAULT_CALIBRATION):
@@ -52,10 +52,10 @@ class Sensor:
             logger.error(f"Calibration failed for {self.name}: {e}")
 
     def get_battery_status(self, current):
-        if current > 0.05:  # Charging
-            return "charging"
-        elif current < -0.05:  # Discharging
+        if current > 0.05:  # Discharging (current flowing out of battery)
             return "discharging"
+        elif current < -0.05:  # Charging (current flowing into battery)
+            return "charging"
         else:
             return "idle"
 
@@ -94,6 +94,36 @@ class Sensor:
         return voltage
 
     def fetch_data(self):
+        # Check if sensor has no device connection (disconnected)
+        if not self.pi and not self.ina:
+            logger.debug(f"Sensor {self.name} has no device connection - returning offline data")
+            data = {
+                "voltage": 0, "current": 0, "power": 0,
+                "time_stamp": datetime.datetime.now().strftime("%I:%M:%S%p on %B %d, %Y"),
+                "state_of_charge": 0 if self.type == "Battery" else None,
+                "status": "disconnected" if self.type == "Battery" else "offline",
+                "output": 0 if self.type != "Battery" else None,
+                "voltage_trend": 0,
+                "current_trend": 0,
+                "power_trend": 0
+            }
+            return data
+            
+        # Check device connection health
+        if self.pi and not self.pi.connected:
+            logger.warning(f"Sensor {self.name} device connection lost")
+            data = {
+                "voltage": 0, "current": 0, "power": 0,
+                "time_stamp": datetime.datetime.now().strftime("%I:%M:%S%p on %B %d, %Y"),
+                "state_of_charge": 0 if self.type == "Battery" else None,
+                "status": "disconnected" if self.type == "Battery" else "offline",
+                "output": 0 if self.type != "Battery" else None,
+                "voltage_trend": 0,
+                "current_trend": 0,
+                "power_trend": 0
+            }
+            return data
+            
         try:
             if self.pi:
                 raw_voltage = self.read_register_16(0x02)
@@ -138,7 +168,7 @@ class Sensor:
                 "voltage": 0, "current": 0, "power": 0,
                 "time_stamp": datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                 "state_of_charge": 0 if self.type == "Battery" else None,
-                "status": "battery-offline" if self.type == "Battery" else None,
+                "status": "battery-offline" if self.type == "Battery" else "error",
                 "output": 0 if self.type != "Battery" else None,
                 "voltage_trend": 0,
                 "current_trend": 0,
@@ -225,7 +255,7 @@ class Sensor:
             "readings": list(self.readings)
         }
         if self.type == "Battery":
-            data["status"] = latest.get('status', ''),
+            data["status"] = latest.get('status', '')
             data["state_of_charge"] = latest.get("state_of_charge", 1)
         else:
             data["output"] = latest.get("output", 0)

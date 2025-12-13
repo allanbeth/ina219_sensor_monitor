@@ -23,19 +23,68 @@ class Device:
         self.gpio_address = gpio_address
         self.pi = None
         self.i2c = None
+        self.connected = False
+        self.last_connection_check = 0
+        self.connection_check_interval = 30  # Check connection every 30 seconds
         logger.info(f"Initializing Device: {self.name} (ID: {self.id} Remote GPIO: {self.remote_gpio})")
 
     def connect(self):
-        if self.remote_gpio:
-            logger.info(f"{self.name}: Establishing remote GPIO connection at {self.gpio_address}")
-            self.pi = pigpio.pi(self.gpio_address)
-            if not self.pi.connected:
-                raise RuntimeError(f"{self.name}: Could not connect to remote GPIO at {self.gpio_address}")
-            logger.info(f"{self.name}: Remote GPIO connection established")
-        else:
-            logger.info(f"{self.name}: Establishing local GPIO connection")
-            self.i2c = board.I2C()
-            logger.info(f"{self.name}: Local GPIO connection established")
+        try:
+            if self.remote_gpio:
+                logger.info(f"{self.name}: Establishing remote GPIO connection at {self.gpio_address}")
+                if self.pi:
+                    self.pi.stop()  # Close existing connection if any
+                self.pi = pigpio.pi(self.gpio_address)
+                if not self.pi.connected:
+                    self.connected = False
+                    raise RuntimeError(f"{self.name}: Could not connect to remote GPIO at {self.gpio_address}")
+                self.connected = True
+                logger.info(f"{self.name}: Remote GPIO connection established")
+            else:
+                logger.info(f"{self.name}: Establishing local GPIO connection")
+                self.i2c = board.I2C()
+                self.connected = True
+                logger.info(f"{self.name}: Local GPIO connection established")
+            self.last_connection_check = time.time()
+        except Exception as e:
+            self.connected = False
+            logger.error(f"{self.name}: Connection failed - {str(e)}")
+            raise
+
+    def check_connection(self):
+        """Check if device connection is still alive"""
+        current_time = time.time()
+        if current_time - self.last_connection_check < self.connection_check_interval:
+            return self.connected
+            
+        try:
+            if self.remote_gpio and self.pi:
+                # Test connection with a simple GPIO operation
+                self.connected = self.pi.connected
+            elif not self.remote_gpio and self.i2c:
+                # For I2C, the connection is generally stable once established
+                self.connected = True
+            else:
+                self.connected = False
+                
+            self.last_connection_check = current_time
+            if not self.connected:
+                logger.warning(f"{self.name}: Connection check failed")
+            return self.connected
+        except Exception as e:
+            self.connected = False
+            logger.error(f"{self.name}: Connection check error - {str(e)}")
+            return False
+
+    def reconnect(self):
+        """Attempt to reconnect the device"""
+        logger.info(f"{self.name}: Attempting to reconnect...")
+        try:
+            self.connect()
+            return True
+        except Exception as e:
+            logger.error(f"{self.name}: Reconnection failed - {str(e)}")
+            return False
 
     def detect_sensors(self):
         if self.remote_gpio:
@@ -111,8 +160,14 @@ class SensorManager:
                 gpio_address=d.get('gpio_address')
             )
             
-            device.connect()
-            self.devices.append(device)
+            try:
+                device.connect()
+                self.devices.append(device)
+                logger.info(f"Device {device.name} connected successfully")
+            except Exception as e:
+                logger.error(f"Failed to connect to device {device.name}: {str(e)}")
+                logger.info(f"Continuing without device {device.name}")
+                # Continue without this device - webserver will still start
 
         self.sensors = self.load_sensors()
         self.sensor_config.sensors = self.sensors
@@ -137,12 +192,10 @@ class SensorManager:
 
     def load_sensors(self):
         sensors = []
-        loaded_from_file = False
         try:
             with open(SENSOR_FILE, "r") as f:
                 logger.info(f"Loading sensors from {SENSOR_FILE}")
                 sensor_data = json.load(f)
-                loaded_from_file = True  # Mark successful load
 
                 for s in sensor_data:
                     i2c = None
@@ -150,6 +203,8 @@ class SensorManager:
                     device_id = s.get("device_id", 0)
                     logger.info(f"Loading sensor: {s['name']} at address {s['address']} on device ID {device_id}")
 
+                    # Look for connected device
+                    device_found = False
                     for device in self.devices:
                         if device.id == device_id:
                             logger.info(f"Found device {device.name} for sensor {s['name']}")
@@ -157,9 +212,12 @@ class SensorManager:
                                 logger.info(f"Using remote GPIO for sensor {s['name']}")
                             i2c = device.i2c
                             pi = device.pi
+                            device_found = True
                             logger.info(f"Found matching device for sensor {s['name']}: {device.name}")
                             break
 
+                    # Create sensor regardless of device connection status
+                    # If device is not connected, i2c and pi will be None, causing graceful degradation
                     sensor = Sensor(
                         s["name"],
                         s["address"],
@@ -171,7 +229,12 @@ class SensorManager:
                         i2c=i2c,
                         pi=pi
                     )
-                    logger.info(f"Creating Sensor: {sensor.name} of type {sensor.type} with address {sensor.address}")
+                    
+                    if not device_found:
+                        logger.warning(f"Creating sensor {sensor.name} without device connection - will show null data")
+                    else:
+                        logger.info(f"Creating Sensor: {sensor.name} of type {sensor.type} with address {sensor.address}")
+                    
                     sensors.append(sensor)
 
                     if sensor.type == "Battery":
@@ -180,7 +243,55 @@ class SensorManager:
                     logger.info(f"Configured Sensor: {sensor.name}")
         except Exception as e:
             logger.warning(f"Failed to load sensors from file: {e}")
+            
+        # If no saved sensors but we have device configurations, create default sensors
+        if not sensors:
+            logger.info("No saved sensors found, creating default sensors from device config")
+            for device_config in self.config.config_data.get('devices', []):
+                device_id = device_config.get('id', 0)
+                device_name = device_config.get('name', f'Device_{device_id}')
+                device_found = False
+                i2c = None
+                pi = None
+                
+                # Look for connected device
+                for d in self.devices:
+                    if d.id == device_id:
+                        device_found = True
+                        i2c = d.i2c
+                        pi = d.pi
+                        break
+                
+                # Create default sensors for each configured device (connected or not)
+                default_sensors = [
+                    {"name": f"Battery_{device_name}", "address": 0x40, "type": "Battery", "max_power": 100, "rating": 12},
+                    {"name": f"Solar_{device_name}", "address": 0x41, "type": "Solar", "max_power": 100, "rating": 12}
+                ]
+                
+                for sensor_config in default_sensors:
+                    sensor = Sensor(
+                        sensor_config["name"],
+                        sensor_config["address"],
+                        sensor_config["type"],
+                        sensor_config["max_power"],
+                        sensor_config["rating"],
+                        self.config.config_data['max_readings'],
+                        device_id=device_id,
+                        i2c=i2c,
+                        pi=pi
+                    )
+                    
+                    if not device_found:
+                        logger.warning(f"Creating default sensor {sensor.name} without device connection - will show null data")
+                    else:
+                        logger.info(f"Creating default sensor: {sensor.name}")
+                    
+                    sensors.append(sensor)
+                    
+                    if sensor.type == "Battery":
+                        self.battery_count += 1
 
+        # Auto-detect sensors only on successfully connected devices
         for device in self.devices:
             if not device.remote_gpio:
                 existing_addresses = [s.address for s in sensors]
@@ -193,9 +304,11 @@ class SensorManager:
                         )
                         sensors.append(default_sensor)
 
-        # Save only if sensors list is not empty OR sensor file was successfully loaded
-        if sensors or loaded_from_file:
+        # Save sensors if we have any
+        if sensors:
             self.sensor_config.save_sensors(sensors)
+        
+        logger.info(f"Total sensors loaded: {len(sensors)} (connected devices: {len(self.devices)})")
         return sensors
 
     def load_mqtt_discovery(self):
@@ -217,6 +330,50 @@ class SensorManager:
         battery_in_total = 0.0
         battery_out_total = 0.0
         battery_count = 0
+
+        # Check device connections periodically
+        connected_devices = 0
+        device_status = {}
+        
+        for device in self.devices:
+            is_connected = device.check_connection()
+            device_status[device.id] = {
+                "name": device.name,
+                "connected": is_connected,
+                "type": "remote" if device.remote_gpio else "local",
+                "address": device.gpio_address if device.remote_gpio else "local"
+            }
+            if is_connected:
+                connected_devices += 1
+        
+        # Try to reconnect failed devices
+        for device_config in self.device_configs:
+            device_id = device_config.get('id', 0)
+            if device_id not in [d.id for d in self.devices]:
+                # Device not in connected devices list, try to add it
+                device = Device(
+                    name=device_config['name'],
+                    id=device_id,
+                    remote_gpio=device_config.get('remote_gpio', 0) == 1,
+                    gpio_address=device_config.get('gpio_address')
+                )
+                if device.reconnect():
+                    self.devices.append(device)
+                    logger.info(f"Device {device.name} reconnected successfully")
+                    connected_devices += 1
+                    device_status[device_id] = {
+                        "name": device.name,
+                        "connected": True,
+                        "type": "remote" if device.remote_gpio else "local",
+                        "address": device.gpio_address if device.remote_gpio else "local"
+                    }
+                else:
+                    device_status[device_id] = {
+                        "name": device_config['name'],
+                        "connected": False,
+                        "type": "remote" if device_config.get('remote_gpio', 0) == 1 else "local",
+                        "address": device_config.get('gpio_address', 'local')
+                    }
 
         for s in self.sensors:
             data[s.name] = {
@@ -266,9 +423,9 @@ class SensorManager:
                 status = data[s.name]['data'].get("status", "")
                 average_battery_soc += soc
                 battery_count += 1
-                if status == "charging" or power > 0:
+                if status == "charging":
                     battery_in_total += abs(power)
-                elif status == "discharging" or power < 0:
+                elif status == "discharging":
                     battery_out_total += abs(power)
 
         # Calculate average SoC
@@ -285,4 +442,10 @@ class SensorManager:
 
         self.mqtt.publish_totals_data(self.totals_data)
         data["totals"] = self.totals_data
+        data["devices"] = device_status
+        data["system_status"] = {
+            "connected_devices": connected_devices,
+            "total_devices": len(self.device_configs),
+            "active_sensors": len([s for s in self.sensors if hasattr(s, 'readings') and s.readings])
+        }
         return data

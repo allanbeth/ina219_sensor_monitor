@@ -1,0 +1,126 @@
+/* ========== Mobile Styles (max-width: 600px) ========== */
+@media (max-width: 930px) {
+    /* Dashboard Layout */
+    .dashboard {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
+    
+    .dashboard.sidebar-collapsed {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar {
+        position: static;
+        width: 100vw;
+        max-width: 100%;
+        height: auto;
+        z-index: 1000;
+        grid-column: 1;
+        grid-row: 1;
+        padding: 15px 0;
+        margin: 0;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        transform: none;
+        transition: none;
+        box-sizing: border-box;
+    }
+    
+    /* Mobile collapsed state - show icons horizontally */
+    .sidebar.collapsed {
+        width: 100%;
+        padding: 10px;
+        overflow: visible;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    
+    /* On mobile, always show full sidebar header and nav text when visible */
+    .sidebar-header {
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 15px;
+        padding: 0 20px;
+    }
+   
+
+    .sidebar.collapsed .sidebar-header h2,
+    .sidebar:not(.collapsed) .sidebar-header h2 {
+        display: block !important;
+        font-size: 1.2em !important;
+        flex: 1 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: inherit !important;
+        text-indent: 0 !important;
+        overflow: visible !important;
+        white-space: normal !important;
+    }
+
+    .sidebar:not(.collapsed) .nav-menu {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar.collapsed .nav-menu {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        max-height: none;
+        opacity: 1;
+        margin-top: 10px;
+        padding: 5px 0;
+    }
+
+    .sidebar.collapsed p {
+        display: none !important;
+    }
+
+    .sidebar.collapsed .nav-link i {
+        font-size: 1.5em !important;
+    } 
+
+         
+    .nav-menu {
+        display: flex;
+        gap: 0;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-item {
+        margin-bottom: 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .nav-link {
+        background: var(--card-background);
+    }
+    .nav-link.active {
+        background: var(--card-background);
+    }
+    
+    /* Main Content Mobile */
+    .main-content {
+        grid-column: 1;
+        grid-row: 2;
+        padding: 10px;
+    }
+    
+  
+    
+
+
+    
+    
+}
+
+

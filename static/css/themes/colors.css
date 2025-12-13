@@ -1,0 +1,195 @@
+/* ========== Theme Colors and Icons ========== */
+
+/* Solar Theme */
+.solar-theme .dashboard-card-icon,
+.sensor-card.type-Solar .sensor-card-icon {
+    background: var(--solar-gradient);
+}
+
+/* Wind Theme */
+.wind-theme .dashboard-card-icon,
+.sensor-card.type-Wind .sensor-card-icon {
+    background: var(--wind-gradient);
+}
+
+/* Battery Theme */
+.battery-theme .dashboard-card-icon,
+.sensor-card.type-Battery .sensor-card-icon {
+    background: var(--battery-gradient);
+}
+
+/* Total Theme */
+.total-theme .dashboard-card-icon {
+    background: var(--total-gradient);
+}
+
+/* ========== Sensor Card Icon Colors ========== */
+.sensor-card.solar-theme .sensor-card-icon {
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: white;
+}
+
+.sensor-card.wind-theme .sensor-card-icon {
+    background: linear-gradient(135deg, #38b2ac, #319795);
+    color: white;
+}
+
+.sensor-card.battery-theme .sensor-card-icon {
+    background: linear-gradient(135deg, #805ad5, #6b46c1);
+    color: white;
+}
+
+.add-sensor-card .sensor-card-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+/* ========== Settings Card Icon Themes ========== */
+
+.system-settings .settings-card-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.polling-settings .settings-card-icon {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+.mqtt-settings .settings-card-icon {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.webserver-settings .settings-card-icon {
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+}
+
+.device-settings .settings-card-icon {
+    background: linear-gradient(135deg, #fa709a, #fee140);
+}
+
+.status-info .settings-card-icon {
+    background: linear-gradient(135deg, #a8edea, #fed6e3);
+    color: #2d3748;
+}
+.backup-action .settings-card-icon {
+    background: linear-gradient(135deg, #9f7aea, #805ad5);
+}
+
+.restore-action .settings-card-icon {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.restart-action .settings-card-icon {
+    background: linear-gradient(135deg, #f56565, #e53e3e);
+}
+
+/* ========== Battery Status Colors ========== */
+.battery-empty {
+    color: #e53e3e;
+    font-weight: 600;
+}
+
+.battery-low {
+    color: #ed8936;
+    font-weight: 600;
+}
+
+.battery-medium {
+    color: #ecc94b;
+    font-weight: 600;
+}
+
+.battery-high {
+    color: #68d391;
+    font-weight: 600;
+}
+
+.battery-full {
+    color: #38a169;
+    font-weight: 600;
+}
+
+.battery-charging {
+    color: #38a169;
+    font-weight: 600;
+}
+
+.battery-discharging {
+    color: #e53e3e;
+    font-weight: 600;
+}
+
+.battery-idle {
+    color: #3182ce;
+    font-weight: 600;
+}
+
+/* ========== Connection Status Icons ========== */
+.fa-wifi {
+    transition: color 0.2s;
+}
+
+.fa-network-wired {
+    transition: color 0.2s;
+}
+
+/* Dynamic connection status colors */
+.fa-wifi.sensor-connected,
+.fa-network-wired.sensor-connected {
+    color: #00ff6e;
+}
+
+.fa-wifi.sensor-disconnected,
+.fa-network-wired.sensor-disconnected {
+    color: #e53e3e;
+}
+
+/* ========== Dashboard Header Connection Status ========== */
+.header-count-display i.status-connected {
+    color: #38a169; /* Green for all connected */
+}
+
+.header-count-display i.status-partial {
+    color: #ed8936; /* Orange for partial connection */  
+}
+
+.header-count-display i.status-disconnected {
+    color: #e53e3e; /* Red for all disconnected */
+}
+
+/* ========== Value Update Animation ========== */
+.dashboard-main-value.stat-updating,
+.sensor-card-value.sensor-updating {
+    transform: scale(1.1);
+    color: #2b6cb0;
+}
+
+/* ========== Trend Indicators ========== */
+.trend-up {
+    color: #48bb78;
+}
+
+.trend-down {
+    color: #f56565;
+}
+
+/* ========== Action buttons ========== */
+
+.fa-xmark:hover {
+    color: #e53e3e;
+}
+.fa-check:hover {
+    color: #38a169;
+}
+
+.fa-save:hover,
+.fa-upload:hover,
+.fa-download:hover,
+.fa-gear:hover,
+.fa-book:hover,
+.fa-plus:hover {
+    color: #667eea;
+}
+
+/* ========== dialog Colors ========== */
+.dialog-card-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}

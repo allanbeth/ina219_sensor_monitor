@@ -2,10 +2,65 @@
 // Energy Monitor Utilities JS
 // ===========================
 
-import { deviceList, remoteGPIOCount, setDeviceList, setRemoteGpio, setDeviceCount, deviceCount } from './globals.js';
+import { deviceList, remoteGPIOCount, setDeviceList, setRemoteGpio, setDeviceCount, deviceCount, isRemoteGpio } from './globals.js';
 
 export function formatNumber(num, decimals = 2) {
     return Number(num).toFixed(decimals);
+}
+
+// Helper function to determine if sensor is connected
+export function isSensorConnected(sensor) {
+    // Check if sensor has valid data
+    if (!sensor.data) return false;
+    
+    // Check for explicit disconnection status
+    if (sensor.data.status === "disconnected" || 
+        sensor.data.status === "offline" || 
+        sensor.data.status === "battery-offline" ||
+        sensor.data.status === "no data") {
+        return false;
+    }
+    
+    // Check for invalid or missing timestamps
+    const hasValidTimestamp = sensor.data.time_stamp && 
+                             sensor.data.time_stamp !== "N/A" && 
+                             sensor.data.time_stamp !== "No Data" &&
+                             sensor.data.time_stamp !== "Not Updated";
+    
+    if (!hasValidTimestamp) return false;
+    
+    // Check if sensor data indicates actual meaningful connection
+    const hasValidData = (
+        sensor.data.voltage !== undefined && sensor.data.voltage !== null &&
+        sensor.data.current !== undefined && sensor.data.current !== null &&
+        sensor.data.power !== undefined && sensor.data.power !== null
+    );
+    
+    if (!hasValidData) return false;
+    
+    // More meaningful connection check - not just presence of data but actual activity
+    // A sensor reading all zeros likely means it's not connected to anything meaningful
+    const voltage = parseFloat(sensor.data.voltage) || 0;
+    const current = parseFloat(sensor.data.current) || 0;
+    const power = parseFloat(sensor.data.power) || 0;
+    
+    // For battery sensors, check if voltage is within reasonable range
+    if (sensor.type === "Battery") {
+        // Battery voltage should be above 1V to be considered connected to actual battery
+        return voltage > 1.0;
+    }
+    
+    // For solar/wind sensors, check if there's any measurable activity
+    // Either voltage > 1V OR power > 0.1W indicates some kind of connection
+    return voltage > 1.0 || power > 0.1;
+}
+
+export async function ensureDeviceInfoLoaded() {
+    // If deviceList is empty, load it
+    if (Object.keys(deviceList).length === 0) {
+        console.log("Device list empty, loading device info...");
+        await setDeviceInfo();
+    }
 }
 
 export function clamp(val, min, max) {
@@ -36,7 +91,7 @@ export function updateSensorGpioStatus(name, remoteGpio, deviceName) {
 }
 
 export function setDeviceInfo() {
-    fetch("/get_settings")
+    return fetch("/get_settings")
         .then(res => res.json())
         .then(data => {
             setDeviceList(data.devices);
@@ -63,12 +118,21 @@ export function setDeviceInfo() {
 
 export function updateAddNewVisibility() {
     const addBtn = document.getElementById("add-sensor-btn");
+    const addContainer = document.getElementById("add-sensor-container");
+    
+    if (!addBtn) {
+        console.warn("add-sensor-btn element not found");
+        return;
+    }
+    
     if (isRemoteGpio) {
         addBtn.classList.remove("hidden");
         console.log("Remote GPIO enabled, showing Add Sensor button");
     } else {
         addBtn.classList.add("hidden");
-        document.getElementById("add-sensor-container").classList.add("hidden");
+        if (addContainer) {
+            addContainer.classList.add("hidden");
+        }
         console.log("Remote GPIO disabled, hiding Add Sensor button");
     }
 }
@@ -78,16 +142,15 @@ export function generateLogHTML(readings) {
         return '<p>No logs available.</p>';
     }
     return readings.slice().reverse().map(reading => `
-        <div class="log-entry">
-            <p>
-                <strong>${reading.time_stamp ?? ''}</strong>
-            </p>
-            <p class="reading-details">
-                <strong>V:</strong> ${reading.voltage ?? 'N/A'} V | 
-                <strong>C:</strong> ${reading.current ?? 'N/A'} A | 
-                <strong>P:</strong> ${reading.power ?? 'N/A'} W | 
-                <strong>T:</strong> ${reading.output ?? reading.state_of_charge}
-            </p>
+        <div class="sensor-log-entry">
+            <label class="sensor-label sensor-reading-timestamp">
+                ${reading.time_stamp ?? ''}
+            </label>
+            <span class="sensor-value reading-details">
+                Voltage: ${reading.voltage ?? 'N/A'} ,
+                Current: ${reading.current ?? 'N/A'} ,
+                Power: ${reading.power ?? 'N/A'} .
+            </span>
         </div>
     `).join('');
 }

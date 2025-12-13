@@ -2,99 +2,96 @@
 // Energy Monitor Backup JS
 // ========================
 
-export function createBackup() {
-    const programConfig = document.getElementById('program-config').checked ? 1 : 0;
-    const sensorConfig = document.getElementById('sensor-config').checked ? 1 : 0;
-    const backupMsg = document.getElementById('backup-config-text');
-    fetch('/backup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ programConfig, sensorConfig })
-    });
-    document.getElementById('backup-config-data').classList.add('hidden');
-    document.getElementById('backup-config-btns').classList.add('hidden');
-    backupMsg.innerHTML = '<p>Backup Successful</p>';
-}
+// import { sleep } from "./utils";
+
+
+// Backup Functions
+
 
 export function fetchBackups() {
-    const backupContainer = document.getElementById('restore-config-entries');
-    backupContainer.innerHTML = '';
+    const backupContent = document.getElementById('config-file-selection');
+    backupContent.innerHTML = '';
     fetch('/list_backups')
         .then(response => response.json())
         .then(data => {
             const files = data.backups;
             if (!files || files.length === 0) {
-                backupContainer.innerHTML = '<p>No backup files found.</p>';
+                backupContent.innerHTML = '<p>No backup files found.</p>';
                 return;
             }
             files.forEach(filename => {
                 const displayName = filename.replace(/\.json$/, '');
                 const row = document.createElement('div');
-                row.className = 'restore-config-entry';
+                row.className = 'settings-entry';
+                row.id = `backup-entry-${displayName}`;
                 const nameDiv = document.createElement('div');
-                nameDiv.className = 'restore-config-file-name';
+                nameDiv.className = 'settings-label';
                 nameDiv.innerText = displayName;
+                const actionDiv = document.createElement('div');
+                actionDiv.className = 'settings-action';
                 const deleteIcon = document.createElement('i');
-                deleteIcon.className = 'fas fa-trash';
-                deleteIcon.title = 'Delete';
+                deleteIcon.className = 'fa-solid fa-trash';
+                deleteIcon.title = 'Delete Config File';
                 deleteIcon.setAttribute('data-filename', filename);
                 deleteIcon.addEventListener('click', () => {
-                    confirmDeleteBackup(filename);
+                    deleteBackupConfirmation(filename);
                 });
                 const restoreIcon = document.createElement('i');
-                restoreIcon.className = 'fas fa-file-import';
-                restoreIcon.title = 'Restore';
+                restoreIcon.className = 'fa-solid fa-file-import';
+                restoreIcon.title = 'Restore Config File';
                 restoreIcon.setAttribute('data-filename', filename);
                 restoreIcon.addEventListener('click', () => {
-                    confirmRestoreBackup(filename);
+                    restoreBackupConfirmation(filename);
                 });
+                actionDiv.appendChild(deleteIcon);
+                actionDiv.appendChild(restoreIcon);
                 row.appendChild(nameDiv);
-                row.appendChild(deleteIcon);
-                row.appendChild(restoreIcon);
-                backupContainer.appendChild(row);
+                row.appendChild(actionDiv);
+                
+                backupContent.appendChild(row);
             });
         });
 }
 
-export function confirmRestoreBackup(filename) {
-    const confirmText = document.getElementById('restore-config-text');
-    confirmText.innerHTML = `<div class="restore-config-text" id="restore-config-text"><p>Are you sure you want to restore "${filename}"?</p></div>`;
-    const confirmDiv = document.getElementById('restore-config-entries');
-    confirmDiv.innerHTML = `<div class="confirm-btns"><i class="fas fa-xmark" id="cancel-restore" title="Cancel"></i><i class="fas fa-check" id="confirm-restore" title="Delete"></i></div>`;
-    document.getElementById('cancel-restore').addEventListener('click', () => {
-        fetchBackups();
-    });
-    document.getElementById('confirm-restore').addEventListener('click', () => {
-        restoreBackup(filename);
-    });
-}
+export function deleteBackupConfirmation(filename) {
+    document.getElementById('config-file-selection').classList.add('hidden');
+    document.getElementById('delete-config-confirmation').classList.remove('hidden');
+    document.getElementById('config-action-btns').classList.remove('hidden');
+    document.getElementById('delete-config-cancel').classList.remove('hidden');
+    document.getElementById('delete-config-confirm').classList.remove('hidden');
+    const confirmDeleteHtml = document.getElementById('delete-file-name');
+    confirmDeleteHtml.innerHTML = `${filename}`;
 
-export async function restoreBackup(filename) {
-    const restoreConfig = confirm('Restore config.json?');
-    const restoreSensors = confirm('Restore sensors.json?');
-    const res = await fetch('restore_backup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename, restore_config: restoreConfig, restore_sensors: restoreSensors })
-    });
-    const result = await res.json();
-    if (result.success) {
-        alert('Restore successful. Please reload or restart the app.');
-    } else {
-        alert('Restore failed: ' + result.error);
-    }
-}
+    // Confirm Delete
+    document.getElementById('delete-config-confirm').addEventListener('click', () => {
+        document.getElementById('delete-config-confirmation').classList.add('hidden');
+        document.getElementById('config-action-btns').classList.remove('hidden');
+        document.getElementById('delete-config-cancel').classList.add('hidden');
+        document.getElementById('delete-config-confirm').classList.add('hidden');
+        document.getElementById('config-action-message').classList.remove('hidden');
+        document.getElementById('config-action-complete').classList.remove('hidden');
 
-export function confirmDeleteBackup(filename) {
-    const confirmText = document.getElementById('restore-config-text');
-    confirmText.innerHTML = `<div class="restore-config-text" id="restore-config-text"><p>Are you sure you want to delete "${filename}"?</p></div>`;
-    const confirmDiv = document.getElementById('restore-config-entries');
-    confirmDiv.innerHTML = `<div class="confirm-btns"><i class="fas fa-xmark" id="cancel-delete" title="Cancel"></i><i class="fas fa-check" id="confirm-delete" title="Delete"></i></div>`;
-    document.getElementById('cancel-delete').addEventListener('click', () => {
-        fetchBackups();
-    });
-    document.getElementById('confirm-delete').addEventListener('click', () => {
         deleteBackup(filename);
+    });
+}
+
+export function restoreBackupConfirmation(filename) {
+    document.getElementById('restore-config-confirmation').classList.remove('hidden');
+    document.getElementById('config-action-btns').classList.remove('hidden');
+    document.getElementById('restore-config-cancel').classList.remove('hidden');
+    document.getElementById('restore-config-confirm').classList.remove('hidden');
+    const confirmRestoreHtml = document.getElementById('restore-file-name');
+    confirmRestoreHtml.innerHTML = `${filename}`;
+
+    // Confirm Restore
+    document.getElementById('restore-config-confirm').addEventListener('click', () => {
+        document.getElementById('delete-config-confirmation').classList.add('hidden');
+        document.getElementById('config-action-btns').classList.remove('hidden');
+        document.getElementById('restore-config-cancel').classList.add('hidden');
+        document.getElementById('restore-config-confirm').classList.add('hidden');
+        document.getElementById('config-action-message').classList.remove('hidden');
+        document.getElementById('config-action-complete').classList.remove('hidden');
+        restoreBackup(filename);
     });
 }
 
@@ -106,10 +103,64 @@ export function deleteBackup(filename) {
     })
         .then(res => res.json())
         .then(() => {
-            document.getElementById('restore-config-entries').innerHTML = 'Backup file deleted successful';
+            document.getElementById('config-action-result').innerHTML = 'Backup file deleted successful';
         })
         .catch(error => {
-            document.getElementById('restore-config-data').innerText = 'Failed to delete Backup.';
+            document.getElementById('config-action-result').innerText = 'Failed to delete Backup.';
             console.error('Error restoring Backup:', error);
         });
 }
+
+
+export async function restoreBackup(filename) {
+    document.getElementById('restore-config-confirmation').classList.add('hidden');
+    document.getElementById('config-action-message').classList.remove('hidden');
+    const restoreResult = document.getElementById('config-action-result');
+    restoreResult.innerHTML = 'Restoring backup...';
+    const restoreConfig = confirm('Restore config.json?');
+    const restoreSensors = confirm('Restore sensors.json?');
+    const res = await fetch('restore_backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename, restore_config: restoreConfig, restore_sensors: restoreSensors })
+    });
+    const result = await res.json();
+    restoreResult.innerHTML = '';
+    if (result.success) {
+        restoreResult.innerHTML = 'Restore successful. Please reload or restart the app.';
+    } else {
+        restoreResult.innerHTML = 'Restore failed: ' + result.error;
+        
+    }
+}
+
+// Create Backup
+
+export function createBackup() {
+    const programConfig = document.getElementById('program-config').checked ? 1 : 0;
+    const sensorConfig = document.getElementById('sensor-config').checked ? 1 : 0;
+    const backupMsg = document.getElementById('backup-result');
+    
+    fetch('/backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ programConfig, sensorConfig })
+    })
+    .then(response => response.json())
+    .then(data => {
+    	  const backupMsg = document.getElementById('backup-result');
+        if (data.success) {
+            backupMsg.innerHTML = 'Backup created successfully!';
+        } else {
+            backupMsg.innerHTML = 'Backup failed: ' + (data.error || 'Unknown error');
+        }
+    })
+    .catch(error => {
+        backupMsg.innerHTML = 'Backup failed: Network error';
+        console.error('Backup error:', error);
+    });
+}
+
+
+
+
