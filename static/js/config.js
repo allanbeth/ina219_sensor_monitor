@@ -7,6 +7,7 @@ import { escapeHTML, sleep, isSensorConnected } from './utils.js';
 
 // Global variable to store current sensor data for status updates
 let currentSensorData = {};
+let currentConfigData = {}; 
 
 // Update sensor data for status calculations
 export function updateSensorData(data) {
@@ -19,7 +20,6 @@ function getConnectedSensorsInfo() {
     if (!currentSensorData || Object.keys(currentSensorData).length === 0) {
         return { count: 'Loading...', total: 0, connectionClass: 'status-connected' };
     }
-    
     let totalSensors = 0;
     let connectedSensors = 0;
     
@@ -75,7 +75,6 @@ function updateStatusDisplay() {
         sensorStatusElement.textContent = sensorInfo.count;
         sensorStatusElement.className = `status-value ${sensorInfo.connectionClass}`;
     }
-    
     // Update last updated time
     const lastUpdatedElement = document.getElementById('last-updated');
     if (lastUpdatedElement) {
@@ -83,14 +82,13 @@ function updateStatusDisplay() {
     }
 }
 
-
-
 // Fetch the settings from the server
 export function fetchSettings() {
     Promise.all([
         fetch('/get_settings').then(res => res.json()),
         fetchStatusInfo()
     ]).then(([configData, statusData]) => {
+        currentConfigData = configData;
         // Populate individual form fields for backward compatibility
         const solarInterval = document.getElementById('solar-interval');
         const windInterval = document.getElementById('wind-interval');
@@ -108,11 +106,11 @@ export function fetchSettings() {
         if (mqttBroker) mqttBroker.value = configData.mqtt_broker ?? '';
         if (mqttPort) mqttPort.value = configData.mqtt_port ?? '';
         
-        const statusSettings = document.getElementById('status-card-content');
-        const systemSettings = document.getElementById('system-card-content');
-        const pollingSettings = document.getElementById('polling-card-content');
-        const mqttSettings = document.getElementById('mqtt-card-content');
-        const webSettings = document.getElementById('webserver-card-content'); 
+        const statusSettings = document.getElementById('status-card-entries');
+        const systemSettings = document.getElementById('system-card-entries');
+        const pollingSettings = document.getElementById('polling-card-entries');
+        const mqttSettings = document.getElementById('mqtt-card-entries');
+        const webSettings = document.getElementById('webserver-card-entries'); 
         
         statusSettings.innerHTML = '';
         systemSettings.innerHTML = '';
@@ -126,9 +124,7 @@ export function fetchSettings() {
         let mqttHtml = '';
         let webHtml = '';
 
-
         statusHtml = `
-            <div class="settings-entries">
                 <div class="settings-entry">
                     <label class="settings-label">Service Status</label>
                     <span class="status-value status-connected" id="service-status">${statusData.service_status || 'Running'}</span>
@@ -149,11 +145,9 @@ export function fetchSettings() {
                     <label class="settings-label">Last Updated</label>
                     <span class="status-value" id="last-updated">${statusData.last_updated || new Date().toLocaleTimeString()}</span>
                 </div>
-            </div>
         `;
 
         systemHtml = `
-            <div class="settings-entries">
                 <div class="settings-entry">
                     <label class="settings-label" for="max-log">Max Log Size (MB):</label>
                     <input type="number" id="max-log" value="${configData.max_log ?? ''}" min="1" />
@@ -162,11 +156,9 @@ export function fetchSettings() {
                     <label class="settings-label" for="max-readings">Max Sensor Readings:</label>
                     <input type="number" id="max-readings" value="${configData.max_readings ?? ''}" min="1" />
                 </div>
-            </div>
         `;
 
         pollingHtml = `
-            <div class="settings-entries">
                 <div class="settings-entry">
                     <label class="settings-label" for="solar-interval">Solar Poll Interval (s):</label>
                     <input type="number" id="solar-interval" value="${configData.poll_intervals.Solar ?? ''}" min="1" />
@@ -179,11 +171,9 @@ export function fetchSettings() {
                     <label class="settings-label" for="battery-interval">Battery Poll Interval (s):</label>
                     <input type="number" id="battery-interval" value="${configData.poll_intervals.Battery ?? ''}" min="1" />
                 </div>
-            </div>
         `;
 
         mqttHtml = `
-            <div class="settings-entries">
                 <div class="settings-entry">
                     <label class="settings-label" for="mqtt-broker">MQTT Broker Address:</label>
                 <input type="text" id="mqtt-broker" value="${configData.mqtt_broker ?? ''}" placeholder="Broker address" />
@@ -192,11 +182,9 @@ export function fetchSettings() {
                     <label class="settings-label" for="mqtt-port">MQTT Broker Port:</label>
                     <input type="number" id="mqtt-port" value="${configData.mqtt_port ?? ''}" placeholder="Broker port" min="1" />
                 </div>
-            </div>
         `;
 
         webHtml = `
-            <div class="settings-entries">
                 <div class="settings-entry">
                     <label class="settings-label" for="webserver-host">Host Address</label>
                     <input type="text" id="webserver-host" value="${configData.webserver_host ?? ''}" placeholder="Webserver address" />
@@ -205,7 +193,6 @@ export function fetchSettings() {
                     <label class="settings-label" for="webserver-port">Port</label>
                     <input type="text" id="webserver-port" value="${configData.webserver_port ?? ''}" placeholder="Webserver port" />
                 </div>
-            </div>
         `;
 
         statusSettings.innerHTML = statusHtml;
@@ -215,7 +202,6 @@ export function fetchSettings() {
         webSettings.innerHTML = webHtml;
 
         // Generate device entries
-
         const deviceContent = document.getElementById('device-card-content');
         deviceContent.innerHTML = '';
         const deviceEntries = document.createElement('div');
@@ -245,8 +231,6 @@ export function fetchSettings() {
                     </span>
                 </div>
                 `;
-
-            // deviceEntriesHtml += deviceEntriesHtml;
         }
         }
         deviceEntries.innerHTML = deviceEntriesHtml;
@@ -266,29 +250,69 @@ export function fetchSettings() {
 }
 
 // Save the settings to the server
-export function saveSettings() {
-    const maxLog = document.getElementById('max-log').value;
-    const solarInterval = document.getElementById('solar-interval').value;
-    const windInterval = document.getElementById('wind-interval').value;
-    const batteryInterval = document.getElementById('battery-interval').value;
-    const maxReadings = document.getElementById('max-readings').value;
-    const mqttBroker = document.getElementById('mqtt-broker').value;
-    const mqttPort = document.getElementById('mqtt-port').value;
-    const webserverHost = document.getElementById('webserver-host').value;
-    const webserverPort = document.getElementById('webserver-port').value;
-    const deviceSettings = {};
-    for (const device of Object.values(deviceList)) {
-        const deviceNameInput = document.querySelector(`.device-name-${device.id}`);
-        const gpioCheckbox = document.querySelector(`.gpio-checkbox-${device.id}`);
-        const gpioAddrInput = document.querySelector(`.gpio-address-${device.id}`);
-        if (deviceNameInput && gpioCheckbox && gpioAddrInput) {
-            deviceSettings[device.id] = {
-                name: deviceNameInput.value.trim(),
-                remote_gpio: gpioCheckbox.checked ? 1 : 0,
-                gpio_address: gpioAddrInput.value.trim()
-            };
-        }
+export function saveSettings(settingsSaveFlag) {
+    let maxLog = currentConfigData.max_log ?? '';
+    let maxReadings = currentConfigData.max_readings ?? '';
+    let solarInterval = currentConfigData.poll_intervals.Solar ?? '';
+    let windInterval = currentConfigData.poll_intervals.Wind ?? '';
+    let batteryInterval = currentConfigData.poll_intervals.Battery ?? '';
+    let mqttBroker = currentConfigData.mqtt_broker ?? '';
+    let mqttPort = currentConfigData.mqtt_port ?? '';
+    let webserverHost = currentConfigData.webserver_host ?? '';
+    let webserverPort = currentConfigData.webserver_port ?? '';
+    let deviceSettings = currentConfigData.devices ?? {};
+    let cardName = '';
+
+    if (settingsSaveFlag === 0) {
+        // Save all settings
+        maxLog = document.getElementById('max-log').value;
+        maxReadings = document.getElementById('max-readings').value;
+        solarInterval = document.getElementById('solar-interval').value;
+        windInterval = document.getElementById('wind-interval').value;
+        batteryInterval = document.getElementById('battery-interval').value;
+        mqttBroker = document.getElementById('mqtt-broker').value;
+        mqttPort = document.getElementById('mqtt-port').value;
+        webserverHost = document.getElementById('webserver-host').value;
+        webserverPort = document.getElementById('webserver-port').value;
+        cardName = 'all';
+    } else if (settingsSaveFlag === 1) {
+        // Save only system settings
+        maxLog = document.getElementById('max-log').value;
+        maxReadings = document.getElementById('max-readings').value;
+        cardName = 'system';
+    } else if (settingsSaveFlag === 2) {
+        // Save only polling settings
+        solarInterval = document.getElementById('solar-interval').value;
+        windInterval = document.getElementById('wind-interval').value;
+        batteryInterval = document.getElementById('battery-interval').value;
+        cardName = 'polling';
+    } else if (settingsSaveFlag === 3) {
+        // Save only MQTT settings
+        mqttBroker = document.getElementById('mqtt-broker').value;
+        mqttPort = document.getElementById('mqtt-port').value;
+        cardName = 'mqtt';
+    } else if (settingsSaveFlag === 4) {
+        // Save only webserver settings
+        webserverHost = document.getElementById('webserver-host').value;
+        webserverPort = document.getElementById('webserver-port').value;
+        cardName = 'webserver';
+    } else if (settingsSaveFlag === 5) {
+        // Save only device settings
+        cardName = 'devices';
+        // for (const device of Object.values(deviceList)) {
+        //     let deviceNameInput = document.querySelector(`.device-name-${device.id}`);
+        //     let gpioCheckbox = document.querySelector(`.gpio-checkbox-${device.id}`);
+        //     let gpioAddrInput = document.querySelector(`.gpio-address-${device.id}`);
+        //     if (deviceNameInput && gpioCheckbox && gpioAddrInput) {
+        //         deviceSettings[device.id] = {
+        //             name: deviceNameInput.value.trim(),
+        //             remote_gpio: gpioCheckbox.checked ? 1 : 0,
+        //             gpio_address: gpioAddrInput.value.trim()
+        //         };
+        //     }
+        // }
     }
+    
     fetch('/update_settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -306,11 +330,19 @@ export function saveSettings() {
         })
     })
         .then(res => res.json())
-        .then(() => {
+        .then(async () => {
+            document.getElementById(`${cardName}-card-entries`).classList.add('hidden');
+            document.getElementById(`${cardName}-action-message`).classList.remove('hidden');
+            let resultHtml = document.getElementById(`${cardName}-save-result`);
+            resultHtml.innerHTML = `Settings Saved Successfully`;
+            await sleep(2000);  
+            resultHtml.innerHTML = ``;
+            document.getElementById(`${cardName}-action-message`).classList.add('hidden');
+            document.getElementById(`${cardName}-card-entries`).classList.remove('hidden');
             window.socket.emit('sensor_update_request');
         });
-    document.getElementById('settings-container').classList.add('hidden');
-    document.getElementById('sensor-container').classList.add('hidden');
+    // document.getElementById('settings-container').classList.add('hidden');
+    // document.getElementById('sensor-container').classList.add('hidden');
 
 }
 
@@ -351,7 +383,7 @@ export function openDevicesConfig(deviceId) {
     document.getElementById('device-config-btns').classList.remove('hidden');
     document.getElementById('device-config-cancel').classList.remove('hidden');
     document.getElementById('device-config-save').classList.remove('hidden');
-    document.getElementById('device-config-add').classList.add('hidden');
+    document.getElementById('new-device-btn').classList.add('hidden');
 
     document.getElementById('device-config-complete').classList.add('hidden');
 
@@ -360,19 +392,53 @@ export function openDevicesConfig(deviceId) {
         document.getElementById('device-config').classList.add('hidden');
         document.getElementById('device-config-save').classList.add('hidden');
         document.getElementById('device-config-cancel').classList.add('hidden');
+        document.getElementById('new-device-btn').classList.remove('hidden');
         document.getElementById('device-card-content').classList.remove('hidden');
         document.getElementById('device-config-add').classList.remove('hidden');
     });
 
     // Save Device Config
     document.getElementById('device-config-save').addEventListener('click', () => {
-        saveSettings();
+        saveSettings(5); // Save only device settings
         document.getElementById('device-config').classList.add('hidden');
         document.getElementById('device-config-btns').classList.add('hidden');
         document.getElementById('device-card-content').classList.remove('hidden');
         document.getElementById('device-config-add').classList.remove('hidden');
     });
     
+}
+
+// New Device Config
+export function openNewDeviceConfig() { 
+    const newDeviceDiv = document.getElementById('new-device');
+    newDeviceDiv.innerHTML = '';
+    let newDeviceHtml = '';
+    newDeviceHtml = `
+        <div class="settings-entry">
+            <label class="settings-label" for="new-device-name">Device Name:</label>
+            <input type="text" placeholder="Enter device name" id="new-device-name" />
+        </div>
+        <div class="settings-entry">
+            <label class="settings-label" for="new-remote-gpio">Enable Remote GPIO:</label>
+            <input type="checkbox" id="new-remote-gpio" />
+        </div>
+        <div class="settings-entry">
+            <label class="settings-label" for="new-gpio-address">GPIO Address:</label>
+            <input type="text" placeholder="GPIO address" id="new-gpio-address" />
+        </div>
+    `;
+    
+    newDeviceDiv.innerHTML = newDeviceHtml;
+
+    document.getElementById('new-device-cancel').addEventListener('click', () => {
+        document.getElementById('new-device').classList.add('hidden');
+        document.getElementById('device-config-btns').classList.remove('hidden');
+        document.getElementById('new-device-save').classList.add('hidden');
+        document.getElementById('new-device-cancel').classList.add('hidden');
+        document.getElementById('new-device-btn').classList.remove('hidden');
+        document.getElementById('device-card-content').classList.remove('hidden');
+
+    });
 }
 
 // Restart Confirmation

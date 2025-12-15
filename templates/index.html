@@ -86,8 +86,8 @@
                         </span>
                     </div>
                     <div class="action-btns header-btn" id="header-btns">
-                        <i class="fa-solid fa-plus hidden" id="add-sensor-header-btn" title="Add Sensor"></i>
-                        <i class="fa-solid fa-save hidden" id="settings-save-header-btn" title="Save Settings"></i>
+                        <i class="fa-solid fa-plus hidden" id="add-sensor-header-btn" title="Add New Sensor"></i>
+                        <i class="fa-solid fa-save hidden" id="settings-save-header-btn" title="Save All Settings"></i>
                         <i class="fa-solid fa-sync-alt hidden" id="refresh-logs-header-btn" title="Refresh Logs"></i>
                         
                         <div class="header-count-display" id="device-count-display" title="Connected Devices">
@@ -136,7 +136,7 @@
                             </div>
                         </div>
                         <div class="settings-card-content">
-                            <div class="status-card-content" id="status-card-content">
+                            <div class="settings-entries" id="status-card-entries">
                                 <!-- Status information will be populated here -->
                             </div>
                         </div>
@@ -157,8 +157,15 @@
                             </div>
                         </div>
                         <div class="settings-card-content">
-                            <div class="system-card-content" id="system-card-content">
+                            <div class="settings-entries" id="system-card-entries">
                                 <!-- System settings will be populated here -->
+                            </div>
+                            <div class="settings-result hidden" id="system-action-message">
+                                <div class="settings-entry">
+                                    <label class="settings-label" id="system-save-result">
+                                        <!-- System save result message -->
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -178,8 +185,15 @@
                             </div>
                         </div>
                         <div class="settings-card-content">
-                            <div class="polling-card-content" id="polling-card-content">
+                            <div class="settings-entries" id="polling-card-entries">
                                 <!-- Polling settings will be populated here -->
+                            </div>
+                            <div class="settings-result hidden" id="polling-action-message">
+                                <div class="settings-entry">
+                                    <label class="settings-label" id="polling-save-result">
+                                        <!-- Polling save result message -->
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -199,8 +213,15 @@
                             </div>
                         </div>
                         <div class="settings-card-content">
-                            <div class="mqtt-card-content" id="mqtt-card-content">
+                            <div class="settings-entries" id="mqtt-card-entries">
                                 <!-- MQTT settings will be populated here -->
+                            </div>
+                            <div class="settings-result hidden" id="mqtt-action-message">
+                                <div class="settings-entry">
+                                    <label class="settings-label" id="mqtt-save-result">
+                                        <!-- MQTT save result message -->
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -220,8 +241,15 @@
                             </div>
                         </div>
                         <div class="settings-card-content">
-                            <div class="webserver-card-content" id="webserver-card-content">
+                            <div class="settings-entries" id="webserver-card-entries">
                                 <!-- Web server settings will be populated here -->
+                            </div>
+                            <div class="settings-result hidden" id="webserver-action-message">
+                                <div class="settings-entry">
+                                    <label class="settings-label" id="webserver-save-result">
+                                        <!-- Web server save result message -->
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -237,7 +265,9 @@
                                 <p>GPIO and sensor device configuration</p>
                             </div>
                             <div class="action-btns device-config-btns" id="device-config-btns">
-                                <i class="fa-solid fa-plus" id="device-config-add" title="New Device"></i>
+                                <i class="fa-solid fa-plus" id="new-device-btn" title="New Device"></i>
+                                <i class="fa-solid fa-xmark hidden" id="new-device-cancel" title="Cancel"></i>
+                                <i class="fa-solid fa-save hidden" id="new-device-save" title="Save"></i>
                                 <i class="fa-solid fa-xmark hidden" id="device-config-cancel" title="Cancel"></i>
                                 <i class="fa-solid fa-save hidden" id="device-config-save" title="Save"></i>
                                 <i class="fa-solid fa-check hidden" id="device-config-complete" title="Complete"></i>
@@ -251,16 +281,15 @@
                             <div class="device-config hidden" id="device-config">
                                <!-- Device configuration form will be populated here -->
                             </div>
-                            <div class="device-add hidden" id="device-add">
-                                
+                            <div class="new-device hidden" id="new-device">
+                                <!-- New device form will be populated here -->    
                             </div>
-                        </div>
-                        <div class="settings-entry hidden" id="action-message">
-                                <label id="device-config-save-result">
+                             <div class="settings-entry hidden" id="action-message">
+                                <label id="settings-label">
                                     <!-- Backup result message -->
                                 </label>                              
-                            </div>
-                            
+                            </div>  
+                        </div>
                     </div>
 
                     <!-- Action Cards (moved to end) -->

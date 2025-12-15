@@ -32,6 +32,7 @@ class flaskWrapper:
         self.app.route("/readme", methods=["GET", "POST"])(self.serve_readme)
         self.app.route("/restart", methods=["POST"])(self.restart_program)
         self.app.route("/add_sensor", methods=["POST"])(self.add_sensor)
+        self.app.route("/add_device", methods=["POST"])(self.add_device)
         self.app.route("/backup", methods=["POST"])(self.backup_config)
         self.app.route("/delete_backup", methods=["POST"])(self.delete_backup)
         self.app.route("/restore_backup", methods=["POST"])(self.restore_backup)
@@ -65,8 +66,13 @@ class flaskWrapper:
             return self.config_manager.config_data
 
     def update_settings(self):
-        data = request.get_json()
-        self.config_manager.save_config(data)
+        try:
+            data = request.get_json()
+            self.config_manager.save_config(data)
+            return jsonify({"status": "success", "message": "Settings updated successfully"})
+        except Exception as e:
+            logger.error(f"Error updating settings: {e}")
+            return jsonify({"status": "error", "message": str(e)}), 500
 
     def backup_config(self):
         logger.info("Backing up configuration file(s)")
@@ -144,6 +150,30 @@ class flaskWrapper:
             return jsonify({"status": "restarting"}), 200
         except Exception as e:
             logger.info("Failed to restart")
+            return jsonify({"status": "error", "message": str(e)}), 500
+        
+    def add_device(self):   
+        data = request.get_json()
+        name = data.get("name")
+        remote_gpio = int(data.get("remote_gpio", 0))
+        gpio_address = data.get("gpio_address", "")
+        try:
+            # Add to config and save
+            new_device = {
+                "name": name,
+                "remote_gpio": remote_gpio,
+                "gpio_address": gpio_address
+            }
+            # Load, append, and save
+            with open(self.config_manager.DEVICE_FILE, "r") as f:
+                devices = json.load(f)
+            devices.append(new_device)
+            with open(self.config_manager.DEVICE_FILE, "w") as f:
+                json.dump(devices, f)
+            logger.info(f"Added new device: {name}")
+            return jsonify({"status": "success"})
+        except Exception as e:
+            logger.error(f"Failed to add device: {e}")
             return jsonify({"status": "error", "message": str(e)}), 500
 
     def add_sensor(self):

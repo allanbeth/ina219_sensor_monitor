@@ -220,14 +220,6 @@
     transform: scale(1.1);
 }
 
-#settings-save-header-btn {
-    color: #48bb78;
-}
-
-#settings-save-header-btn:hover {
-    background: linear-gradient(135deg, #48bb78, #38b2ac) !important;
-    color: white;
-}
 
 /* ========== Header Count Displays ========== */
 .header-count-display {

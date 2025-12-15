@@ -352,9 +352,9 @@ export function loadSensorCards(data) {
         `;
         cardGrid.appendChild(addCard); 
 
-          // Close Add Device Card
-    document.getElementById('new-sensor-cancel').addEventListener('click', () => {
-        document.getElementById('add-sensor-card').classList.add('hidden');
+          // Close Add Sensor Card
+        document.getElementById('new-sensor-cancel').addEventListener('click', () => {
+            document.getElementById('add-sensor-card').classList.add('hidden');
     });
 
     

@@ -2,12 +2,7 @@
 // Energy Monitor Backup JS
 // ========================
 
-// import { sleep } from "./utils";
-
-
-// Backup Functions
-
-
+// Fetch and Display Backups
 export function fetchBackups() {
     const backupContent = document.getElementById('config-file-selection');
     backupContent.innerHTML = '';
@@ -53,6 +48,7 @@ export function fetchBackups() {
         });
 }
 
+// Delete Backup Confirmation
 export function deleteBackupConfirmation(filename) {
     document.getElementById('config-file-selection').classList.add('hidden');
     document.getElementById('delete-config-confirmation').classList.remove('hidden');
@@ -62,7 +58,7 @@ export function deleteBackupConfirmation(filename) {
     const confirmDeleteHtml = document.getElementById('delete-file-name');
     confirmDeleteHtml.innerHTML = `${filename}`;
 
-    // Confirm Delete
+    // Confirm Delete Handler
     document.getElementById('delete-config-confirm').addEventListener('click', () => {
         document.getElementById('delete-config-confirmation').classList.add('hidden');
         document.getElementById('config-action-btns').classList.remove('hidden');
@@ -75,6 +71,7 @@ export function deleteBackupConfirmation(filename) {
     });
 }
 
+// Restore Backup Confirmation
 export function restoreBackupConfirmation(filename) {
     document.getElementById('restore-config-confirmation').classList.remove('hidden');
     document.getElementById('config-action-btns').classList.remove('hidden');
@@ -83,7 +80,7 @@ export function restoreBackupConfirmation(filename) {
     const confirmRestoreHtml = document.getElementById('restore-file-name');
     confirmRestoreHtml.innerHTML = `${filename}`;
 
-    // Confirm Restore
+    // Confirm Restore Handler
     document.getElementById('restore-config-confirm').addEventListener('click', () => {
         document.getElementById('delete-config-confirmation').classList.add('hidden');
         document.getElementById('config-action-btns').classList.remove('hidden');
@@ -95,6 +92,32 @@ export function restoreBackupConfirmation(filename) {
     });
 }
 
+// Create Backup
+export function createBackup() {
+    const programConfig = document.getElementById('program-config').checked ? 1 : 0;
+    const sensorConfig = document.getElementById('sensor-config').checked ? 1 : 0;
+    const backupMsg = document.getElementById('backup-result');
+    fetch('/backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ programConfig, sensorConfig })
+    })
+    .then(response => response.json())
+    .then(data => {
+    	  const backupMsg = document.getElementById('backup-result');
+        if (data.success) {
+            backupMsg.innerHTML = 'Backup created successfully!';
+        } else {
+            backupMsg.innerHTML = 'Backup failed: ' + (data.error || 'Unknown error');
+        }
+    })
+    .catch(error => {
+        backupMsg.innerHTML = 'Backup failed: Network error';
+        console.error('Backup error:', error);
+    });
+}
+
+// Delete Backup
 export function deleteBackup(filename) {
     fetch('/delete_backup', {
         method: 'POST',
@@ -111,7 +134,7 @@ export function deleteBackup(filename) {
         });
 }
 
-
+// Restore Backup
 export async function restoreBackup(filename) {
     document.getElementById('restore-config-confirmation').classList.add('hidden');
     document.getElementById('config-action-message').classList.remove('hidden');
@@ -133,34 +156,6 @@ export async function restoreBackup(filename) {
         
     }
 }
-
-// Create Backup
-
-export function createBackup() {
-    const programConfig = document.getElementById('program-config').checked ? 1 : 0;
-    const sensorConfig = document.getElementById('sensor-config').checked ? 1 : 0;
-    const backupMsg = document.getElementById('backup-result');
-    
-    fetch('/backup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ programConfig, sensorConfig })
-    })
-    .then(response => response.json())
-    .then(data => {
-    	  const backupMsg = document.getElementById('backup-result');
-        if (data.success) {
-            backupMsg.innerHTML = 'Backup created successfully!';
-        } else {
-            backupMsg.innerHTML = 'Backup failed: ' + (data.error || 'Unknown error');
-        }
-    })
-    .catch(error => {
-        backupMsg.innerHTML = 'Backup failed: Network error';
-        console.error('Backup error:', error);
-    });
-}
-
 
 
 

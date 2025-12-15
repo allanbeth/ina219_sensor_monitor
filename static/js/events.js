@@ -42,20 +42,8 @@ export function setupEventHandlers() {
         }
     });
 
-    // Add Sensor (header button - only visible on sensors page)
-    document.getElementById('add-sensor-header-btn').addEventListener('click', () => {
-        document.getElementById('add-sensor-card').classList.remove('hidden');
-    });
-
-    // Settings Save (header button - only visible on settings page)
-    document.getElementById('settings-save-header-btn').addEventListener('click', () => {
-        config.saveSettings();
-    });
-
-    // Refresh Logs (header button - only visible on logs page)
-    document.getElementById('refresh-logs-header-btn').addEventListener('click', () => {
-        config.getLogFile();
-    });
+    // Navigation Links
+    // =========================
     // Settings
     document.getElementById('settings-btn').addEventListener('click', async () => {
         showPage('settings');
@@ -80,20 +68,72 @@ export function setupEventHandlers() {
         collapseNavMenuOnMobile();
     });
 
+    // Header Action Buttons
+    // =========================
+    // Add Sensor (header button - only visible on sensors page)
+    document.getElementById('add-sensor-header-btn').addEventListener('click', () => {
+        document.getElementById('add-sensor-card').classList.remove('hidden');
+    });
+
+    // Settings Save (header button - only visible on settings page)
+    document.getElementById('settings-save-header-btn').addEventListener('click', () => {
+        config.saveSettings(0); // Save all settings
+    });
+
+    // Refresh Logs (header button - only visible on logs page)
+    document.getElementById('refresh-logs-header-btn').addEventListener('click', () => {
+        config.getLogFile();
+    });
+    
+    
+
     // Add Device Card Buttons
     // =========================
     
 
     // Close Add Sensor Card
-    document.getElementById('add-sensor-cancel').addEventListener('click', () => {
-        document.getElementById('add-sensor-card').classList.add('hidden');
-    });
+    // document.getElementById('add-sensor-cancel').addEventListener('click', () => {
+    //     document.getElementById('add-sensor-card').classList.add('hidden');
+    // });
     // Save New Sensor
-    document.getElementById('add-sensor-save').addEventListener('click', () => {
-        config.addSensor();
+    // document.getElementById('add-sensor-save').addEventListener('click', () => {
+    //     config.addSensor();
+    // });
+
+    //settings Card Buttons
+    // =========================
+    // System Save Button
+    document.getElementById('system-save-btn').addEventListener('click', () => {
+        config.saveSettings(1); // Save only system settings
     });
 
-    // Settings Action Cards
+    // Polling Save Button
+    document.getElementById('polling-save-btn').addEventListener('click', () => {
+        config.saveSettings(2); // Save only polling settings
+    });
+
+    // MQTT Save Button
+    document.getElementById('mqtt-save-btn').addEventListener('click', () => {
+        config.saveSettings(3); // Save only MQTT settings
+    });
+
+    // Web Server Save Button
+    document.getElementById('webserver-save-btn').addEventListener('click', () => {
+        config.saveSettings(4); // Save only web server settings
+    });
+
+    // New Device Button
+    document.getElementById('new-device-btn').addEventListener('click', () => {
+        document.getElementById('new-device').classList.remove('hidden');
+        document.getElementById('device-config-btns').classList.remove('hidden');
+        document.getElementById('new-device-cancel').classList.remove('hidden');
+        document.getElementById('new-device-save').classList.remove('hidden');
+        document.getElementById('new-device-btn').classList.add('hidden');
+        document.getElementById('device-card-content').classList.add('hidden');    
+        config.openNewDeviceConfig();
+    });
+
+    // Backup and Restore Configuration Buttons
     // =========================
 
     // Backup Configuration Card
