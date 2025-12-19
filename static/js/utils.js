@@ -117,11 +117,11 @@ export function setDeviceInfo() {
 }
 
 export function updateAddNewVisibility() {
-    const addBtn = document.getElementById("add-sensor-btn");
+    const addBtn = document.getElementById("add-sensor-header-btn");
     const addContainer = document.getElementById("add-sensor-container");
     
     if (!addBtn) {
-        console.warn("add-sensor-btn element not found");
+        console.warn("add-sensor-header-btn element not found");
         return;
     }
     

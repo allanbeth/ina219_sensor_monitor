@@ -17,9 +17,14 @@ export function initializeSocket(url) {
     // On first update, render all cards and create dashboard stats
     socketInstance.once('sensor_update', (data) => {
         console.log('First sensor update received:', data);
-        loadSensorCards(data);
-        createDashboardStats(data);
-        updateSensorData(data); // Update config page status
+        try {
+            loadSensorCards(data);
+            createDashboardStats(data);
+            updateSensorData(data); // Update config page status
+            console.log('All data processing completed successfully');
+        } catch (error) {
+            console.error('Error processing sensor update:', error);
+        }
         
         // Hide loading screen with animation after first data load
         const loadingScreen = document.getElementById('loading-screen');

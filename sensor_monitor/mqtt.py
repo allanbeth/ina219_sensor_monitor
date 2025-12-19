@@ -74,6 +74,7 @@ class MQTTPublisher:
         state_topic = f"{MQTT_BASE}/totals"
         
         totals = [
+            ("total_power", "Total Power Generated", "W", "power", "mdi:flash"),
             ("solar_total", "Solar Total Generated", "W", "power", "mdi:solar-power"),
             ("wind_total", "Wind Total Generated", "W", "power", "mdi:weather-windy"),
             ("battery_soc_total", "Battery Total SoC", "%", "battery", "mdi:battery"),

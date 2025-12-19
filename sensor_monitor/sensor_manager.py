@@ -412,29 +412,41 @@ class SensorManager:
                     }
                     data[s.name]['data'] = sensor_data
 
-                # --- Calculate totals for all sensors, using latest data ---
-            if s.type == "Solar":
-                solar_total += data[s.name]['data'].get("power", 0.0)
-            elif s.type == "Wind":
-                wind_total += data[s.name]['data'].get("power", 0.0)
-            elif s.type == "Battery":
-                soc = data[s.name]['data'].get("state_of_charge", 0.0)
-                power = data[s.name]['data'].get("power", 0.0)
-                status = data[s.name]['data'].get("status", "")
-                average_battery_soc += soc
-                battery_count += 1
-                if status == "charging":
-                    battery_in_total += abs(power)
-                elif status == "discharging":
-                    battery_out_total += abs(power)
+            # --- Calculate totals for all sensors, using latest data ---
+            # Only calculate totals for sensors with valid data (not default 'no data' state)
+            sensor_power = data[s.name]['data'].get("power", 0.0)
+            sensor_voltage = data[s.name]['data'].get("voltage", 0.0)
+            
+            # Skip sensors with no readings (voltage and power both 0 usually indicates no data)
+            if sensor_voltage > 0 or sensor_power != 0:
+                if s.type == "Solar":
+                    # Use absolute power for solar in case of negative readings due to wiring
+                    solar_total += abs(sensor_power)
+                elif s.type == "Wind":
+                    # For wind turbines, use absolute power for totals since negative power
+                    # just indicates current direction (depends on wiring/sensor orientation)
+                    wind_total += abs(sensor_power)
+                elif s.type == "Battery":
+                    soc = data[s.name]['data'].get("state_of_charge", 0.0)
+                    status = data[s.name]['data'].get("status", "")
+                    average_battery_soc += soc
+                    battery_count += 1
+                    if status == "charging":
+                        battery_in_total += abs(sensor_power)
+                    elif status == "discharging":
+                        battery_out_total += abs(sensor_power)
 
         # Calculate average SoC
         if battery_count > 0:
             average_battery_soc = average_battery_soc / battery_count
 
+        # Calculate total power generation (solar + wind)
+        total_power_generation = solar_total + wind_total
+        
         self.totals_data = {
             "solar_total": round(solar_total, 2),
             "wind_total": round(wind_total, 2),
+            "total_power": round(total_power_generation, 2),
             "battery_soc_total": round(average_battery_soc, 2),
             "battery_in_total": round(battery_in_total, 2),
             "battery_out_total": round(battery_out_total, 2)

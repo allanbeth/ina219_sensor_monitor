@@ -72,7 +72,7 @@ export function setupEventHandlers() {
     // =========================
     // Add Sensor (header button - only visible on sensors page)
     document.getElementById('add-sensor-header-btn').addEventListener('click', () => {
-        document.getElementById('add-sensor-card').classList.remove('hidden');
+        document.getElementById('add-sensor-container').classList.remove('hidden');
     });
 
     // Settings Save (header button - only visible on settings page)
@@ -339,6 +339,10 @@ function showPage(pageName) {
     // Update header based on page
     const pageHeading = document.getElementById('page-heading');
     const headerTotals = document.getElementById('header-totals');
+    const solarSensorsFilterBtn = document.getElementById('solar-sensor-filter-header-btn');
+    const windSensorsFilterBtn = document.getElementById('wind-sensor-filter-header-btn');
+    const batterySensorsFilterBtn = document.getElementById('battery-sensor-filter-header-btn');
+    const clearSensorFilterBtn = document.getElementById('clear-sensor-filter-header-btn');
     const addSensorBtn = document.getElementById('add-sensor-header-btn');
     const settingsSaveBtn = document.getElementById('settings-save-header-btn');
     const refreshLogsBtn = document.getElementById('refresh-logs-header-btn');
@@ -374,15 +378,20 @@ function showPage(pageName) {
         }
     }
     
-    if (pageHeading && headerTotals && addSensorBtn && settingsSaveBtn && refreshLogsBtn && deviceCountDisplay && sensorCountDisplay) {
+    if (pageHeading && headerTotals && solarSensorsFilterBtn && windSensorsFilterBtn && batterySensorsFilterBtn && clearSensorFilterBtn && addSensorBtn && settingsSaveBtn && refreshLogsBtn && deviceCountDisplay && sensorCountDisplay) {
         switch(pageName) {
             case 'dashboard':
                 pageHeading.textContent = 'Dashboard';
                 pageHeading.style.display = 'block';
                 headerTotals.classList.add('hidden');
                 addSensorBtn.classList.add('hidden');
+                addSensorBtn.style.display = 'none'; // Ensure inline style hides it
                 settingsSaveBtn.classList.add('hidden');
                 refreshLogsBtn.classList.add('hidden');
+                solarSensorsFilterBtn.classList.add('hidden');
+                windSensorsFilterBtn.classList.add('hidden');
+                batterySensorsFilterBtn.classList.add('hidden');
+                clearSensorFilterBtn.classList.add('hidden');
                 deviceCountDisplay.classList.remove('hidden');
                 sensorCountDisplay.classList.remove('hidden');
                 break;
@@ -390,7 +399,11 @@ function showPage(pageName) {
                 pageHeading.textContent = 'Sensors';
                 pageHeading.style.display = 'block';
                 headerTotals.classList.add('hidden');
+                solarSensorsFilterBtn.classList.remove('hidden');
+                windSensorsFilterBtn.classList.remove('hidden');
+                batterySensorsFilterBtn.classList.remove('hidden');
                 addSensorBtn.classList.remove('hidden');
+                addSensorBtn.style.display = ''; // Clear inline style
                 settingsSaveBtn.classList.add('hidden');
                 refreshLogsBtn.classList.add('hidden');
                 deviceCountDisplay.classList.add('hidden');
@@ -401,6 +414,11 @@ function showPage(pageName) {
                 pageHeading.style.display = 'block';
                 headerTotals.classList.add('hidden');
                 addSensorBtn.classList.add('hidden');
+                addSensorBtn.style.display = 'none'; // Ensure inline style hides it
+                solarSensorsFilterBtn.classList.add('hidden');
+                windSensorsFilterBtn.classList.add('hidden');
+                batterySensorsFilterBtn.classList.add('hidden');
+                clearSensorFilterBtn.classList.add('hidden');
                 settingsSaveBtn.classList.remove('hidden');
                 refreshLogsBtn.classList.add('hidden');
                 deviceCountDisplay.classList.add('hidden');
@@ -410,7 +428,12 @@ function showPage(pageName) {
                 pageHeading.textContent = 'Logs';
                 pageHeading.style.display = 'block';
                 headerTotals.classList.add('hidden');
+                solarSensorsFilterBtn.classList.add('hidden');
+                windSensorsFilterBtn.classList.add('hidden');
+                batterySensorsFilterBtn.classList.add('hidden');
+                clearSensorFilterBtn.classList.add('hidden');
                 addSensorBtn.classList.add('hidden');
+                addSensorBtn.style.display = 'none'; // Ensure inline style hides it
                 settingsSaveBtn.classList.add('hidden');
                 refreshLogsBtn.classList.remove('hidden');
                 deviceCountDisplay.classList.add('hidden');
@@ -420,7 +443,12 @@ function showPage(pageName) {
                 pageHeading.textContent = 'About';
                 pageHeading.style.display = 'block';
                 headerTotals.classList.add('hidden');
+                solarSensorsFilterBtn.classList.add('hidden');
+                windSensorsFilterBtn.classList.add('hidden');
+                batterySensorsFilterBtn.classList.add('hidden');
+                clearSensorFilterBtn.classList.add('hidden');
                 addSensorBtn.classList.add('hidden');
+                addSensorBtn.style.display = 'none'; // Ensure inline style hides it
                 settingsSaveBtn.classList.add('hidden');
                 refreshLogsBtn.classList.add('hidden');
                 deviceCountDisplay.classList.add('hidden');

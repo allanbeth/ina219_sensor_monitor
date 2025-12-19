@@ -129,6 +129,12 @@ class Sensor:
                 raw_voltage = self.read_register_16(0x02)
                 voltage = round((raw_voltage >> 3) * 0.004, 1)
                 raw_current = self.read_register_16(0x04)
+                
+                # Handle signed 16-bit current register
+                # Convert unsigned 16-bit to signed if necessary
+                if raw_current > 32767:
+                    raw_current = raw_current - 65536  # Convert to signed
+                
                 CURRENT_LSB = 3.2 / 32767
                 current = round(raw_current * CURRENT_LSB, 0)
             else:
@@ -139,7 +145,13 @@ class Sensor:
             if self.type == "Battery":
                 voltage = self.handle_battery_voltage(voltage)
 
+            # Calculate power (voltage * current)
+            # For wind turbines, negative current is normal depending on wiring direction
+            # The sign indicates current flow direction relative to the INA219 sensor orientation
             power = round(voltage * current, 0)
+            
+            # For wind/solar generation, we typically want absolute power values for totals
+            # but keep the sign for individual sensor readings to show current direction
             time_stamp = datetime.datetime.now().strftime("%I:%M:%S%p on %B %d, %Y")
             new_readings = {"voltage": voltage, "current": current, "power": power, "time_stamp": time_stamp}
 
