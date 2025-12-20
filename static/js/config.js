@@ -12,13 +12,50 @@ let currentConfigData = {};
 // Update sensor data for status calculations
 export function updateSensorData(data) {
     currentSensorData = data;
-    updateStatusDisplay();
+    // Status display is now updated directly from dashboard
 }
 
+// Calculate connected devices count using actual sensor data (same logic as dashboard)
+function getConnectedDevicesInfo() {
+    if (!currentSensorData || Object.keys(currentSensorData).length === 0) {
+        return { count: 'Loading...', total: 0, connectionClass: 'status-disconnected' };
+    }
+    
+    const deviceIds = new Set();
+    const configuredDevices = Object.values(deviceList) || [];
+    
+    // Count unique devices from actual sensor data (matches dashboard logic)
+    for (let [name, sensor] of Object.entries(currentSensorData)) {
+        if (name === 'totals' || name === 'devices' || name === 'system_status' || 
+            !sensor || !sensor.type || !sensor.data) {
+            continue;
+        }
+        if (sensor.device_id !== undefined) {
+            deviceIds.add(sensor.device_id);
+        }
+    }
+    
+    const connectedDevices = deviceIds.size;
+    const totalDevices = configuredDevices.length;
+    
+    let connectionClass = 'status-disconnected';
+    if (connectedDevices === totalDevices && connectedDevices > 0) {
+        connectionClass = 'status-connected';
+    } else if (connectedDevices > 0) {
+        connectionClass = 'status-partial';
+    }
+    
+    return {
+        count: totalDevices > 0 ? `${connectedDevices}/${totalDevices}` : 'No devices',
+        connectedCount: connectedDevices,
+        total: totalDevices,
+        connectionClass: connectionClass
+    };
+}
 // Calculate connected sensors count using actual sensor data
 function getConnectedSensorsInfo() {
     if (!currentSensorData || Object.keys(currentSensorData).length === 0) {
-        return { count: 'Loading...', total: 0, connectionClass: 'status-connected' };
+        return { count: 'Loading...', total: 0, connectionClass: 'status-disconnected' };
     }
     let totalSensors = 0;
     let connectedSensors = 0;
@@ -48,19 +85,14 @@ function getConnectedSensorsInfo() {
 
 // Fetch current system status information
 function fetchStatusInfo() {
-    // Use available device data and provide basic status info
-    const devices = Object.values(deviceList) || [];
-    const totalDevices = devices.length;
-    const connectedDevices = totalDevices; // Assume configured devices are available
-    
-    const deviceConnectionClass = connectedDevices > 0 ? 'status-connected' : 'status-disconnected';
+    const deviceInfo = getConnectedDevicesInfo();
     const sensorInfo = getConnectedSensorsInfo();
     
     return Promise.resolve({
         service_status: 'Running',
-        connected_devices: `${connectedDevices}/${totalDevices}`,
+        connected_devices: deviceInfo.count,
         connected_sensors: sensorInfo.count,
-        device_connection_class: deviceConnectionClass,
+        device_connection_class: deviceInfo.connectionClass,
         sensor_connection_class: sensorInfo.connectionClass,
         mqtt_status: 'Connected', // Default status
         last_updated: new Date().toLocaleTimeString()
@@ -69,12 +101,22 @@ function fetchStatusInfo() {
 
 // Update the status display elements directly
 function updateStatusDisplay() {
+    // Update device status
+    const deviceStatusElement = document.getElementById('device-status');
+    if (deviceStatusElement) {
+        const deviceInfo = getConnectedDevicesInfo();
+        deviceStatusElement.textContent = deviceInfo.count;
+        deviceStatusElement.className = `status-value ${deviceInfo.connectionClass}`;
+    }
+    
+    // Update sensor status
     const sensorStatusElement = document.getElementById('sensor-status');
     if (sensorStatusElement) {
         const sensorInfo = getConnectedSensorsInfo();
         sensorStatusElement.textContent = sensorInfo.count;
         sensorStatusElement.className = `status-value ${sensorInfo.connectionClass}`;
     }
+    
     // Update last updated time
     const lastUpdatedElement = document.getElementById('last-updated');
     if (lastUpdatedElement) {

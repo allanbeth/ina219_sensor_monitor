@@ -4,7 +4,7 @@
 // Handles the main dashboard interface for monitoring solar, wind, and battery systems
 // Provides real-time power generation statistics and system health information
 
-import { isSensorConnected } from './utils.js';
+import { isSensorConnected, filterSensorsByType, clearSensorFilter } from './utils.js';
 
 /**
  * Initialize the dashboard interface
@@ -22,6 +22,9 @@ export function initializeDashboard() {
     } catch (error) {
         console.error('Error initializing dashboard:', error);
     }
+
+     // Add drill button event delegation
+    document.addEventListener('click', handleDashboardDrillClick);
 }
 
 /**
@@ -527,6 +530,9 @@ function updateHeaderCounts(deviceCount, sensorCount, systemStatus = null, senso
     if (sensorData) {
         updateSensorStatusIndicator(sensorCount, sensorData);
     }
+    
+    // Update status card to match header counts
+    updateStatusCardCounts(deviceCount, sensorCount, sensorData);
 }
 
 /**
@@ -615,3 +621,90 @@ function updateSensorStatusIndicator(totalSensors, sensorData) {
         sensorCountDisplay.title = `No sensors connected (${totalSensors} configured)`;
     }
 }
+
+function handleDashboardDrillClick(e) {
+    if (!e.target.classList.contains('dashboard-drill-btn')) return;
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const buttonId = e.target.id;
+    const sensorType = buttonId.replace('dashboard-drill-btn-', '').toLowerCase();
+    
+    console.log(`Dashboard drill: navigating to sensors page with ${sensorType} filter`);
+    
+    // Navigate to sensors page
+    if (window.showPage) {
+        window.showPage('sensors');
+    }
+    
+    // Apply filter after a short delay to ensure page is loaded
+    setTimeout(() => {
+        if (sensorType && sensorType !== 'all') {
+            filterSensorsByType(sensorType);
+        } else {
+            clearSensorFilter();
+        }
+    }, 50);
+    
+    // Collapse mobile menu if applicable
+    collapseNavMenuOnMobile();
+}
+
+/**
+ * Update status card counts to match header calculations
+ * @param {number} deviceCount - Calculated device count from sensor data
+ * @param {number} sensorCount - Calculated sensor count from sensor data  
+ * @param {Object} sensorData - Complete sensor data for connection analysis
+ */
+function updateStatusCardCounts(deviceCount, sensorCount, sensorData) {
+    // Update device status in config page - use exact same logic as header
+    const deviceStatusElement = document.getElementById('device-status');
+    if (deviceStatusElement) {
+        // Simple approach: show actual connected devices from sensor data
+        let deviceText = `${deviceCount}/${deviceCount}`;
+        let deviceClass = 'status-connected';
+        
+        // If no devices found, show as disconnected
+        if (deviceCount === 0) {
+            deviceText = '0/1';
+            deviceClass = 'status-disconnected';
+        }
+        
+        deviceStatusElement.textContent = deviceText;
+        deviceStatusElement.className = `status-value ${deviceClass}`;
+    }
+    
+    // Update sensor status in config page - use exact same logic as header  
+    const sensorStatusElement = document.getElementById('sensor-status');
+    if (sensorStatusElement && sensorData) {
+        // Count connected sensors using same logic as header
+        let connectedSensors = 0;
+        for (let [name, sensor] of Object.entries(sensorData)) {
+            if (name === 'totals' || name === 'devices' || name === 'system_status' || 
+                !sensor || !sensor.type || !sensor.data) {
+                continue;
+            }
+            if (isSensorConnected(sensor)) {
+                connectedSensors++;
+            }
+        }
+        
+        let sensorText = `${connectedSensors}/${sensorCount}`;
+        let sensorClass = 'status-connected';
+        
+        if (connectedSensors < sensorCount) {
+            sensorClass = connectedSensors > 0 ? 'status-partial' : 'status-disconnected';
+        }
+        
+        sensorStatusElement.textContent = sensorText;
+        sensorStatusElement.className = `status-value ${sensorClass}`;
+    }
+    
+    // Update last updated timestamp
+    const lastUpdatedElement = document.getElementById('last-updated');
+    if (lastUpdatedElement) {
+        lastUpdatedElement.textContent = new Date().toLocaleTimeString();
+    }
+}
+

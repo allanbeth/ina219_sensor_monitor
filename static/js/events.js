@@ -50,7 +50,7 @@ export function setupEventHandlers() {
         // Ensure device info is loaded before fetching settings
         await utils.ensureDeviceInfoLoaded();
         config.fetchSettings();
-        backup.fetchBackups();
+        utils.fetchBackups();
         collapseNavMenuOnMobile();
     });
 
@@ -70,9 +70,30 @@ export function setupEventHandlers() {
 
     // Header Action Buttons
     // =========================
+    // Solar Sensors Filter
+    document.getElementById('solar-sensor-filter-header-btn').addEventListener('click', () => {
+        utils.filterSensorsByType('solar');
+    });
+
+    // Wind Sensors Filter
+    document.getElementById('wind-sensor-filter-header-btn').addEventListener('click', () => {
+        utils.filterSensorsByType('wind');
+    });
+
+    // Battery Sensors Filter
+    document.getElementById('battery-sensor-filter-header-btn').addEventListener('click', () => {
+        utils.filterSensorsByType('battery');
+    });
+
+    // Clear Sensor Filter
+    document.getElementById('clear-sensor-filter-header-btn').addEventListener('click', () => {
+        utils.clearSensorFilter();
+    });
+    
     // Add Sensor (header button - only visible on sensors page)
     document.getElementById('add-sensor-header-btn').addEventListener('click', () => {
-        document.getElementById('add-sensor-container').classList.remove('hidden');
+        document.getElementById('add-sensor-card').classList.remove('hidden');
+        document.getElementById('add-sensor-header-btn').classList.add('hidden');
     });
 
     // Settings Save (header button - only visible on settings page)
@@ -163,7 +184,7 @@ export function setupEventHandlers() {
         document.getElementById('backup-message').classList.remove('hidden');
         document.getElementById('backup-complete').classList.remove('hidden');
         document.getElementById('run-backup').classList.add('hidden');
-        backup.createBackup();
+        utils.createBackup();
     });
     
     // Backup Complete button
@@ -203,7 +224,7 @@ export function setupEventHandlers() {
         document.getElementById('restore-config-confirmation').classList.add('hidden');
         document.getElementById('config-action-btns').classList.add('hidden');
         document.getElementById('config-file-selection').classList.remove('hidden');
-        backup.fetchBackups();
+        utils.fetchBackups();
     });
     
 
@@ -383,25 +404,29 @@ function showPage(pageName) {
             case 'dashboard':
                 pageHeading.textContent = 'Dashboard';
                 pageHeading.style.display = 'block';
-                headerTotals.classList.add('hidden');
+                solarSensorsFilterBtn.classList.add('hidden');
+                solarSensorsFilterBtn.style.display = 'none';
+                windSensorsFilterBtn.classList.add('hidden');
+                windSensorsFilterBtn.style.display = 'none';
+                batterySensorsFilterBtn.classList.add('hidden');
+                batterySensorsFilterBtn.style.display = 'none';
+                clearSensorFilterBtn.classList.add('hidden');
                 addSensorBtn.classList.add('hidden');
                 addSensorBtn.style.display = 'none'; // Ensure inline style hides it
                 settingsSaveBtn.classList.add('hidden');
                 refreshLogsBtn.classList.add('hidden');
-                solarSensorsFilterBtn.classList.add('hidden');
-                windSensorsFilterBtn.classList.add('hidden');
-                batterySensorsFilterBtn.classList.add('hidden');
-                clearSensorFilterBtn.classList.add('hidden');
                 deviceCountDisplay.classList.remove('hidden');
                 sensorCountDisplay.classList.remove('hidden');
                 break;
             case 'sensors':
                 pageHeading.textContent = 'Sensors';
                 pageHeading.style.display = 'block';
-                headerTotals.classList.add('hidden');
                 solarSensorsFilterBtn.classList.remove('hidden');
+                solarSensorsFilterBtn.style.display = ''; // Clear inline style
                 windSensorsFilterBtn.classList.remove('hidden');
+                windSensorsFilterBtn.style.display = ''; // Clear inline style
                 batterySensorsFilterBtn.classList.remove('hidden');
+                batterySensorsFilterBtn.style.display = ''; // Clear inline style
                 addSensorBtn.classList.remove('hidden');
                 addSensorBtn.style.display = ''; // Clear inline style
                 settingsSaveBtn.classList.add('hidden');
@@ -412,7 +437,6 @@ function showPage(pageName) {
             case 'settings':
                 pageHeading.textContent = 'Settings';
                 pageHeading.style.display = 'block';
-                headerTotals.classList.add('hidden');
                 addSensorBtn.classList.add('hidden');
                 addSensorBtn.style.display = 'none'; // Ensure inline style hides it
                 solarSensorsFilterBtn.classList.add('hidden');
@@ -427,7 +451,6 @@ function showPage(pageName) {
             case 'logs':
                 pageHeading.textContent = 'Logs';
                 pageHeading.style.display = 'block';
-                headerTotals.classList.add('hidden');
                 solarSensorsFilterBtn.classList.add('hidden');
                 windSensorsFilterBtn.classList.add('hidden');
                 batterySensorsFilterBtn.classList.add('hidden');
@@ -442,7 +465,6 @@ function showPage(pageName) {
             case 'about':
                 pageHeading.textContent = 'About';
                 pageHeading.style.display = 'block';
-                headerTotals.classList.add('hidden');
                 solarSensorsFilterBtn.classList.add('hidden');
                 windSensorsFilterBtn.classList.add('hidden');
                 batterySensorsFilterBtn.classList.add('hidden');

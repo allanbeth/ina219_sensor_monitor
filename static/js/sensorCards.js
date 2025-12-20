@@ -4,8 +4,8 @@
 // Manages individual sensor card display, interactions, and real-time data updates
 // Handles solar, wind, and battery sensor visualization with edit/log/delete functionality
 
-import { deviceList, setPaused, getIsPaused, socket, undoTimers } from './globals.js';
-import { updateHeaderTotals, generateLogHTML, isSensorConnected } from './utils.js';
+import { deviceList, setPaused, getIsPaused, socket, undoTimers, setSensorFilter } from './globals.js';
+import { generateLogHTML, isSensorConnected, updateFilterButtonStates } from './utils.js';
 
 // ========================================
 // Device Information Helper Functions
@@ -45,6 +45,7 @@ function getGpioStatus(deviceId) {
 let globalSensorClickHandler = null;
 // Current sensor data cache for event handlers
 let currentSensorData = {};
+let currentSensorFilter = null;
 
 /**
  * Set up responsive layout handler for sensor cards
@@ -239,7 +240,10 @@ function isOnSensorsPage() {
  * Load and display sensor cards with current data
  * @param {Object} data - Complete sensor data from backend
  */
-export function loadSensorCards(data) {
+export function loadSensorCards(data, filterType = null) {
+    // Update global filter state
+    setSensorFilter(filterType);
+    
     const container = document.getElementById('sensor-container'); 
     const cardGrid = document.getElementById('sensor-cards-grid');
     
@@ -261,39 +265,106 @@ export function loadSensorCards(data) {
     // Validate incoming data
     if (!data || typeof data !== 'object') {
         console.warn('Invalid sensor data received:', data);
-        showNoSensorsMessage();
+        showNoSensorsMessage(filterType);
         return;
     }
     
     // Set up event handling for sensor interactions
     setupGlobalSensorEventDelegation(container, data);
     
-    // Handle empty data case
-    if (Object.keys(data).length === 0) {
-        showNoSensorsMessage();
+    // Filter the data before processing if filter is specified
+    const filteredData = filterType ? filterSensorData(data, filterType) : data;
+    
+    // Handle empty data case (either no data or no matches for filter)
+    if (Object.keys(filteredData).length === 0) {
+        showNoSensorsMessage(filterType);
+        // Still create add sensor card even with no matches
+        createAddSensorCard(cardGrid);
+        updateFilterButtonStates(filterType);
         return;
     }
     
-    // Process and create sensor cards
-    processSensorData(data, cardGrid);
+    // Process and create sensor cards with filtered data
+    processSensorData(filteredData, cardGrid);
     
-    // Add "Add New Sensor" card
+    // Add "Add New Sensor" card (always show)
     createAddSensorCard(cardGrid);
     
     // Update UI based on sensor count and screen size
-    finalizeSensorCardsLayout(data, container);
+    finalizeSensorCardsLayout(filteredData, container);
+    
+    // Update filter button states
+    updateFilterButtonStates(filterType);
 }
 
+function filterSensorData(data, filterType) {
+    if (!filterType) return data;
+    
+    console.log(`Filtering sensor data by type: ${filterType}`);
+    
+    const filtered = {};
+    const targetType = normalizeFilterType(filterType);
+    
+    // Copy non-sensor data (system entries) to filtered result
+    Object.entries(data).forEach(([name, sensor]) => {
+        if (!isSensorEntry(name, sensor)) {
+            filtered[name] = sensor;
+            return;
+        }
+        
+        // Include sensors that match the filter type
+        if (sensor.type && sensor.type.toLowerCase() === targetType.toLowerCase()) {
+            filtered[name] = sensor;
+        }
+    });
+    
+    console.log(`Filter result: ${Object.keys(filtered).filter(name => 
+        isSensorEntry(name, filtered[name])).length} sensors match filter`);
+    
+    return filtered;
+}
+
+function normalizeFilterType(filterType) {
+    const typeMap = {
+        'solar': 'Solar',
+        'wind': 'Wind', 
+        'battery': 'Battery'
+    };
+    return typeMap[filterType.toLowerCase()] || filterType;
+}
 /**
  * Show or hide the "no sensors" message based on current page
  */
-function showNoSensorsMessage() {
+function showNoSensorsMessage(filterType = null) {
     if (!isOnSensorsPage()) return;
     
     const noSensorsElement = document.getElementById('no-sensors');
-    if (noSensorsElement) {
-        noSensorsElement.classList.remove('hidden');
+    if (!noSensorsElement) return;
+    
+    // Update message based on filter state
+    if (filterType) {
+        const filterDisplayName = normalizeFilterType(filterType);
+        noSensorsElement.innerHTML = `
+            <div class="no-sensors-content">
+                <i class="fa-solid fa-filter"></i>
+                <h3>No ${filterDisplayName} Sensors Found</h3>
+                <p>No sensors match the current ${filterDisplayName.toLowerCase()} filter.</p>
+                <button class="clear-filter-btn" onclick="loadSensorCards(window.lastSensorData, null)">
+                    <i class="fa-solid fa-times"></i> Clear Filter
+                </button>
+            </div>
+        `;
+    } else {
+        noSensorsElement.innerHTML = `
+            <div class="no-sensors-content">
+                <i class="fa-solid fa-exclamation-triangle"></i>
+                <h3>No Sensors Configured</h3>
+                <p>Add your first sensor to get started monitoring your energy systems.</p>
+            </div>
+        `;
     }
+    
+    noSensorsElement.classList.remove('hidden');
 }
 
 /**
@@ -494,6 +565,12 @@ function generateSensorCardHTML(name, sensor, deviceInfo, sensorProps) {
  * @param {HTMLElement} cardGrid - Grid container element
  */
 function createAddSensorCard(cardGrid) {
+    // Check if add sensor card already exists to prevent duplicates
+    const existingAddCard = document.getElementById('add-sensor-card');
+    if (existingAddCard) {
+        existingAddCard.remove();
+    }
+    
     const addCard = document.createElement('div');
     addCard.className = 'sensor-card add-sensor-card hidden';
     addCard.id = 'add-sensor-card';
@@ -506,6 +583,7 @@ function createAddSensorCard(cardGrid) {
     if (cancelBtn) {
         cancelBtn.addEventListener('click', () => {
             document.getElementById('add-sensor-card').classList.add('hidden');
+            document.getElementById('add-sensor-header-btn').classList.remove('hidden');
         });
     }
 }
@@ -596,11 +674,10 @@ function countActualSensors(data) {
  * @param {Object} data - Complete sensor data update from backend
  */
 export function handleSensorReadingsUpdate(data) {
+    // Store data globally for filter operations
+    window.lastSensorData = data;
     // Exit early if updates are paused (e.g., during editing)
     if (getIsPaused()) return;
-    
-    // Update dashboard header totals
-    updateHeaderTotals(data.totals);
 
     // Update individual sensor cards with new readings
     for (let [name, sensor] of Object.entries(data)) {
