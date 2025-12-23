@@ -2,10 +2,10 @@
 // Energy Monitor Socket JS
 // ========================
 
-import { setSocket, getSensorFilter } from './globals.js';
+import { setSocket, updateSensorData, getSensorFilter } from './globals.js';
 import { loadSensorCards, handleSensorReadingsUpdate } from './sensorCards.js';
-import { createDashboardStats, updateDashboardStats } from './dashboard.js';
-import { updateSensorData } from './config.js';
+import { createDashboardStats, updateDashboardStats } from './dashboardCards.js';
+// import { updateSensorData } from './config.js';
 
 export function initializeSocket(url) {
     const socketInstance = io(url, { reconnection: true });
@@ -39,8 +39,9 @@ export function initializeSocket(url) {
             // Load cards with current filter (if any)
             const currentFilter = getSensorFilter();
             loadSensorCards(data, currentFilter);
-            createDashboardStats(data);
             updateSensorData(data); // Update config page status
+            createDashboardStats(data);
+            
             
             // Update progress for cards rendered (this will hide loading screen)
             setTimeout(() => {

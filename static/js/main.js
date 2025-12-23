@@ -2,11 +2,11 @@
 // Energy Monitor Main JS
 // =======================
 
-import {setDeviceInfo } from './utils.js';
+import {setDeviceInfo, initializeDashboard, showPage } from './utils.js';
 import { initializeSocket } from './socket.js';
 import { setupEventHandlers } from './events.js';
 import { loadSensorCards } from './sensorCards.js';
-import { initializeDashboard } from './dashboard.js';
+// import { initializeDashboard } from './dashboard.js';
 
 // Loading progress tracking
 let loadingProgress = 0;
@@ -128,10 +128,9 @@ window.addEventListener('DOMContentLoaded', () => {
         // Progress tracking continues in socket.js
         
         // Show dashboard page by default
-        if (window.showPage) {
-            window.showPage('dashboard');
+            showPage('dashboard');
             console.log('Dashboard page shown');
-        }
+        
     }, 1500);
     
     // Fallback: Hide loading screen after 10 seconds if it hasn't been hidden yet
