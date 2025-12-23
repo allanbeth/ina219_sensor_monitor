@@ -23,7 +23,7 @@ function fetchStatusInfo() {
 }
 
 // Update the status display elements directly
-function updateStatusDisplay() {
+export function updateStatusDisplay() {
     // Update device status
     const deviceStatusElement = document.getElementById('device-status');
     if (deviceStatusElement) {
@@ -45,6 +45,13 @@ function updateStatusDisplay() {
     if (lastUpdatedElement) {
         lastUpdatedElement.textContent = new Date().toLocaleTimeString();
     }
+}
+
+// Update sensor data and refresh status display
+export function updateSensorData(data) {
+    // Store data in globals for utils functions to use
+    window.currentSensorData = data;
+    updateStatusDisplay();
 }
 
 // Fetch the settings from the server

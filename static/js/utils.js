@@ -298,36 +298,40 @@ export function getConnectedDevicesInfo() {
     }
     
     const deviceIds = new Set();
-    const configuredDevices = Object.values(deviceList) || [];
+    const devicesWithSensors = new Set();
     
-    // Count unique devices from actual sensor data (matches dashboard logic)
+    // Count unique devices from actual sensor data - these are devices with associated sensors
     for (let [name, sensor] of Object.entries(currentSensorData)) {
         if (name === 'totals' || name === 'devices' || name === 'system_status' || 
             !sensor || !sensor.type || !sensor.data) {
             continue;
         }
         if (sensor.device_id !== undefined) {
-            deviceIds.add(sensor.device_id);
+            devicesWithSensors.add(sensor.device_id);
+            // Check if sensor is actually connected
+            if (isSensorConnected(sensor)) {
+                deviceIds.add(sensor.device_id);
+            }
         }
     }
     
     const connectedDevices = deviceIds.size;
-    const totalDevices = configuredDevices.length;
+    const totalDevicesWithSensors = devicesWithSensors.size;
     
     let connectionClass = 'status-disconnected';
-    if (connectedDevices === totalDevices && connectedDevices > 0) {
+    if (connectedDevices === totalDevicesWithSensors && connectedDevices > 0) {
         connectionClass = 'status-connected';
     } else if (connectedDevices > 0) {
         connectionClass = 'status-partial';
     }
 
-    setDeviceCount(totalDevices);
+    setDeviceCount(totalDevicesWithSensors);
     setConnectedDeviceCount(connectedDevices);
     
     return {
-        count: deviceCount > 0 ? `${connectedDeviceCount}/${deviceCount}` : 'No devices',
+        count: totalDevicesWithSensors > 0 ? `${connectedDevices}/${totalDevicesWithSensors}` : 'No devices',
         // connectedCount: connectedDevices,
-        total: deviceCount,
+        total: totalDevicesWithSensors,
         connectionClass: connectionClass
     };
 }

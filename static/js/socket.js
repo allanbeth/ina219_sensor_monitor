@@ -5,6 +5,7 @@
 import { setSocket, updateSensorData, getSensorFilter } from './globals.js';
 import { loadSensorCards, handleSensorReadingsUpdate } from './sensorCards.js';
 import { createDashboardStats, updateDashboardStats } from './dashboardCards.js';
+import { updateSensorData as updateSettingsSensorData } from './settingsCards.js';
 // import { updateSensorData } from './config.js';
 
 export function initializeSocket(url) {
@@ -40,6 +41,7 @@ export function initializeSocket(url) {
             const currentFilter = getSensorFilter();
             loadSensorCards(data, currentFilter);
             updateSensorData(data); // Update config page status
+            updateSettingsSensorData(data); // Update settings status card
             createDashboardStats(data);
             
             
@@ -66,6 +68,7 @@ export function initializeSocket(url) {
         handleSensorReadingsUpdate(data);
         updateDashboardStats(data);
         updateSensorData(data); // Update config page status
+        updateSettingsSensorData(data); // Update settings status card
     });
     
     return socketInstance;

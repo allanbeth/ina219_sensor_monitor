@@ -4,7 +4,7 @@
 // Handles the main dashboard interface for monitoring solar, wind, and battery systems
 // Provides real-time power generation statistics and system health information
 
-import { isSensorConnected } from './utils.js';
+import { isSensorConnected, getConnectedDevicesInfo, getConnectedSensorsInfo } from './utils.js';
 
 /**
  * Create and populate dashboard statistics cards
@@ -147,8 +147,10 @@ export function createDashboardStats(data = {}) {
         }
     }
     
-    // Update header with current system status
-    updateHeaderCounts(deviceIds.size, metrics.total.count, data.system_status, data);
+    // Update header with current system status using utils functions
+    const deviceInfo = getConnectedDevicesInfo();
+    const sensorInfo = getConnectedSensorsInfo();
+    updateHeaderCounts(deviceInfo.total, sensorInfo.total, data.system_status, data, deviceInfo, sensorInfo);
 }
 
 /**
@@ -365,8 +367,10 @@ export function updateDashboardStats(data) {
     updateStatValue('wind-generation', windPower.toFixed(2));
     updateStatValue('battery-status', batterySOC.toFixed(1));
     
-    // Update header status indicators
-    updateHeaderCounts(deviceIds.size, sensorCount, data.system_status, data);
+    // Update header status indicators using utils functions
+    const deviceInfo = getConnectedDevicesInfo();
+    const sensorInfo = getConnectedSensorsInfo();
+    updateHeaderCounts(deviceInfo.total, sensorInfo.total, data.system_status, data, deviceInfo, sensorInfo);
 }
 
 /**
@@ -395,22 +399,26 @@ function updateStatValue(statType, newValue) {
  * @param {Object} systemStatus - System status from backend
  * @param {Object} sensorData - Complete sensor data for connection analysis
  */
-function updateHeaderCounts(deviceCount, sensorCount, systemStatus = null, sensorData = null) {
+function updateHeaderCounts(deviceCount, sensorCount, systemStatus = null, sensorData = null, deviceInfo = null, sensorInfo = null) {
     // Update numeric counts in header
     updateCountElements(deviceCount, sensorCount);
     
-    // Update device connection status indicators
-    if (systemStatus) {
+    // Update device connection status indicators using utils info
+    if (deviceInfo) {
+        updateDeviceStatusIndicatorFromUtils(deviceInfo);
+    } else if (systemStatus) {
         updateDeviceStatusIndicator(deviceCount, systemStatus);
     }
     
-    // Update sensor connection status indicators
-    if (sensorData) {
+    // Update sensor connection status indicators using utils info
+    if (sensorInfo) {
+        updateSensorStatusIndicatorFromUtils(sensorInfo);
+    } else if (sensorData) {
         updateSensorStatusIndicator(sensorCount, sensorData);
     }
     
-    // Update status card to match header counts
-    updateStatusCardCounts(deviceCount, sensorCount, sensorData);
+    // Update status card to match header counts (handled by settingsCards.js now)
+    // updateStatusCardCounts(deviceCount, sensorCount, sensorData);
 }
 
 /**
@@ -428,6 +436,44 @@ function updateCountElements(deviceCount, sensorCount) {
     if (sensorCountElement) {
         sensorCountElement.textContent = sensorCount;
     }
+}
+
+/**
+ * Update device status indicator using utils function data
+ * @param {Object} deviceInfo - Device info from getConnectedDevicesInfo()
+ */
+function updateDeviceStatusIndicatorFromUtils(deviceInfo) {
+    const deviceCountDisplay = document.getElementById('device-count-display');
+    if (!deviceCountDisplay) return;
+    
+    const deviceIcon = deviceCountDisplay.querySelector('i');
+    if (!deviceIcon) return;
+    
+    // Reset status classes
+    deviceIcon.classList.remove('status-connected', 'status-partial', 'status-disconnected');
+    
+    // Apply status class from utils
+    deviceIcon.classList.add(deviceInfo.connectionClass);
+    deviceCountDisplay.title = `Device Status: ${deviceInfo.count}`;
+}
+
+/**
+ * Update sensor status indicator using utils function data
+ * @param {Object} sensorInfo - Sensor info from getConnectedSensorsInfo()
+ */
+function updateSensorStatusIndicatorFromUtils(sensorInfo) {
+    const sensorCountDisplay = document.getElementById('sensor-count-display');
+    if (!sensorCountDisplay) return;
+    
+    const sensorIcon = sensorCountDisplay.querySelector('i');
+    if (!sensorIcon) return;
+    
+    // Reset status classes
+    sensorIcon.classList.remove('status-connected', 'status-partial', 'status-disconnected');
+    
+    // Apply status class from utils
+    sensorIcon.classList.add(sensorInfo.connectionClass);
+    sensorCountDisplay.title = `Sensor Status: ${sensorInfo.count}`;
 }
 
 /**
