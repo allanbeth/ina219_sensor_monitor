@@ -17,6 +17,7 @@ class flaskWrapper:
     def __init__(self, config_manager, sensor_config):
         self.config_manager = config_manager
         self.sensor_config = sensor_config
+        self.mqtt_publisher = None  # Will be set by SensorManager
         self.templatePath = ROOT / "templates/"
         self.stylePath = ROOT / "static/"
         self.readmePath = ROOT / "README.md"
@@ -38,6 +39,7 @@ class flaskWrapper:
         self.app.route("/restore_backup", methods=["POST"])(self.restore_backup)
         self.app.route("/list_backups", methods=["GET", "POST"])(self.list_backups)
         self.app.route("/debug", methods=["GET"])(self.serve_debug)
+        self.app.route("/mqtt_status", methods=["GET"])(self.get_mqtt_status)
 
 
     def main(self):
@@ -58,6 +60,17 @@ class flaskWrapper:
 
         self.sensor_config.update_sensor(original_name, new_name, new_type, max_power, rating, address, device_id)
         return jsonify({"status": "success"})
+    
+
+    def get_mqtt_status(self):
+        if self.mqtt_publisher:
+            status = self.mqtt_publisher.get_connection_status()
+            return jsonify({
+                'status': 'Connected' if self.mqtt_publisher.is_connected() else 'Disconnected',
+                'connection_class': 'status-connected' if self.mqtt_publisher.is_connected() else 'status-disconnected',
+                'details': status
+            })
+        return jsonify({'status': 'Not configured', 'connection_class': 'status-disconnected'})
 
         
     def get_settings(self):
@@ -140,7 +153,14 @@ class flaskWrapper:
             return jsonify({"error": str(e), "logs": []}), 500
 
     def broadcast_sensor_data(self):
-        self.socketio.emit("sensor_update", sensor_data)
+        # Include MQTT status in the sensor data broadcast
+        data_with_status = sensor_data.copy()
+        if self.mqtt_publisher:
+            data_with_status['mqtt_connection_status'] = 1 if self.mqtt_publisher.is_connected() else 0
+        else:
+            data_with_status['mqtt_connection_status'] = 0
+        
+        self.socketio.emit("sensor_update", data_with_status)
 
     def restart_program(self):
         try:

@@ -2,13 +2,14 @@
 // Energy Monitor Config JS
 // ==========================
 
-import { deviceList, currentConfigData, updateConfigData, deviceCount, connectedDeviceCount, sensorCount, connectedSensorCount } from './globals.js';
-import { sleep, getConnectedDevicesInfo, getConnectedSensorsInfo } from './utils.js';
+import { deviceList, currentConfigData, updateConfigData, deviceCount, connectedDeviceCount, sensorCount, connectedSensorCount, mqttConnectionStatus } from './globals.js';
+import { sleep, getConnectedDevicesInfo, getConnectedSensorsInfo, getMqttConnectionInfo} from './utils.js';
 
 // Fetch current system status information
 function fetchStatusInfo() {
     const deviceInfo = getConnectedDevicesInfo();
     const sensorInfo = getConnectedSensorsInfo();
+    const mqttInfo = getMqttConnectionInfo();
     
     return Promise.resolve({
         service_status: 'Running',
@@ -16,7 +17,8 @@ function fetchStatusInfo() {
         connected_sensors: sensorInfo.count,
         device_connection_class: deviceInfo.connectionClass,
         sensor_connection_class: sensorInfo.connectionClass,
-        mqtt_status: 'Connected', // Default status
+        mqtt_status: mqttInfo.status,
+        mqtt_connection_class: mqttInfo.connectionClass,
         last_updated: new Date().toLocaleTimeString()
     });
 
@@ -39,6 +41,14 @@ export function updateStatusDisplay() {
         sensorStatusElement.textContent = sensorInfo.count;
         sensorStatusElement.className = `status-value ${sensorInfo.connectionClass}`;
     }
+
+    // Update MQTT status
+    const mqttStatusElement = document.getElementById('mqtt-status');
+    if (mqttStatusElement) {
+        const mqttInfo = getMqttConnectionInfo();
+        mqttStatusElement.textContent = mqttInfo.status;
+        mqttStatusElement.className = `status-value ${mqttInfo.connectionClass}`;
+    }
     
     // Update last updated time
     const lastUpdatedElement = document.getElementById('last-updated');
@@ -53,6 +63,7 @@ export function updateSensorData(data) {
     window.currentSensorData = data;
     updateStatusDisplay();
 }
+
 
 // Fetch the settings from the server
 export function fetchSettings() {
@@ -111,7 +122,7 @@ export function fetchSettings() {
                 </div>
                 <div class="settings-entry">
                     <label class="settings-label">MQTT Connection</label>
-                    <span class="status-value ${statusData.mqtt_status === 'Connected' ? 'status-connected' : 'status-disconnected'}" id="mqtt-status">${statusData.mqtt_status || 'Unknown'}</span>
+                    <span class="status-value ${statusData.mqtt_connection_class || 'status-disconnected'}" id="mqtt-status">${statusData.mqtt_status || 'Unknown'}</span>
                 </div>
                 <div class="settings-entry">
                     <label class="settings-label">Last Updated</label>

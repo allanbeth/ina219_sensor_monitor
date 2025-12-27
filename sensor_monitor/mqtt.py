@@ -1,5 +1,6 @@
 # sensor_monitor/mqtt.py
 import sys
+import time
 try:
     from sensor_monitor.config_manager import MQTT_DISCOVERY_PREFIX, MQTT_BASE, VERSION
     from sensor_monitor.logger import logger
@@ -31,22 +32,79 @@ except Exception as ex:
     print("Error loading config: " + str(ex))
     sys.exit()
 
+# Global MQTT connection status for frontend
+mqttConnectionStatus = 0
+
 class MQTTPublisher:
     def __init__(self, mqtt_config):
+        self.connection_status = {
+            'state': 'disconnected',  # disconnected, connecting, connected, error
+            'last_connected': None,
+            'last_error': None,
+            'connection_attempts': 0
+        }
+
         logger.info("Initializing MQTT Publisher")
         self.mqtt_broker = mqtt_config['mqtt_broker']
         self.mqtt_port = int(mqtt_config['mqtt_port'])
         self.client = mqtt.Client()
+        self.client.on_connect = self._on_connect
+        self.client.on_disconnect = self._on_disconnect
         self.client.loop_start()
 
         try:
+            self.connection_status['state'] = 'connecting'
+            self.connection_status['connection_attempts'] += 1
             self.client.connect(self.mqtt_broker, self.mqtt_port, 60)
             logger.info("Connected to MQTT Broker")
             self.client.publish(f"{MQTT_BASE}/ina219_hub_status", "online", retain=True)
             self.client.publish(f"{MQTT_DISCOVERY_PREFIX}/sensor/ina219_hub_status/availability", "online", retain=True)
             logger.info("Published Hub Status as online")
         except Exception as e:
+            self.connection_status['state'] = 'error'
+            self.connection_status['last_error'] = str(e)
             logger.error(f"Connection to MQTT Broker failed: {e}")
+
+    def _on_connect(self, client, userdata, flags, rc):
+        global mqttConnectionStatus
+        if rc == 0:
+            self.connection_status['state'] = 'connected'
+            self.connection_status['last_connected'] = time.time()
+            self.connection_status['last_error'] = None
+            logger.info("MQTT connection established successfully")
+            
+            # Update global MQTT status for frontend
+            mqttConnectionStatus = 1
+        else:
+            self.connection_status['state'] = 'error'
+            self.connection_status['last_error'] = f"Connection failed with code {rc}"
+            logger.error(f"MQTT connection failed with code {rc}")
+            
+            # Update global MQTT status for frontend
+            mqttConnectionStatus = 0
+
+    def _on_disconnect(self, client, userdata, rc):
+        global mqttConnectionStatus
+        self.connection_status['state'] = 'disconnected'
+        if rc != 0:
+            self.connection_status['last_error'] = f"Unexpected disconnection (code {rc})"
+            logger.warning(f"MQTT disconnected unexpectedly with code {rc}")
+        else:
+            logger.info("MQTT disconnected gracefully")
+            
+        # Update global MQTT status for frontend
+        mqttConnectionStatus = 0
+
+    def get_connection_status(self):
+        """Get current MQTT connection status for API"""
+        status = self.connection_status.copy()
+        status['broker'] = self.mqtt_broker
+        status['port'] = self.mqtt_port
+        return status
+
+    def is_connected(self):
+        """Simple connection check"""
+        return self.connection_status['state'] == 'connected'
 
     def publish_hub_device(self):
         payload = {

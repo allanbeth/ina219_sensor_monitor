@@ -2,7 +2,7 @@
 // Energy Monitor Utilities JS
 // ===========================
 
-import { deviceList, remoteGPIOCount, setDeviceList, currentSensorData, setRemoteGpio, setDeviceCount, setConnectedDeviceCount, deviceCount, connectedDeviceCount, setSensorCount, setConnectedSensorCount, sensorCount, connectedSensorCount, isRemoteGpio, setSensorFilter} from './globals.js';
+import { deviceList, remoteGPIOCount, setDeviceList, currentSensorData, setRemoteGpio, setDeviceCount, setConnectedDeviceCount, deviceCount, connectedDeviceCount, setSensorCount, setConnectedSensorCount, sensorCount, connectedSensorCount, isRemoteGpio, setSensorFilter, mqttConnectionStatus} from './globals.js';
 import { loadSensorCards } from './sensorCards.js';
 import { createDashboardStats } from './dashboardCards.js';
 
@@ -366,6 +366,14 @@ export function getConnectedSensorsInfo() {
         count: sensorCount > 0 ? `${connectedSensorCount}/${sensorCount}` : 'No sensors',
         total: sensorCount,
         connectionClass: connectionClass
+    };
+}
+
+export function getMqttConnectionInfo() {
+    // Return current MQTT status with appropriate CSS classes
+    return {
+        status: mqttConnectionStatus === 1 ? 'Connected' : 'Disconnected',
+        connectionClass: mqttConnectionStatus === 1 ? 'status-connected' : 'status-disconnected'
     };
 }
 

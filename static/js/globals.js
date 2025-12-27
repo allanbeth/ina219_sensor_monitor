@@ -17,7 +17,7 @@ export let connectedSensorCount = 0;
 export let sensorFilter = null;
 export let currentSensorData = {};
 export let currentConfigData = {}; 
-
+export let mqttConnectionStatus = 0;
 
 export function setSocket(newSocket) { socket = newSocket; }
 export function setDeviceList(list) { deviceList = list; }
@@ -35,3 +35,4 @@ export function getSensorFilter() { return sensorFilter; }
 export function clearSensorFilter() { sensorFilter = null; }
 export function updateSensorData(data) { currentSensorData = data; }
 export function updateConfigData(data) { currentConfigData = data; }
+export function updateMqttConnectionStatus(state) { mqttConnectionStatus = state; }

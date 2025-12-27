@@ -7,7 +7,7 @@ import board
 import sys
 try:
     from sensor_monitor.sensor import Sensor
-    from sensor_monitor.config_manager import SENSOR_FILE
+    from sensor_monitor.config_manager import SENSOR_FILE, MQTT_STATUS
     from sensor_monitor.mqtt import MQTTPublisher
     from sensor_monitor.webserver import flaskWrapper
     from sensor_monitor.logger import logger
@@ -173,6 +173,7 @@ class SensorManager:
         self.sensor_config.sensors = self.sensors
 
         self.webserver = flaskWrapper(self.config, self.sensor_config)
+        self.webserver.mqtt_publisher = self.mqtt  # Pass MQTT publisher to webserver
 
         self.mqtt.publish_hub_device()
         self.load_mqtt_discovery()

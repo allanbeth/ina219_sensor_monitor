@@ -13,6 +13,7 @@ except Exception as ex:
 MQTT_TOPIC = "homeassistant/sensor"
 MQTT_DISCOVERY_PREFIX = "homeassistant"
 MQTT_BASE = "ina219_sensor_monitor"
+MQTT_STATUS = 0
 
 ROOT = Path(__file__).parents[1]
 

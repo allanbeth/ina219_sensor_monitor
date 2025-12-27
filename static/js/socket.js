@@ -2,7 +2,7 @@
 // Energy Monitor Socket JS
 // ========================
 
-import { setSocket, updateSensorData, getSensorFilter } from './globals.js';
+import { setSocket, updateSensorData, getSensorFilter, updateMqttConnectionStatus } from './globals.js';
 import { loadSensorCards, handleSensorReadingsUpdate } from './sensorCards.js';
 import { createDashboardStats, updateDashboardStats } from './dashboardCards.js';
 import { updateSensorData as updateSettingsSensorData } from './settingsCards.js';
@@ -28,6 +28,11 @@ export function initializeSocket(url) {
         try {
             // Store the complete dataset globally for filter operations
             window.lastSensorData = data;
+            
+            // Update MQTT connection status if provided
+            if (data.mqtt_connection_status !== undefined) {
+                updateMqttConnectionStatus(data.mqtt_connection_status);
+            }
             
             // Update progress for data received
             setTimeout(() => {
@@ -65,6 +70,11 @@ export function initializeSocket(url) {
     
     // On subsequent updates, update readings and dashboard stats (and respect pause)
     socketInstance.on('sensor_update', (data) => {
+        // Update MQTT connection status if provided
+        if (data.mqtt_connection_status !== undefined) {
+            updateMqttConnectionStatus(data.mqtt_connection_status);
+        }
+        
         handleSensorReadingsUpdate(data);
         updateDashboardStats(data);
         updateSensorData(data); // Update config page status
