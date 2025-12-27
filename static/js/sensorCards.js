@@ -262,10 +262,14 @@ export function loadSensorCards(data, filterType = null) {
     cardGrid.innerHTML = '';
     container.classList.remove('single-card');
     
+    // Add "Add New Sensor" card first (always show)
+    createAddSensorCard(cardGrid);
+
     // Validate incoming data
     if (!data || typeof data !== 'object') {
         console.warn('Invalid sensor data received:', data);
-        showNoSensorsMessage(filterType);
+        showNoSensorsMessage(cardGrid, filterType);
+        updateFilterButtonStates(filterType);
         return;
     }
     
@@ -275,20 +279,18 @@ export function loadSensorCards(data, filterType = null) {
     // Filter the data before processing if filter is specified
     const filteredData = filterType ? filterSensorData(data, filterType) : data;
     
+    // Count actual sensor entries (not system data)
+    const sensorCount = countActualSensors(filteredData);
+    
     // Handle empty data case (either no data or no matches for filter)
-    if (Object.keys(filteredData).length === 0) {
-        showNoSensorsMessage(filterType);
-        // Still create add sensor card even with no matches
-        createAddSensorCard(cardGrid);
+    if (sensorCount === 0) {
+        showNoSensorsMessage(cardGrid, filterType);
         updateFilterButtonStates(filterType);
         return;
     }
     
     // Process and create sensor cards with filtered data
     processSensorData(filteredData, cardGrid);
-    
-    // Add "Add New Sensor" card (always show)
-    createAddSensorCard(cardGrid);
     
     // Update UI based on sensor count and screen size
     finalizeSensorCardsLayout(filteredData, container);
@@ -333,38 +335,71 @@ function normalizeFilterType(filterType) {
     return typeMap[filterType.toLowerCase()] || filterType;
 }
 /**
- * Show or hide the "no sensors" message based on current page
+ * Show "no sensors" message as a card in the grid
+ * @param {HTMLElement} cardGrid - Grid container for cards
+ * @param {string|null} filterType - Current filter type or null
  */
-function showNoSensorsMessage(filterType = null) {
+function showNoSensorsMessage(cardGrid, filterType = null) {
     if (!isOnSensorsPage()) return;
     
-    const noSensorsElement = document.getElementById('no-sensors');
-    if (!noSensorsElement) return;
+    // Remove existing no-sensors card if it exists
+    const existingNoSensorsCard = document.getElementById('no-sensors-card');
+    if (existingNoSensorsCard) {
+        existingNoSensorsCard.remove();
+    }
     
-    // Update message based on filter state
+    // Create no sensors card
+    const noSensorsCard = document.createElement('div');
+    noSensorsCard.className = 'sensor-card no-sensors-card';
+    noSensorsCard.id = 'no-sensors-card';
+    
+    // Generate content based on filter state
     if (filterType) {
         const filterDisplayName = normalizeFilterType(filterType);
-        noSensorsElement.innerHTML = `
-            <div class="no-sensors-content">
-                <i class="fa-solid fa-filter"></i>
-                <h3>No ${filterDisplayName} Sensors Found</h3>
-                <p>No sensors match the current ${filterDisplayName.toLowerCase()} filter.</p>
-                <button class="clear-filter-btn" onclick="loadSensorCards(window.lastSensorData, null)">
-                    <i class="fa-solid fa-times"></i> Clear Filter
-                </button>
+        noSensorsCard.innerHTML = `
+            <div class="sensor-card-header">
+                <div class="sensor-card-icon">
+                    <i class="fa-solid fa-info"></i>
+                </div>
+                <div class="sensor-card-title">
+                    <h3>No ${filterDisplayName} Sensors Found</h3>
+                </div>
+                <div class="action-btns">
+                    <i class="fa-solid fa-xmark" id="clear-sensor-filter" title="Clear Sensor Filter"></i>
+                </div>
+            </div>
+            <div class="sensor-card-content" id="no-sensors-content">
+                <div class="sensor-entries">
+                    <div class="sensor-entry">
+                        <span class="sensor-label">No ${filterDisplayName.toLowerCase()} sensors configured.</span>
+                    </div>
+                </div>
             </div>
         `;
     } else {
-        noSensorsElement.innerHTML = `
-            <div class="no-sensors-content">
-                <i class="fa-solid fa-exclamation-triangle"></i>
-                <h3>No Sensors Configured</h3>
-                <p>Add your first sensor to get started monitoring your energy systems.</p>
+        noSensorsCard.innerHTML = `
+            <div class="sensor-card-header">
+                <div class="sensor-card-icon">
+                    <i class="fa-solid fa-exclamation-triangle"></i>
+                </div>
+                <div class="sensor-card-title">
+                    <h3>No Sensors Configured</h3>
+                </div>
+                <div class="action-btns">
+                    <i class="fa-solid fa-plus" id="new-sensor-card-add" title="Add New Sensor"></i>
+                </div>
+            </div>
+            <div class="sensor-card-content" id="no-sensors-content">
+                <div class="sensor-entries">
+                    <div class="sensor-entry">
+                        <span class="sensor-label">Add your first sensor to get started monitoring your energy systems.</span>
+                    </div>
+                </div>
             </div>
         `;
     }
     
-    noSensorsElement.classList.remove('hidden');
+    cardGrid.appendChild(noSensorsCard);
 }
 
 /**
@@ -643,13 +678,7 @@ function generateAddSensorCardHTML() {
  * @param {Object} data - Sensor data object
  * @param {HTMLElement} container - Main container element
  */
-function finalizeSensorCardsLayout(data, container) {
-    // Hide "no sensors" message since we have cards
-    const noSensorsElement = document.getElementById('no-sensors');
-    if (noSensorsElement) {
-        noSensorsElement.classList.add('hidden');
-    }
-    
+function finalizeSensorCardsLayout(data, container) {    
     // Adjust layout for mobile single-sensor view
     const sensorCount = countActualSensors(data);
     if (sensorCount === 1 && window.innerWidth <= 768) {
