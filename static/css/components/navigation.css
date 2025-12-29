@@ -264,3 +264,11 @@
 .header-count-display i.status-disconnected {
     color: #f56565;
 }
+
+/* Count number styling */
+.header-count-display .count-number {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-left: var(--spacing-xs);
+}

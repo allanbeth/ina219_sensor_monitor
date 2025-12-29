@@ -374,6 +374,15 @@ function updateDeviceStatusIndicatorFromUtils(deviceInfo) {
     // Apply status class from utils
     deviceIcon.classList.add(deviceInfo.connectionClass);
     deviceCountDisplay.title = `Device Status: ${deviceInfo.count}`;
+    
+    // Add count number as text content after icon
+    let countSpan = deviceCountDisplay.querySelector('.count-number');
+    if (!countSpan) {
+        countSpan = document.createElement('span');
+        countSpan.className = 'count-number';
+        deviceCountDisplay.appendChild(countSpan);
+    }
+    countSpan.textContent = deviceInfo.count.split('/')[0]; // Show connected count
 }
 
 // Update sensor status indicator using utils function data
@@ -390,6 +399,15 @@ function updateSensorStatusIndicatorFromUtils(sensorInfo) {
     // Apply status class from utils
     sensorIcon.classList.add(sensorInfo.connectionClass);
     sensorCountDisplay.title = `Sensor Status: ${sensorInfo.count}`;
+    
+    // Add count number as text content after icon
+    let countSpan = sensorCountDisplay.querySelector('.count-number');
+    if (!countSpan) {
+        countSpan = document.createElement('span');
+        countSpan.className = 'count-number';
+        sensorCountDisplay.appendChild(countSpan);
+    }
+    countSpan.textContent = sensorInfo.count.split('/')[0]; // Show connected count
 }
 
 
