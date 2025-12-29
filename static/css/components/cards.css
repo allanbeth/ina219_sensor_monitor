@@ -147,8 +147,8 @@
 .dashboard-card-unit,
 .sensor-card-unit {
     font-size: 0.5em;
-    color: var(--text-secondary);
-    font-weight: 400;
+    color: var(--text-primary);
+    font-weight: 700;
     margin-left: var(--spacing-xs);
 }
 
@@ -175,7 +175,7 @@
 .dashboard-label,
 .sensor-label,
 .settings-label {
-    color: var(--text-secondary);
+    color: var(--text-primary);
     font-weight: 500;
 }
 
@@ -183,7 +183,7 @@
 .sensor-value,
 .settings-value,
 .setting-action {
-    color: var(--text-primary);
+    color: var(--text-secondary);
     font-weight: 600;
 }
 
@@ -207,7 +207,7 @@
 }
 
 .action-btns i {
-    font-size: 1.3em;
+    font-size: 1.5em;
     color: var(--text-secondary);
     cursor: pointer;
     padding: var(--spacing-xs);
@@ -230,7 +230,7 @@
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: var(--radius-md);
     transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-    color: var(--text-primary);
+    color: var(--text-secondary);
     font-weight: 600;
     width: 30%;
 } 

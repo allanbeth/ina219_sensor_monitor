@@ -187,12 +187,18 @@
     color: #38a169;
 }
 
-.fa-save:hover,
+/* .fa-save:hover,
 .fa-upload:hover,
 .fa-download:hover,
 .fa-gear:hover,
 .fa-book:hover,
 .fa-plus:hover {
+    color: #667eea;
+} */
+
+.dashboard-actions i:hover,
+.sensor-actions i:hover,
+.settings-actions i:hover {
     color: #667eea;
 }
 

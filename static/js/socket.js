@@ -2,11 +2,11 @@
 // Energy Monitor Socket JS
 // ========================
 
-import { setSocket, updateSensorData, getSensorFilter, updateMqttConnectionStatus } from './globals.js';
+import { setSocket, updateSensorData, getSensorFilter, updateMqttConnectionStatus, setLastSensorData } from './globals.js';
 import { loadSensorCards, handleSensorReadingsUpdate } from './sensorCards.js';
 import { createDashboardStats, updateDashboardStats } from './dashboardCards.js';
 import { updateSensorData as updateSettingsSensorData } from './settingsCards.js';
-// import { updateSensorData } from './config.js';
+import { updateLoadingProgress, hideLoadingScreen } from './utils.js';
 
 export function initializeSocket(url) {
     const socketInstance = io(url, { reconnection: true });
@@ -15,10 +15,8 @@ export function initializeSocket(url) {
         console.log('Socket Connected:', socketInstance.id);
         // Update progress for socket connection with delay to make it visible
         setTimeout(() => {
-            if (window.updateLoadingProgress) {
-                console.log('Calling updateLoadingProgress for socket step');
-                window.updateLoadingProgress('socket');
-            }
+            console.log('Calling updateLoadingProgress for socket step');
+            updateLoadingProgress('socket');
         }, 300);
     });
     
@@ -27,7 +25,7 @@ export function initializeSocket(url) {
         console.log('First sensor update received:', data);
         try {
             // Store the complete dataset globally for filter operations
-            window.lastSensorData = data;
+            setLastSensorData(data);
             
             // Update MQTT connection status if provided
             if (data.mqtt_connection_status !== undefined) {
@@ -36,10 +34,8 @@ export function initializeSocket(url) {
             
             // Update progress for data received
             setTimeout(() => {
-                if (window.updateLoadingProgress) {
-                    console.log('Calling updateLoadingProgress for data step');
-                    window.updateLoadingProgress('data');
-                }
+                console.log('Calling updateLoadingProgress for data step');
+                updateLoadingProgress('data');
             }, 300);
             
             // Load cards with current filter (if any)
@@ -52,19 +48,15 @@ export function initializeSocket(url) {
             
             // Update progress for cards rendered (this will hide loading screen)
             setTimeout(() => {
-                if (window.updateLoadingProgress) {
-                    console.log('Calling updateLoadingProgress for cards step - should hide loading screen');
-                    window.updateLoadingProgress('cards');
-                }
+                console.log('Calling updateLoadingProgress for cards step - should hide loading screen');
+                updateLoadingProgress('cards');
             }, 800); // Longer delay to ensure cards are rendered
             
             console.log('All data processing completed successfully');
         } catch (error) {
             console.error('Error processing sensor update:', error);
             // Hide loading screen on error
-            if (window.hideLoadingScreen) {
-                window.hideLoadingScreen();
-            }
+            hideLoadingScreen();
         }
     });
     

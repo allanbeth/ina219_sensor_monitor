@@ -394,24 +394,24 @@ The system properly handles bi-directional current flow, especially important fo
 ### **Project Structure**
 ```
 ina219_sensor_monitor/
-├── main.py                     # Application entry point
-├── sensor_monitor/             # Main package
-│   ├── config_manager.py       # Configuration handling  
-│   ├── sensor_manager.py       # Device and sensor management
-│   ├── sensor.py              # Individual sensor logic
-│   ├── mqtt.py                # MQTT publisher and Home Assistant integration
-│   ├── webserver.py           # Flask web server and API endpoints
-│   └── logger.py              # Logging configuration
+├── main.py                 # Application entry point
+├── sensor_monitor/         # Main package
+│   ├── config_manager.py   # Configuration handling  
+│   ├── sensor_manager.py   # Device and sensor management
+│   ├── sensor.py           # Individual sensor logic
+│   ├── mqtt.py             # MQTT publisher and Discovery
+│   ├── webserver.py        # Flask web server and API endpoints
+│   └── logger.py           # Logging configuration
 ├── templates/
-│   └── index.html             # Main web interface template
-├── static/                    # Web assets
-│   ├── css/                   # Stylesheets
-│   ├── js/                    # JavaScript modules
-│   └── icons/                 # Web app icons
-├── config.json                # Main configuration file
-├── sensors.json               # Sensor definitions
-├── requirements.txt           # Python dependencies
-└── sensor_monitor.service     # Systemd service definition
+│   └── index.html          # Main web interface template
+├── static/                 # Web assets
+│   ├── css/                # Stylesheets
+│   ├── js/                 # JavaScript modules
+│   └── icons/              # Web app icons
+├── config.json             # Main configuration file
+├── sensors.json            # Sensor definitions
+├── requirements.txt        # Python dependencies
+└── sensor_monitor.service  # Systemd service definition
 ```
 
 ### **API Endpoints**

@@ -1,106 +1,35 @@
 // ==============================
 // Energy Monitor Sensor Cards JS
 // ==============================
-// Manages individual sensor card display, interactions, and real-time data updates
-// Handles solar, wind, and battery sensor visualization with edit/log/delete functionality
 
 import { deviceList, setPaused, getIsPaused, socket, undoTimers, setSensorFilter } from './globals.js';
-import { generateLogHTML, isSensorConnected, updateFilterButtonStates } from './utils.js';
-
-// ========================================
-// Device Information Helper Functions
-// ========================================
+import { generateLogHTML, isSensorConnected, updateFilterButtonStates, clearSensorFilter, formatValue, normalizeFilterType, isSensorEntry } from './utils.js';
 
 
-/**
- * Get device name from device ID
- * @param {number|string} deviceId - Device identifier
- * @returns {string} Device name or default fallback
- */
-function getDeviceName(deviceId) {
-    for (const device of Object.values(deviceList)) {
-        if (device.id === deviceId) {
-            return device.name || `Device ${device.id}`;
-        }
-    }
-    return 'Default Device';
-}
-
-/**
- * Get GPIO status for a device (for form field states)
- * @param {number|string} deviceId - Device identifier
- * @returns {string} 'Enabled' or 'Disabled' status
- */
+// Get GPIO status for a device from local storage
 function getGpioStatus(deviceId) {
     // Check local storage for GPIO configuration
     const gpioConfig = JSON.parse(localStorage.getItem('gpio_config')) || {};
     return gpioConfig[deviceId] ? 'Enabled' : 'Disabled';
 }
 
-// ========================================
-// Global Event Management
-// ========================================
-
-// Global click handler for sensor card interactions
-let globalSensorClickHandler = null;
 // Current sensor data cache for event handlers
 let currentSensorData = {};
-let currentSensorFilter = null;
 
-/**
- * Set up responsive layout handler for sensor cards
- * Adjusts card layout based on screen size and number of cards
- */
-export function setupSensorResponsiveLayoutHandler() {
-    window.addEventListener('resize', handleSensorCardResize);
-}
 
-/**
- * Handle window resize events for sensor card layout
- * Applies appropriate CSS classes for mobile/desktop layouts
- */
-function handleSensorCardResize() {
-    const sensorContainer = document.getElementById('sensor-container');
-    if (!sensorContainer) return;
-    
-    const cardCount = sensorContainer.children.length;
-    
-    // Reset layout classes
-    sensorContainer.classList.remove('single-card');
-    
-    // Apply single-card layout for mobile when only one card exists
-    if (cardCount === 1 && window.innerWidth <= 768) {
-        sensorContainer.classList.add('single-card');
-    }
-}
-
-/**
- * Set up global event delegation for sensor card interactions
- * Uses event bubbling to handle clicks on dynamically created elements
- * @param {HTMLElement} container - Container element for event delegation
- * @param {Object} data - Sensor data for event handlers
- */
 function setupGlobalSensorEventDelegation(container, data) {
     // Cache sensor data for event handlers
     currentSensorData = data;
     
     // Clean up existing event listener to prevent duplicates
-    if (globalSensorClickHandler) {
-        container.removeEventListener('click', globalSensorClickHandler);
-    }
-    
-    // Create global click handler with event delegation
-    globalSensorClickHandler = handleGlobalSensorClick;
+    container.removeEventListener('click', handleGlobalSensorClick);
     
     // Attach event listener with delegation
-    container.addEventListener('click', globalSensorClickHandler);
+    container.addEventListener('click', handleGlobalSensorClick);
     console.log('Global sensor event delegation established');
 }
 
-/**
- * Handle global sensor card clicks using event delegation
- * @param {Event} e - Click event object
- */
+// Handle global click events on sensor cards
 function handleGlobalSensorClick(e) {
     const target = e.target;
     
@@ -112,13 +41,16 @@ function handleGlobalSensorClick(e) {
     else if (target.classList.contains('log-btn')) {
         handleLogButtonClick(e, target);
     }
+    else if (target.id === 'clear-sensor-filter') {
+        clearSensorFilter();
+    }
+    else if (target.id === 'add-new-sensor-card') {
+        handleSensorAddClick();
+
+    }    
 }
 
-/**
- * Handle edit button click events
- * @param {Event} e - Click event
- * @param {HTMLElement} target - Button element
- */
+// Handle edit button click events
 function handleEditButtonClick(e, target) {
     e.preventDefault();
     e.stopPropagation();
@@ -127,7 +59,8 @@ function handleEditButtonClick(e, target) {
     if (!sensorName || !currentSensorData[sensorName]) return;
     
     const sensor = currentSensorData[sensorName];
-    const deviceName = getDeviceName(sensor.device_id || sensorName);
+    const deviceInfo = getDeviceInfo(sensor.device_id || sensorName);
+    const deviceName = deviceInfo.deviceName;
     const deviceID = sensor.device_id || sensor.id || '';
     const hexAddress = sensor.address ? 
         `0x${parseInt(sensor.address).toString(16).padStart(2, '0')}` : '0x00';
@@ -137,11 +70,7 @@ function handleEditButtonClick(e, target) {
                     sensor.rating, hexAddress, gpioStatus, deviceName, deviceID);
 }
 
-/**
- * Handle log button click events
- * @param {Event} e - Click event
- * @param {HTMLElement} target - Button element
- */
+// Handle edit button click events
 function handleLogButtonClick(e, target) {
     e.preventDefault();
     e.stopPropagation();
@@ -156,90 +85,19 @@ function handleLogButtonClick(e, target) {
     renderSensorLogs(sensorName, logHTML);
 }
 
-/**
- * Attach individual event listeners to sensor card buttons
- * @param {string} name - Sensor name/identifier
- * @param {Object} sensor - Sensor configuration and data
- * @deprecated - This function is kept for fallback but global event delegation is preferred
- */
-function attachSensorCardEventListeners(name, sensor) {
-    const card = document.getElementById(`card-${name}`);
-    if (!card) {
-        console.warn(`Sensor card not found: ${name}`);
-        return;
-    }
-    
-    // Attach direct event listeners as fallback
-    attachEditButtonListener(card, name, sensor);
-    attachLogButtonListener(card, name, sensor);
+function handleSensorAddClick() {
+    document.getElementById('add-sensor-card').classList.remove('hidden');
+    document.getElementById('add-sensor-header-btn').classList.add('hidden');
+    document.getElementById('no-sensors-card').classList.add('hidden');
 }
 
-/**
- * Attach edit button event listener
- * @param {HTMLElement} card - Card element
- * @param {string} name - Sensor name
- * @param {Object} sensor - Sensor data
- */
-function attachEditButtonListener(card, name, sensor) {
-    const editBtn = card.querySelector('.edit-btn');
-    if (!editBtn) return;
-    
-    editBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const deviceName = getDeviceName(sensor.device_id);
-        const deviceID = sensor.device_id || sensor.id || '';
-        const hexAddress = sensor.address ? 
-            `0x${parseInt(sensor.address).toString(16).padStart(2, '0')}` : '0x00';
-        const gpioStatus = getGpioStatus(sensor.device_id || name);
-        
-        renderSensorEdit(name, sensor.type, sensor.max_power, 
-                        sensor.rating, hexAddress, gpioStatus, deviceName, deviceID);
-    };
-}
-
-/**
- * Attach log button event listener
- * @param {HTMLElement} card - Card element
- * @param {string} name - Sensor name
- * @param {Object} sensor - Sensor data
- */
-function attachLogButtonListener(card, name, sensor) {
-    const logBtn = card.querySelector('.log-btn');
-    if (!logBtn) return;
-    
-    logBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const readings = sensor.data?.readings;
-        const logHTML = generateLogHTML(Array.isArray(readings) ? readings : []);
-        renderSensorLogs(name, logHTML);
-    };
-}
-
-// ========================================
-// Utility Functions
-// ========================================
-
-/**
- * Check if the user is currently viewing the sensors page
- * @returns {boolean} True if sensors page is active
- */
+// Check if currently on sensors page
 function isOnSensorsPage() {
     const sensorContainer = document.getElementById('sensor-container');
     return sensorContainer && !sensorContainer.classList.contains('hidden');
 }
 
-// ========================================
-// Main Sensor Card Management Functions
-// ========================================
-
-/**
- * Load and display sensor cards with current data
- * @param {Object} data - Complete sensor data from backend
- */
+// Load and render sensor cards with optional filtering
 export function loadSensorCards(data, filterType = null) {
     // Update global filter state
     setSensorFilter(filterType);
@@ -326,19 +184,9 @@ function filterSensorData(data, filterType) {
     return filtered;
 }
 
-function normalizeFilterType(filterType) {
-    const typeMap = {
-        'solar': 'Solar',
-        'wind': 'Wind', 
-        'battery': 'Battery'
-    };
-    return typeMap[filterType.toLowerCase()] || filterType;
-}
-/**
- * Show "no sensors" message as a card in the grid
- * @param {HTMLElement} cardGrid - Grid container for cards
- * @param {string|null} filterType - Current filter type or null
- */
+
+
+// Show message when no sensors are configured or match filter
 function showNoSensorsMessage(cardGrid, filterType = null) {
     if (!isOnSensorsPage()) return;
     
@@ -365,7 +213,7 @@ function showNoSensorsMessage(cardGrid, filterType = null) {
                     <h3>No ${filterDisplayName} Sensors Found</h3>
                 </div>
                 <div class="action-btns">
-                    <i class="fa-solid fa-xmark" id="clear-sensor-filter" title="Clear Sensor Filter"></i>
+                    <i class="fa-solid fa-xmark clear-filter-btn" id="clear-sensor-filter" title="Clear Sensor Filter"></i>
                 </div>
             </div>
             <div class="sensor-card-content" id="no-sensors-content">
@@ -386,7 +234,7 @@ function showNoSensorsMessage(cardGrid, filterType = null) {
                     <h3>No Sensors Configured</h3>
                 </div>
                 <div class="action-btns">
-                    <i class="fa-solid fa-plus" id="new-sensor-card-add" title="Add New Sensor"></i>
+                    <i class="fa-solid fa-plus add-sensor-btn" id="add-new-sensor-card" title="Add New Sensor"></i>
                 </div>
             </div>
             <div class="sensor-card-content" id="no-sensors-content">
@@ -402,11 +250,7 @@ function showNoSensorsMessage(cardGrid, filterType = null) {
     cardGrid.appendChild(noSensorsCard);
 }
 
-/**
- * Process sensor data and create individual sensor cards
- * @param {Object} data - Sensor data object
- * @param {HTMLElement} cardGrid - Grid container for cards
- */
+// Process and create sensor cards from data
 function processSensorData(data, cardGrid) {
     for (let [name, sensor] of Object.entries(data)) {
         // Skip non-sensor entries (system data, totals, etc.)
@@ -416,29 +260,13 @@ function processSensorData(data, cardGrid) {
         const card = createSensorCard(name, sensor);
         cardGrid.appendChild(card);
         
-        // Attach event listeners after DOM insertion
-        setTimeout(() => {
-            attachSensorCardEventListeners(name, sensor);
-        }, 0);
+        // Event listeners handled by global delegation
     }
 }
 
-/**
- * Check if an entry represents a sensor (not system data)
- * @param {string} name - Entry name
- * @param {Object} sensor - Entry data
- * @returns {boolean} True if this is a sensor entry
- */
-function isSensorEntry(name, sensor) {
-    const systemEntries = ['totals', 'devices', 'system_status'];
-    return !systemEntries.includes(name) && sensor && sensor.type && sensor.data;
-}
-/**
- * Create a single sensor card element
- * @param {string} name - Sensor name
- * @param {Object} sensor - Sensor configuration and data
- * @returns {HTMLElement} Created sensor card element
- */
+
+
+// Create individual sensor card element
 function createSensorCard(name, sensor) {
     // Get device information for this sensor
     const deviceInfo = getDeviceInfo(sensor.device_id);
@@ -458,11 +286,7 @@ function createSensorCard(name, sensor) {
     return card;
 }
 
-/**
- * Get device information for a sensor
- * @param {number|string} deviceId - Device identifier
- * @returns {Object} Device information object
- */
+// Retrieve device information by ID
 function getDeviceInfo(deviceId) {
     let deviceName = 'Default Device';
     let remoteGpio = 0;
@@ -480,11 +304,7 @@ function getDeviceInfo(deviceId) {
     return { deviceName, remoteGpio, deviceID };
 }
 
-/**
- * Extract sensor properties with defaults
- * @param {Object} sensor - Sensor data object
- * @returns {Object} Extracted properties
- */
+// Extract sensor properties with defaults
 function extractSensorProperties(sensor) {
     return {
         sensorType: sensor.type || '',
@@ -495,11 +315,7 @@ function extractSensorProperties(sensor) {
     };
 }
 
-/**
- * Get CSS theme class for sensor type
- * @param {string} type - Sensor type (Solar, Wind, Battery)
- * @returns {string} CSS class name
- */
+// Get CSS class for sensor type
 function getSensorTypeClass(type) {
     const typeMap = {
         'Solar': 'solar-theme',
@@ -509,11 +325,7 @@ function getSensorTypeClass(type) {
     return typeMap[type] || 'battery-theme';
 }
 
-/**
- * Get icon type for sensor
- * @param {string} type - Sensor type
- * @returns {string} FontAwesome icon class
- */
+// Get icon class for sensor type
 function getSensorIcon(type) {
     const iconMap = {
         'Solar': 'fa-solar-panel',
@@ -523,12 +335,7 @@ function getSensorIcon(type) {
     return iconMap[type] || 'fa-question';
 }
 
-/**
- * Generate connection status icon and text
- * @param {Object} sensor - Sensor data
- * @param {Object} deviceInfo - Device information
- * @returns {Object} Connection status information
- */
+// Generate connection status elements
 function generateConnectionStatus(sensor, deviceInfo) {
     const isConnected = isSensorConnected(sensor);
     const connectionClass = isConnected ? 'sensor-connected' : 'sensor-disconnected';
@@ -547,14 +354,7 @@ function generateConnectionStatus(sensor, deviceInfo) {
     return { gpioIcon, gpioClass, connectionStatus };
 }
 
-/**
- * Generate HTML content for sensor card
- * @param {string} name - Sensor name
- * @param {Object} sensor - Sensor data
- * @param {Object} deviceInfo - Device information
- * @param {Object} sensorProps - Sensor properties
- * @returns {string} HTML content for card
- */
+// Generate HTML content for a sensor card
 function generateSensorCardHTML(name, sensor, deviceInfo, sensorProps) {
     const connectionStatus = generateConnectionStatus(sensor, deviceInfo);
     const iconType = getSensorIcon(sensor.type);
@@ -595,10 +395,8 @@ function generateSensorCardHTML(name, sensor, deviceInfo, sensorProps) {
         </div>
     `;
 }
-/**
- * Create "Add New Sensor" card
- * @param {HTMLElement} cardGrid - Grid container element
- */
+
+// Create "Add New Sensor" card element
 function createAddSensorCard(cardGrid) {
     // Check if add sensor card already exists to prevent duplicates
     const existingAddCard = document.getElementById('add-sensor-card');
@@ -623,10 +421,8 @@ function createAddSensorCard(cardGrid) {
     }
 }
 
-/**
- * Generate HTML for "Add New Sensor" card
- * @returns {string} HTML content for add sensor card
- */
+
+// Generate HTML content for "Add New Sensor" card
 function generateAddSensorCardHTML() {
     return `
         <div class="sensor-card-header">
@@ -673,11 +469,7 @@ function generateAddSensorCardHTML() {
     `;
 }
 
-/**
- * Finalize sensor cards layout and UI adjustments
- * @param {Object} data - Sensor data object
- * @param {HTMLElement} container - Main container element
- */
+// Finalize layout adjustments after rendering cards
 function finalizeSensorCardsLayout(data, container) {    
     // Adjust layout for mobile single-sensor view
     const sensorCount = countActualSensors(data);
@@ -686,22 +478,14 @@ function finalizeSensorCardsLayout(data, container) {
     }
 }
 
-/**
- * Count actual sensor entries (excluding system data)
- * @param {Object} data - Data object to count
- * @returns {number} Number of actual sensors
- */
+// Count actual sensor entries (not system data)
 function countActualSensors(data) {
     return Object.keys(data).filter(name => 
-        !['totals', 'devices', 'system_status'].includes(name) && 
-        data[name].type && data[name].data
+        isSensorEntry(name, data[name])
     ).length;
 }
 
-/**
- * Handle real-time sensor readings updates from WebSocket
- * @param {Object} data - Complete sensor data update from backend
- */
+// Handle sensor readings update on subsequent data updates
 export function handleSensorReadingsUpdate(data) {
     // Store data globally for filter operations
     window.lastSensorData = data;
@@ -711,7 +495,7 @@ export function handleSensorReadingsUpdate(data) {
     // Update individual sensor cards with new readings
     for (let [name, sensor] of Object.entries(data)) {
         // Skip system data entries
-        if (['totals', 'devices', 'system_status'].includes(name)) continue;
+        if (!isSensorEntry(name, sensor)) continue;
         
         const viewElement = document.getElementById(`view-${name}`);
         if (viewElement) {
@@ -721,56 +505,27 @@ export function handleSensorReadingsUpdate(data) {
             // Update connection status indicator
             updateSensorConnectionStatus(name, sensor);
             
-            // Re-attach event listeners after DOM update
-            setTimeout(() => {
-                attachSensorCardEventListeners(name, sensor);
-            }, 0);
+            // Event listeners handled by global delegation
         }
     }
 }
 
-/**
- * Update sensor connection status display in card header
- * @param {string} name - Sensor name
- * @param {Object} sensor - Sensor data object
- */
+// Update sensor connection status indicator in card title
 function updateSensorConnectionStatus(name, sensor) {
     // Find device information for this sensor
     const deviceInfo = getDeviceInfo(sensor.device_id);
     
-    // Generate connection status elements
+    // Generate connection status elements using existing function
     const connectionInfo = generateConnectionStatus(sensor, deviceInfo);
-
-    // Determine connection status
-    const isConnected = isSensorConnected(sensor);
-    const connectionClass = isConnected ? 'sensor-connected' : 'sensor-disconnected';
-    const connectionStatus = isConnected ? 'Connected' : 'Disconnected';
-    
-    // Create GPIO icon
-    let gpioIcon = '';
-    if (deviceInfo.remoteGpio === 1) {
-        gpioIcon = `<i class="fa-solid fa-wifi ${connectionClass}" title="${deviceInfo.deviceName} - ${connectionStatus}"></i>`;
-    } else {
-        gpioIcon = `<i class="fa-solid fa-network-wired ${connectionClass}" title="${deviceInfo.deviceName} - ${connectionStatus}"></i>`;
-    }
 
     // Update the connection status in the card title
     const cardTitleElement = document.querySelector(`#card-${name} .sensor-card-title p`);
     if (cardTitleElement) {
-        cardTitleElement.innerHTML = `${gpioIcon} ${deviceInfo.deviceName} - ${connectionStatus}`;
+        cardTitleElement.innerHTML = `${connectionInfo.gpioIcon} ${deviceInfo.deviceName} - ${connectionInfo.connectionStatus}`;
     }
 }
 
-// ========================================
-// Sensor Data Display Functions
-// ========================================
-
-/**
- * Render current sensor readings in the main view
- * @param {string} name - Sensor name
- * @param {Object} sensor - Sensor configuration and data
- * @returns {string} HTML string for sensor readings
- */
+// Render sensor readings HTML
 export function renderSensorReadings(name, sensor) {
     // Validate sensor data availability
     if (!sensor?.data) {
@@ -785,14 +540,14 @@ export function renderSensorReadings(name, sensor) {
     // Format readings with appropriate precision
     const voltage = formatValue(data.voltage, 'V', 2);
     const current = formatValue(data.current, 'A', 3);
-    const power = formatValue(data.power, 'W', 2);
+    const power = formatValue(data.power,'', 2);
     
     // Generate sensor readings with proper CSS class structure
     let html = `
         <div class="sensor-main-entry">
-            <div class="sensor-main-value">${power} <span class="sensor-card-unit">W</span></div>
+            <div class="sensor-main-value">${power}<span class="sensor-card-unit">W</span></div>
         </div>
-        <div class="sensor-entries">
+        <div class="sensor-entries"> 
             <div class="sensor-entry">
                 <span class="sensor-label">Voltage:</span>
                 <span class="sensor-value">${voltage}</span>
@@ -835,10 +590,6 @@ export function renderSensorReadings(name, sensor) {
     return html;
 }
 
-/**
- * Generate HTML for sensors with no data
- * @returns {string} HTML string for no data state
- */
 function generateNoDataHTML() {
     return `
         <div class="sensor-error">
@@ -849,21 +600,7 @@ function generateNoDataHTML() {
     `;
 }
 
-// ========================================
-// Sensor Edit and Management Functions
-// ========================================
-
-/**
- * Render sensor edit form in card
- * @param {string} name - Sensor name
- * @param {string} sensorType - Current sensor type
- * @param {number} maxPower - Maximum power rating
- * @param {number} rating - Voltage rating
- * @param {string} hexAddress - I2C address in hex format
- * @param {string} gpioStatus - GPIO status (enabled/disabled)
- * @param {string} deviceName - Device name
- * @param {number|string} deviceID - Device identifier
- */
+// Render sensor edit form
 export function renderSensorEdit(name, sensorType, maxPower, rating, hexAddress, gpioStatus, deviceName, deviceID) {
     // Pause real-time updates during editing
     setPaused(true);
@@ -883,11 +620,7 @@ export function renderSensorEdit(name, sensorType, maxPower, rating, hexAddress,
     setupEditEventHandlers(name);
 }
 
-/**
- * Toggle between view and edit modes for a sensor card
- * @param {string} name - Sensor name
- * @param {boolean} editMode - True for edit mode, false for view mode
- */
+// Toggle between view and edit modes for a sensor card
 function toggleEditMode(name, editMode) {
     const elements = {
         view: document.getElementById(`view-${name}`),
@@ -917,18 +650,7 @@ function toggleEditMode(name, editMode) {
     }
 }
 
-/**
- * Generate HTML for sensor edit form
- * @param {string} name - Sensor name
- * @param {string} sensorType - Sensor type
- * @param {number} maxPower - Max power rating
- * @param {number} rating - Voltage rating
- * @param {string} hexAddress - I2C address
- * @param {string} gpioStatus - GPIO status
- * @param {string} deviceName - Device name
- * @param {number|string} deviceID - Device ID
- * @returns {string} HTML for edit form
- */
+// Generate HTML for sensor edit form
 function generateEditFormHTML(name, sensorType, maxPower, rating, hexAddress, gpioStatus, deviceName, deviceID) {
     return `
         <div class="settings-entry">
@@ -963,10 +685,7 @@ function generateEditFormHTML(name, sensorType, maxPower, rating, hexAddress, gp
     `;
 }
 
-/**
- * Setup event handlers for edit mode
- * @param {string} name - Sensor name
- */
+// Setup event handlers for edit mode buttons
 function setupEditEventHandlers(name) {
     const backBtn = document.getElementById(`back-btn-${name}`);
     if (backBtn) {
@@ -978,10 +697,7 @@ function setupEditEventHandlers(name) {
     }
 }
 
-/**
- * Close sensor edit mode and return to view mode
- * @param {string} name - Sensor name
- */
+// Close sensor edit mode and resume updates
 export function closeSensorEdit(name) {
     // Switch back to view mode
     toggleEditMode(name, false);
@@ -996,11 +712,7 @@ export function closeSensorEdit(name) {
     setPaused(false);
 }
 
-/**
- * Render sensor logs in card
- * @param {string} name - Sensor name
- * @param {string} logHTML - Pre-generated log HTML content
- */
+// Render sensor logs view
 export function renderSensorLogs(name, logHTML) {
     // Pause updates during log viewing
     setPaused(true);
@@ -1021,9 +733,6 @@ export function renderSensorLogs(name, logHTML) {
 
     document.getElementById(`log-${name}`).innerHTML = '';
     document.getElementById(`log-${name}`).innerHTML = html;
-    // const card = document.getElementById(`card-${name}`);
-    // card.querySelector(".log-back-btn").addEventListener("click", () => closeSensorLogs(name));
-    // // card.querySelector(".refresh-log-btn").addEventListener("click", () => refreshLog(name, sensor.data.readings ?? []));
     document.getElementById(`log-${name}`).classList.remove("hidden");
     document.getElementById(`back-btn-${name}`).classList.remove("hidden");
     document.getElementById(`back-btn-${name}`).onclick = function(e) {
@@ -1033,6 +742,7 @@ export function renderSensorLogs(name, logHTML) {
 }
 }
 
+// Render sensor delete confirmation
 export function renderSensorDelete(name) {
     document.getElementById(`edit-${name}`).classList.add("hidden");
     let html =  `
@@ -1050,6 +760,7 @@ export function renderSensorDelete(name) {
     document.getElementById(`delete-${name}`).classList.remove("hidden");
 }
 
+// Render sensor undo countdown
 export function renderSensorUndo(name) {
     clearInterval(undoTimers[name]);
     document.getElementById(`undo-${name}`).classList.add("hidden");
@@ -1160,26 +871,4 @@ export function finalizeDelete(name) {
         });
 }
 
-// ========================================
-// Utility and Helper Functions
-// ========================================
 
-/**
- * Format sensor values with appropriate units and precision
- * @param {number|null|undefined} value - Value to format
- * @param {string} unit - Unit suffix (e.g., 'V', 'A', 'W')
- * @param {number} decimals - Number of decimal places
- * @returns {string} Formatted value string
- */
-export function formatValue(value, unit = '', decimals = 2) {
-    if (value === undefined || value === null || isNaN(value)) {
-        return `-- ${unit}`.trim();
-    }
-    
-    // Handle very small numbers (treat as zero)
-    if (Math.abs(value) < Math.pow(10, -decimals)) {
-        return `0.00 ${unit}`.trim();
-    }
-    
-    return `${value.toFixed(decimals)} ${unit}`.trim();
-}

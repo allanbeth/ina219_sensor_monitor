@@ -6,10 +6,7 @@
 
 import { isSensorConnected, getConnectedDevicesInfo, getConnectedSensorsInfo } from './utils.js';
 
-/**
- * Create and populate dashboard statistics cards
- * @param {Object} data - Sensor data object containing totals and individual sensor readings
- */
+// Create dashboard statistics cards based on sensor data
 export function createDashboardStats(data = {}) {
     const dashboardStats = document.getElementById('dashboard-container');
     const dashboardGrid = document.getElementById('dashboard-cards-grid');
@@ -150,14 +147,11 @@ export function createDashboardStats(data = {}) {
     // Update header with current system status using utils functions
     const deviceInfo = getConnectedDevicesInfo();
     const sensorInfo = getConnectedSensorsInfo();
-    updateHeaderCounts(deviceInfo.total, sensorInfo.total, data.system_status, data, deviceInfo, sensorInfo);
+    updateDeviceStatusIndicatorFromUtils(deviceInfo);
+    updateSensorStatusIndicatorFromUtils(sensorInfo);
 }
 
-/**
- * Create a dashboard statistics card element
- * @param {Object} stat - Statistics object containing title, value, unit, icon, etc.
- * @returns {HTMLElement} - Configured dashboard card element
- */
+// Create individual dashboard statistic card element
 function createStatCard(stat) {
     const card = document.createElement('div');
     card.className = `dashboard-card ${stat.theme}`;
@@ -186,11 +180,7 @@ function createStatCard(stat) {
     return card;
 }
 
-/**
- * Create HTML content for power generation cards (Total, Solar, Wind)
- * @param {Object} stat - Statistics object
- * @returns {string} - HTML string for power card
- */
+// Create HTML content for total power card
 function createPowerCardHTML(stat) {
     return `
         <div class="dashboard-card-header">
@@ -204,7 +194,7 @@ function createPowerCardHTML(stat) {
         </div>
         <div class="dashboard-card-content">
             <div class="dashboard-main-entry">
-                <div class="dashboard-main-value">${stat.value} <span class="dashboard-card-unit">W</span></div>
+                <div class="dashboard-main-value">${stat.value}<span class="dashboard-card-unit">W</span></div>
             </div>
             <div class="dashboard-entries">
                 <div class="dashboard-entry">
@@ -224,11 +214,7 @@ function createPowerCardHTML(stat) {
     `;
 }
 
-/**
- * Create HTML content for battery status card
- * @param {Object} stat - Statistics object
- * @returns {string} - HTML string for battery card
- */
+// Create HTML content for battery status card
 function createBatteryCardHTML(stat) {
     return `
         <div class="dashboard-card-header">
@@ -245,7 +231,7 @@ function createBatteryCardHTML(stat) {
         </div>
         <div class="dashboard-card-content">
             <div class="dashboard-main-entry">
-                <div class="dashboard-main-value">${stat.value} <span class="dashboard-card-unit">%</span></div>
+                <div class="dashboard-main-value">${stat.value}<span class="dashboard-card-unit">%</span></div>
             </div>
             <div class="dashboard-entries">
                 <div class="dashboard-entry">
@@ -265,11 +251,7 @@ function createBatteryCardHTML(stat) {
     `;
 }
 
-/**
- * Create HTML content for generic dashboard cards
- * @param {Object} stat - Statistics object
- * @returns {string} - HTML string for generic card
- */
+// Create HTML content for battery status card
 function createGenericCardHTML(stat) {
     return `
         <div class="dashboard-card-header">
@@ -286,7 +268,7 @@ function createGenericCardHTML(stat) {
         </div>
         <div class="dashboard-card-content">
             <div class="dashboard-main-entry">
-                <div class="dashboard-main-value">${stat.value} <span class="dashboard-card-unit">${stat.unit}</span></div>
+                <div class="dashboard-main-value">${stat.value}<span class="dashboard-card-unit">${stat.unit}</span></div>
             </div>
             <div class="dashboard-entries">
                 <div class="dashboard-entry">
@@ -306,21 +288,13 @@ function createGenericCardHTML(stat) {
     `;
 }
 
-/**
- * Format trend value for display
- * @param {number} trend - Trend value (positive/negative percentage)
- * @returns {string} - Formatted trend string
- */
+// Format trend percentage for display
 function formatTrend(trend) {
     if (trend === 0) return '0%';
     return trend >= 0 ? `+${trend.toFixed(1)}%` : `${trend.toFixed(1)}%`;
 }
 
-/**
- * Get update field identifier for dashboard card
- * @param {string} title - Card title
- * @returns {string} - Field identifier for updates
- */
+// Get data-update-field attribute value based on statistic title
 function getUpdateField(title) {
     const fieldMap = {
         'Total Power': 'total-power',
@@ -332,10 +306,7 @@ function getUpdateField(title) {
     return fieldMap[title] || title.toLowerCase().replace(/\s+/g, '-');
 }
 
-/**
- * Update dashboard statistics with new data (real-time updates)
- * @param {Object} data - Updated sensor data from WebSocket
- */
+// Update dashboard statistics cards with new sensor data
 export function updateDashboardStats(data) {
     // Extract pre-calculated totals from backend
     const totals = data.totals || {};
@@ -370,14 +341,11 @@ export function updateDashboardStats(data) {
     // Update header status indicators using utils functions
     const deviceInfo = getConnectedDevicesInfo();
     const sensorInfo = getConnectedSensorsInfo();
-    updateHeaderCounts(deviceInfo.total, sensorInfo.total, data.system_status, data, deviceInfo, sensorInfo);
+    updateDeviceStatusIndicatorFromUtils(deviceInfo);
+    updateSensorStatusIndicatorFromUtils(sensorInfo);
 }
 
-/**
- * Update individual statistic value with animation
- * @param {string} statType - Type of statistic to update
- * @param {string} newValue - New value to display
- */
+// Update individual statistic card value with animation
 function updateStatValue(statType, newValue) {
     const valueElement = document.querySelector(`[data-value="${statType}"]`);
     if (!valueElement) return;
@@ -392,56 +360,7 @@ function updateStatValue(statType, newValue) {
     }, 300);
 }
 
-/**
- * Update header counts and status indicators
- * @param {number} deviceCount - Total number of configured devices
- * @param {number} sensorCount - Total number of configured sensors
- * @param {Object} systemStatus - System status from backend
- * @param {Object} sensorData - Complete sensor data for connection analysis
- */
-function updateHeaderCounts(deviceCount, sensorCount, systemStatus = null, sensorData = null, deviceInfo = null, sensorInfo = null) {
-    // Update numeric counts in header
-    updateCountElements(deviceCount, sensorCount);
-    
-    // Update device connection status indicators using utils info
-    if (deviceInfo) {
-        updateDeviceStatusIndicatorFromUtils(deviceInfo);
-    } else if (systemStatus) {
-        updateDeviceStatusIndicator(deviceCount, systemStatus);
-    }
-    
-    // Update sensor connection status indicators using utils info
-    if (sensorInfo) {
-        updateSensorStatusIndicatorFromUtils(sensorInfo);
-    } else if (sensorData) {
-        updateSensorStatusIndicator(sensorCount, sensorData);
-    }
-    
-    // Update status card to match header counts (handled by settingsCards.js now)
-    // updateStatusCardCounts(deviceCount, sensorCount, sensorData);
-}
-
-/**
- * Update count elements in the header
- * @param {number} deviceCount - Number of devices
- * @param {number} sensorCount - Number of sensors
- */
-function updateCountElements(deviceCount, sensorCount) {
-    const deviceCountElement = document.getElementById('device-count');
-    const sensorCountElement = document.getElementById('sensor-count');
-    
-    if (deviceCountElement) {
-        deviceCountElement.textContent = deviceCount;
-    }
-    if (sensorCountElement) {
-        sensorCountElement.textContent = sensorCount;
-    }
-}
-
-/**
- * Update device status indicator using utils function data
- * @param {Object} deviceInfo - Device info from getConnectedDevicesInfo()
- */
+// Update device status indicator using utils function data
 function updateDeviceStatusIndicatorFromUtils(deviceInfo) {
     const deviceCountDisplay = document.getElementById('device-count-display');
     if (!deviceCountDisplay) return;
@@ -457,10 +376,7 @@ function updateDeviceStatusIndicatorFromUtils(deviceInfo) {
     deviceCountDisplay.title = `Device Status: ${deviceInfo.count}`;
 }
 
-/**
- * Update sensor status indicator using utils function data
- * @param {Object} sensorInfo - Sensor info from getConnectedSensorsInfo()
- */
+// Update sensor status indicator using utils function data
 function updateSensorStatusIndicatorFromUtils(sensorInfo) {
     const sensorCountDisplay = document.getElementById('sensor-count-display');
     if (!sensorCountDisplay) return;
@@ -476,131 +392,5 @@ function updateSensorStatusIndicatorFromUtils(sensorInfo) {
     sensorCountDisplay.title = `Sensor Status: ${sensorInfo.count}`;
 }
 
-/**
- * Update device status indicator in header
- * @param {number} totalDevices - Total configured devices
- * @param {Object} systemStatus - System status information
- */
-function updateDeviceStatusIndicator(totalDevices, systemStatus) {
-    const deviceCountDisplay = document.getElementById('device-count-display');
-    if (!deviceCountDisplay) return;
-    
-    const connectedDevices = systemStatus.connected_devices || 0;
-    const deviceIcon = deviceCountDisplay.querySelector('i');
-    
-    if (!deviceIcon) return;
-    
-    // Reset status classes
-    deviceIcon.classList.remove('status-connected', 'status-partial', 'status-disconnected');
-    
-    // Apply appropriate status class and tooltip
-    if (connectedDevices === totalDevices && connectedDevices > 0) {
-        deviceIcon.classList.add('status-connected');
-        deviceCountDisplay.title = `All ${totalDevices} devices connected`;
-    } else if (connectedDevices > 0) {
-        deviceIcon.classList.add('status-partial');
-        deviceCountDisplay.title = `${connectedDevices}/${totalDevices} devices connected`;
-    } else {
-        deviceIcon.classList.add('status-disconnected');
-        deviceCountDisplay.title = `No devices connected (${totalDevices} configured)`;
-    }
-}
 
-/**
- * Update sensor status indicator in header
- * @param {number} totalSensors - Total configured sensors
- * @param {Object} sensorData - Complete sensor data
- */
-function updateSensorStatusIndicator(totalSensors, sensorData) {
-    const sensorCountDisplay = document.getElementById('sensor-count-display');
-    if (!sensorCountDisplay) return;
-    
-    // Count actually connected sensors using connection logic
-    let connectedSensors = 0;
-    for (let [name, sensor] of Object.entries(sensorData)) {
-        if (name === 'totals' || name === 'devices' || name === 'system_status' || 
-            !sensor || !sensor.type || !sensor.data) {
-            continue;
-        }
-        if (isSensorConnected(sensor)) {
-            connectedSensors++;
-        }
-    }
-    
-    const sensorIcon = sensorCountDisplay.querySelector('i');
-    if (!sensorIcon) return;
-    
-    // Reset status classes
-    sensorIcon.classList.remove('status-connected', 'status-partial', 'status-disconnected');
-    
-    // Apply appropriate status class and tooltip
-    if (connectedSensors === totalSensors && connectedSensors > 0) {
-        sensorIcon.classList.add('status-connected');
-        sensorCountDisplay.title = `All ${totalSensors} sensors connected`;
-    } else if (connectedSensors > 0) {
-        sensorIcon.classList.add('status-partial');
-        sensorCountDisplay.title = `${connectedSensors}/${totalSensors} sensors connected`;
-    } else {
-        sensorIcon.classList.add('status-disconnected');
-        sensorCountDisplay.title = `No sensors connected (${totalSensors} configured)`;
-    }
-}
-
-
-/**
- * Update status card counts to match header calculations
- * @param {number} deviceCount - Calculated device count from sensor data
- * @param {number} sensorCount - Calculated sensor count from sensor data  
- * @param {Object} sensorData - Complete sensor data for connection analysis
- */
-function updateStatusCardCounts(deviceCount, sensorCount, sensorData) {
-    // Update device status in config page - use exact same logic as header
-    const deviceStatusElement = document.getElementById('device-status');
-    if (deviceStatusElement) {
-        // Simple approach: show actual connected devices from sensor data
-        let deviceText = `${deviceCount}/${deviceCount}`;
-        let deviceClass = 'status-connected';
-        
-        // If no devices found, show as disconnected
-        if (deviceCount === 0) {
-            deviceText = '0/1';
-            deviceClass = 'status-disconnected';
-        }
-        
-        deviceStatusElement.textContent = deviceText;
-        deviceStatusElement.className = `status-value ${deviceClass}`;
-    }
-    
-    // Update sensor status in config page - use exact same logic as header  
-    const sensorStatusElement = document.getElementById('sensor-status');
-    if (sensorStatusElement && sensorData) {
-        // Count connected sensors using same logic as header
-        let connectedSensors = 0;
-        for (let [name, sensor] of Object.entries(sensorData)) {
-            if (name === 'totals' || name === 'devices' || name === 'system_status' || 
-                !sensor || !sensor.type || !sensor.data) {
-                continue;
-            }
-            if (isSensorConnected(sensor)) {
-                connectedSensors++;
-            }
-        }
-        
-        let sensorText = `${connectedSensors}/${sensorCount}`;
-        let sensorClass = 'status-connected';
-        
-        if (connectedSensors < sensorCount) {
-            sensorClass = connectedSensors > 0 ? 'status-partial' : 'status-disconnected';
-        }
-        
-        sensorStatusElement.textContent = sensorText;
-        sensorStatusElement.className = `status-value ${sensorClass}`;
-    }
-    
-    // Update last updated timestamp
-    const lastUpdatedElement = document.getElementById('last-updated');
-    if (lastUpdatedElement) {
-        lastUpdatedElement.textContent = new Date().toLocaleTimeString();
-    }
-}
 

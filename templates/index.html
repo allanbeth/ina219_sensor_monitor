@@ -93,7 +93,7 @@
                         <i class="fa-solid fa-wind hidden" id="wind-sensor-filter-header-btn" title="Filter Wind Sensors"></i>
                         <i class="fa-solid fa-car-battery hidden" id="battery-sensor-filter-header-btn" title="Filter Battery Sensors"></i>
                         <i class="fa-solid fa-xmark hidden" id="clear-sensor-filter-header-btn" title="Clear Sensor Filters"></i>
-                        <i class="fa-solid fa-plus hidden" id="add-sensor-header-btn" title="Add New Sensor" style="display: none;"></i>
+                        <i class="fa-solid fa-plus add-sensor-header-btn hidden" id="add-sensor-header-btn" title="Add New Sensor"></i>
                         <i class="fa-solid fa-save hidden" id="settings-save-header-btn" title="Save All Settings"></i>
                         <i class="fa-solid fa-sync-alt hidden" id="refresh-logs-header-btn" title="Refresh Logs"></i>
                         
@@ -114,14 +114,6 @@
                 </div>
             </div>
             
-            <div id="no-sensors" class="no-sensors hidden">
-                <div class="empty-state">
-                    <i class="fa-solid fa-exclamation-triangle"></i>
-                    <h3>No sensors detected</h3>
-                    <p>Please ensure your INA219 sensors are connected and configured properly.</p>
-                </div>
-            </div>
-
             <div class="sensor-container hidden" id="sensor-container">
                 <div class="sensor-cards-grid" id="sensor-cards-grid">
                     <!-- Sensor cards will be dynamically populated -->
@@ -159,7 +151,7 @@
                                 <h3>System Configuration</h3>
                                 <p>Core system settings and logging</p>
                             </div>
-                            <div class="action-btns save-btn" id="system-action-btn">
+                            <div class="action-btns settings-actions" id="system-action-btn">
                                 <i class="fa-solid fa-save" id="system-save-btn" title="Save System Settings"></i>
                             </div>
                         </div>
@@ -187,7 +179,7 @@
                                 <h3>Polling Intervals</h3>
                                 <p>Sensor data collection frequency</p>
                             </div>
-                            <div class="action-btns save-btn" id="polling-action-btn">
+                            <div class="action-btns settings-actions" id="polling-action-btn">
                                 <i class="fa-solid fa-save" id="polling-save-btn" title="Save Polling Settings"></i>
                             </div>
                         </div>
@@ -215,7 +207,7 @@
                                 <h3>MQTT Configuration</h3>
                                 <p>Message broker connectivity</p>
                             </div>
-                            <div class="action-btns save-btn" id="mqtt-action-btn">
+                            <div class="action-btns settings-actions" id="mqtt-action-btn">
                                 <i class="fa-solid fa-save" id="mqtt-save-btn" title="Save MQTT Settings"></i>
                             </div>
                         </div>
@@ -243,7 +235,7 @@
                                 <h3>Web Server</h3>
                                 <p>Dashboard access configuration</p>
                             </div>
-                            <div class="action-btns save-btn" id="webserver-action-btn">
+                            <div class="action-btns settings-actions" id="webserver-action-btn">
                                 <i class="fa-solid fa-save" id="webserver-save-btn" title="Save Web Server Settings"></i>
                             </div>
                         </div>
@@ -271,7 +263,7 @@
                                 <h3>Hardware Devices</h3>
                                 <p>GPIO and sensor device configuration</p>
                             </div>
-                            <div class="action-btns device-config-btns" id="device-config-btns">
+                            <div class="action-btns settings-actions" id="device-config-btns">
                                 <i class="fa-solid fa-plus" id="new-device-btn" title="New Device"></i>
                                 <i class="fa-solid fa-xmark hidden" id="new-device-cancel" title="Cancel"></i>
                                 <i class="fa-solid fa-save hidden" id="new-device-save" title="Save"></i>
@@ -309,7 +301,7 @@
                                 <h3>Backup Config</h3>
                                 <p>Export configuration files</p>
                             </div>
-                            <div class="action-btns backup-config-btns" id="backup-config-btns">
+                            <div class="action-btns settings-actions" id="backup-config-btns">
                                 <i class="fa-solid fa-download" id="run-backup" title="Backup Now"></i>
                                 <i class="fa-solid fa-xmark hidden" id="backup-cancel" title="Cancel Backup"></i>
                                 <i class="fa-solid fa-check hidden" id="backup-confirm" title="Confirm Backup"></i>
@@ -349,7 +341,7 @@
                                 <h3>Restore Config</h3>
                                 <p>Import configuration files</p>
                             </div>
-                            <div class="action-btns config-action-btns hidden" id="config-action-btns">
+                            <div class="action-btns settings-actions hidden" id="config-action-btns">
                                 <i class="fa-solid fa-xmark hidden" id="delete-config-cancel" title="Cancel Delete"></i>
                                 <i class="fa-solid fa-check hidden" id="delete-config-confirm" title="Confirm Delete"></i>
                                 <i class="fa-solid fa-xmark hidden" id="restore-config-cancel" title="Cancel Restore"></i>
@@ -390,7 +382,7 @@
                                 <h3>Restart Service</h3>
                                 <p>Restart the monitoring service</p>
                             </div>
-                            <div class="action-btns restart-action-btns hidden" id="restart-action-btns">
+                            <div class="action-btns settings-actions hidden" id="restart-action-btns">
                                 <i class="fa-solid fa-xmark" id="restart-close" title="Cancel Restart"></i>
                                 <i class="fa-solid fa-check" id="restart-confirm" title="Confirm Restart"></i>
                             </div>
@@ -410,22 +402,6 @@
                 </div>
             </div>
 
-            <!-- Device Page -->
-            <div class="devices-container hidden" id="devices-container">
-                <!-- Device cards will be dynamically populated -->
-            </div>
-            
-            <!-- About Page -->
-            <div class="about-container hidden" id="about-container">
-                <div id="about-card" class="about-card">
-                    <div class="about-card-content about-file-overflow" id="about-card-content">
-                        <div class="about-file" id="about-file">
-                            Loading README...
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
             <!-- Logs Page -->
             <div class="log-file-container hidden" id="log-file-container">
                 <div id="log-file-card" class="log-file-card">
@@ -436,7 +412,18 @@
                     </div>
                 </div>
             </div>
-
+            
+            <!-- About Page -->
+            <div class="about-container hidden" id="about-container">
+                <div id="about-card" class="about-card">
+                    <div class="about-card-content about-file-overflow" id="about-card-content">
+                        <div class="about-file" id="about-file">
+                            <!-- About content will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="dialog-container hidden" id="dialog-container">
                 <div class="dialog-card" id="dialog-card">
                     <div class="dialog-card-header">
@@ -450,57 +437,7 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    
-
-    <div class="add-sensor-container hidden" id="add-sensor-container">
-        <div class="add-sensor-card">
-            <div class="add-sensor-header">
-                <div class="back-btn">
-                    <i class="fa-solid fa-arrow-left" id="add-sensor-cancel" title="Back"></i>
-                </div>
-                <div class="sensor-card-title">
-                <h4>Add New Sensor</h4>
-                </div>
-                <div class="action-btns save-btn">
-                    <i class="fa-solid fa-save" id="add-sensor-save" title="Save New Sensor"></i>
-                </div>
-            </div>
-            <div class="add-sensor-data">
-                <div class="add-sensor-entry">
-                    <label for="add-sensor-name">Senor Name:</label>
-                    <input type="text" id="add-sensor-name" placeholder="Name" />
-                </div>
-                <div class="add-sensor-entry">
-                    <label for="add-sensor-type">Senor Type:</label>
-                    <select id="add-sensor-type">
-                        <option value="" disabled selected><span class="select-placeholder">Select Sensor Type</span>
-                        </option>
-                        <option value="Solar">Solar</option>
-                        <option value="Wind">Wind</option>
-                        <option value="Battery">Battery</option>
-                    </select>
-                </div>
-                <div class="add-sensor-entry">
-                    <label for="add-sensor-max-power"> Senor Max Power:</label>
-                    <input type="number" id="add-sensor-max-power" placeholder="Max Power (W)" />
-                </div>
-                <div class="add-sensor-entry">
-                    <label for="add-sensor-rating">Sensor Rating:</label>
-                    <input type="number" id="add-sensor-rating" placeholder="Voltage Rating (V)" />
-                </div>
-                <div class="add-sensor-entry">
-                    <label for="add-sensor-address">Senor Address:</label>
-                    <input type="text" id="add-sensor-address" placeholder="I2C Address (hex)" />
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    
-    
+    </div> 
 
     <script src="{{ url_for('static', filename='js/main.js') }}" type="module"></script>
 </body>

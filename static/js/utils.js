@@ -2,10 +2,77 @@
 // Energy Monitor Utilities JS
 // ===========================
 
-import { deviceList, remoteGPIOCount, setDeviceList, currentSensorData, setRemoteGpio, setDeviceCount, setConnectedDeviceCount, deviceCount, connectedDeviceCount, setSensorCount, setConnectedSensorCount, sensorCount, connectedSensorCount, isRemoteGpio, setSensorFilter, mqttConnectionStatus} from './globals.js';
+import { deviceList, remoteGPIOCount, setDeviceList, currentSensorData, setRemoteGpio, setDeviceCount, setConnectedDeviceCount, deviceCount, connectedDeviceCount, setSensorCount, setConnectedSensorCount, sensorCount, connectedSensorCount, isRemoteGpio, setSensorFilter, mqttConnectionStatus, getLastSensorData} from './globals.js';
 import { loadSensorCards } from './sensorCards.js';
 import { createDashboardStats } from './dashboardCards.js';
 
+// Loading progress tracking
+const loadingSteps = {
+    system: { progress: 25, message: "System components loaded" },
+    socket: { progress: 50, message: "Connected to server" },
+    data: { progress: 75, message: "Sensor data received" },
+    cards: { progress: 100, message: "Interface ready" }
+};
+
+// Update loading progress bar and text
+export function updateLoadingProgress(step) {
+    console.log(`[Progress] Updating loading progress to step: ${step}`);
+    
+    if (!loadingSteps[step]) {
+        console.warn(`Unknown loading step: ${step}`);
+        return;
+    }
+    
+    // Get progress and message from loadingSteps
+    const stepData = loadingSteps[step];
+    let loadingProgress = stepData.progress;
+    
+    // Get elements
+    const progressFill = document.getElementById('loading-progress-fill');
+    const progressText = document.getElementById('loading-progress');
+    
+    console.log('[Progress] Element check:');
+    console.log('- Progress fill:', !!progressFill);
+    console.log('- Progress text:', !!progressText);
+    
+    if (!progressFill) {
+        console.warn('[Progress] Progress fill element not found!');
+        return;
+    }
+    
+    // Update progress bar
+    progressFill.style.width = `${loadingProgress}%`;
+    console.log(`[Progress] Set progress bar to ${loadingProgress}%`);
+    
+    // Update progress text
+    if (progressText) {
+        progressText.textContent = `${stepData.message}`;
+        console.log(`[Progress] Updated text to: ${stepData.message}`);
+    }
+    
+    console.log(`[Progress] Loading progress: ${step} (${loadingProgress}%)`);
+    
+    // Hide loading screen when fully complete
+    if (loadingProgress >= 100) {
+        console.log('[Progress] Loading complete! Hiding loading screen in 1 second...');
+        setTimeout(() => {
+            hideLoadingScreen();
+        }, 1000);
+    }
+}
+
+// Hide loading screen with fade-out effect
+export function hideLoadingScreen() {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen && !loadingScreen.classList.contains('fade-out')) {
+        console.log('Hiding loading screen...');
+        loadingScreen.classList.add('fade-out');
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+            console.log('Loading screen hidden');
+        }, 500);
+    }
+}
 
 // Initialize sidebar state on page load
 export function initializeSidebarState() {
@@ -125,6 +192,7 @@ export function showPage(pageName) {
                 refreshLogsBtn.classList.add('hidden');
                 deviceCountDisplay.classList.add('hidden');
                 sensorCountDisplay.classList.add('hidden');
+                clearSensorFilter();
                 break;
             case 'settings':
                 pageHeading.textContent = 'Settings';
@@ -199,9 +267,6 @@ window.addEventListener('resize', () => {
     }
 });
 
-// Make showPage available globally
-// window.showPage = showPage;
-
 // Initialize the dashboard event handlers and layout
 export function initializeDashboard() {
     console.log('Initializing dashboard...');
@@ -247,10 +312,7 @@ function handleDashboardDrillClick(e) {
     collapseNavMenuOnMobile();
 }
 
-/**
- * Set up navigation event handlers for dashboard and sensors views
- * Manages active states and view switching
- */
+// Set up navigation link click events
 function setupNavigationEvents() {
     // Set up active state management for navigation links
     const navLinks = document.querySelectorAll('.nav-link');
@@ -264,18 +326,12 @@ function setupNavigationEvents() {
 }
 
 
-/**
- * Set up responsive layout handler for dashboard cards
- * Adjusts layout based on screen size and number of cards
- */
+// Set up responsive layout handler for dashboard   
 function setupResponsiveLayoutHandler() {
     window.addEventListener('resize', handleResponsiveLayout);
 }
 
-/**
- * Handle responsive layout adjustments on window resize
- * Applies appropriate CSS classes for mobile/desktop layouts
- */
+// Handle window resize events for dashboard layout
 function handleResponsiveLayout() {
     const dashboardStats = document.getElementById('dashboard-container');
     if (!dashboardStats) return;
@@ -377,48 +433,6 @@ export function getMqttConnectionInfo() {
     };
 }
 
-// // Fetch current system status information
-// export function fetchStatusInfo() {
-//     const deviceInfo = getConnectedDevicesInfo();
-//     const sensorInfo = getConnectedSensorsInfo();
-    
-//     return Promise.resolve({
-//         service_status: 'Running',
-//         connected_devices: deviceInfo.count,
-//         connected_sensors: sensorInfo.count,
-//         device_connection_class: deviceInfo.connectionClass,
-//         sensor_connection_class: sensorInfo.connectionClass,
-//         mqtt_status: 'Connected', // Default status
-//         last_updated: new Date().toLocaleTimeString()
-//     });
-// }
-
-// Update the status display elements directly
-function updateStatusDisplay() {
-    // Update device status
-    const deviceStatusElement = document.getElementById('device-status');
-    if (deviceStatusElement) {
-        const deviceInfo = getConnectedDevicesInfo();
-        deviceStatusElement.textContent = deviceInfo.count;
-        deviceStatusElement.className = `status-value ${deviceInfo.connectionClass}`;
-    }
-    
-    // Update sensor status
-    const sensorStatusElement = document.getElementById('sensor-status');
-    if (sensorStatusElement) {
-        const sensorInfo = getConnectedSensorsInfo();
-        sensorStatusElement.textContent = sensorInfo.count;
-        sensorStatusElement.className = `status-value ${sensorInfo.connectionClass}`;
-    }
-    
-    // Update last updated time
-    const lastUpdatedElement = document.getElementById('last-updated');
-    if (lastUpdatedElement) {
-        lastUpdatedElement.textContent = new Date().toLocaleTimeString();
-    }
-}
-
-
 export function formatNumber(num, decimals = 2) {
     return Number(num).toFixed(decimals);
 }
@@ -499,10 +513,6 @@ export function updateSensorGpioStatus(name, remoteGpio, deviceName) {
         gpioStatusSpan.classList.add("local");
     }
     gpioStatusSpan.innerHTML = html;
-
-    // setInitialLoad(false);
-  
-
 }
 
 export async function setDeviceInfo() {
@@ -629,8 +639,8 @@ export function filterSensorsByType(type) {
     console.log(`Applying ${type} sensor filter`);
     
     // Use the stored sensor data with the filter
-    if (window.lastSensorData) {
-        loadSensorCards(window.lastSensorData, type);
+    if (getLastSensorData()) {
+        loadSensorCards(getLastSensorData(), type);
     } else {
         console.warn('No sensor data available for filtering');
     }
@@ -640,8 +650,8 @@ export function clearSensorFilter() {
     console.log('Clearing sensor filter');
     
     // Reload all sensors without filter
-    if (window.lastSensorData) {
-        loadSensorCards(window.lastSensorData, null);
+    if (getLastSensorData()) {
+        loadSensorCards(getLastSensorData(), null);
     } else {
         console.warn('No sensor data available for clearing filter');
     }
@@ -651,7 +661,7 @@ export function clearSensorFilter() {
 export async function getLogFile() {
     const logContainer = document.getElementById('log-file-entries');
     logContainer.innerHTML = '<label class="log-file-label">Retrieving logs...</label>';
-    await sleep(2000); // brief pause to show loading message
+    await sleep(1000); // brief pause to show loading message
     fetch('/get_log_file')
         .then(res => res.json())
         .then(data => {
@@ -662,13 +672,27 @@ export async function getLogFile() {
             }
             const logFileHTML = logEntries.map(entry => {
                 const logText = entry.logs.trim();
-                const match = logText.match(/^\s*[\d\-:, ]+\s+([A-Z]+)\s+(.*)$/);
+                const match = logText.match(/^\s*([\d\-:, ]+)\s+([A-Z]+)\s+(.*)$/);
                 if (match) {
-                    const logType = match[1];
-                    const logMessage = match[2];
+                    const fullTimestamp = match[1].trim();
+                    const logType = match[2];
+                    const logMessage = match[3];
+                    
+                    // Extract date and time components
+                    const dateMatch = fullTimestamp.match(/(\d{4}-\d{2}-\d{2})/);
+                    const timeMatch = fullTimestamp.match(/(\d{2}:\d{2}:\d{2})/);
+                    
+                    const dateOnly = dateMatch ? dateMatch[1] : '';
+                    const timeOnly = timeMatch ? timeMatch[1] : '';
+                    
+                    const dateTime = dateOnly && timeOnly ? 
+                        `${timeOnly} - ${dateOnly}` : // time date format
+                        fullTimestamp;
+                    
                     return `
                         <div class="log-file-entry">
-                            <p><strong style="color:green;">${escapeHTML(logType)}</strong> ${escapeHTML(logMessage)}</p>
+                            <p><label class="log-type-label-${logType.toLowerCase()}">${escapeHTML(logType)}</label> <label class="log-message-label">${escapeHTML(logMessage)}</label></p>
+                            <p><label class="log-timestamp-label">${escapeHTML(dateTime)}</label></p>
                         </div>
                     `;
                 } else {
@@ -697,159 +721,51 @@ export function getAbout() {
         });
 }
 
+// ========================================
+// Sensor Utility Functions
+// ========================================
 
-// // Backup Management Functions
-// // Fetch and Display Backups
-// export function fetchBackups() {
-//     const backupContent = document.getElementById('config-file-selection');
-//     backupContent.innerHTML = '';
-//     fetch('/list_backups')
-//         .then(response => response.json())
-//         .then(data => {
-//             const files = data.backups;
-//             if (!files || files.length === 0) {
-//                 backupContent.innerHTML = '<p>No backup files found.</p>';
-//                 return;
-//             }
-//             files.forEach(filename => {
-//                 const displayName = filename.replace(/\.json$/, '');
-//                 const row = document.createElement('div');
-//                 row.className = 'settings-entry';
-//                 row.id = `backup-entry-${displayName}`;
-//                 const nameDiv = document.createElement('div');
-//                 nameDiv.className = 'settings-label';
-//                 nameDiv.innerText = displayName;
-//                 const actionDiv = document.createElement('div');
-//                 actionDiv.className = 'settings-action';
-//                 const deleteIcon = document.createElement('i');
-//                 deleteIcon.className = 'fa-solid fa-trash';
-//                 deleteIcon.title = 'Delete Config File';
-//                 deleteIcon.setAttribute('data-filename', filename);
-//                 deleteIcon.addEventListener('click', () => {
-//                     deleteBackupConfirmation(filename);
-//                 });
-//                 const restoreIcon = document.createElement('i');
-//                 restoreIcon.className = 'fa-solid fa-file-import';
-//                 restoreIcon.title = 'Restore Config File';
-//                 restoreIcon.setAttribute('data-filename', filename);
-//                 restoreIcon.addEventListener('click', () => {
-//                     restoreBackupConfirmation(filename);
-//                 });
-//                 actionDiv.appendChild(deleteIcon);
-//                 actionDiv.appendChild(restoreIcon);
-//                 row.appendChild(nameDiv);
-//                 row.appendChild(actionDiv);
-                
-//                 backupContent.appendChild(row);
-//             });
-//         });
-// }
+/**
+ * Format sensor values with appropriate units and precision
+ * @param {number|null|undefined} value - Value to format
+ * @param {string} unit - Unit suffix (e.g., 'V', 'A', 'W')
+ * @param {number} decimals - Number of decimal places
+ * @returns {string} Formatted value string
+ */
+export function formatValue(value, unit = '', decimals = 2) {
+    if (value === undefined || value === null || isNaN(value)) {
+        return `-- ${unit}`.trim();
+    }
+    
+    // Handle very small numbers (treat as zero)
+    if (Math.abs(value) < Math.pow(10, -decimals)) {
+        return `0.00 ${unit}`.trim();
+    }
+    
+    return `${value.toFixed(decimals)} ${unit}`.trim();
+}
 
-// // Delete Backup Confirmation
-// export function deleteBackupConfirmation(filename) {
-//     document.getElementById('config-file-selection').classList.add('hidden');
-//     document.getElementById('delete-config-confirmation').classList.remove('hidden');
-//     document.getElementById('config-action-btns').classList.remove('hidden');
-//     document.getElementById('delete-config-cancel').classList.remove('hidden');
-//     document.getElementById('delete-config-confirm').classList.remove('hidden');
-//     const confirmDeleteHtml = document.getElementById('delete-file-name');
-//     confirmDeleteHtml.innerHTML = `${filename}`;
+/**
+ * Normalize filter type string to proper case
+ * @param {string} filterType - Filter type to normalize
+ * @returns {string} Normalized filter type
+ */
+export function normalizeFilterType(filterType) {
+    const typeMap = {
+        'solar': 'Solar',
+        'wind': 'Wind', 
+        'battery': 'Battery'
+    };
+    return typeMap[filterType.toLowerCase()] || filterType;
+}
 
-//     // Confirm Delete Handler
-//     document.getElementById('delete-config-confirm').addEventListener('click', () => {
-//         document.getElementById('delete-config-confirmation').classList.add('hidden');
-//         document.getElementById('config-action-btns').classList.remove('hidden');
-//         document.getElementById('delete-config-cancel').classList.add('hidden');
-//         document.getElementById('delete-config-confirm').classList.add('hidden');
-//         document.getElementById('config-action-message').classList.remove('hidden');
-//         document.getElementById('config-action-complete').classList.remove('hidden');
-
-//         deleteBackup(filename);
-//     });
-// }
-
-// // Restore Backup Confirmation
-// export function restoreBackupConfirmation(filename) {
-//     document.getElementById('restore-config-confirmation').classList.remove('hidden');
-//     document.getElementById('config-action-btns').classList.remove('hidden');
-//     document.getElementById('restore-config-cancel').classList.remove('hidden');
-//     document.getElementById('restore-config-confirm').classList.remove('hidden');
-//     const confirmRestoreHtml = document.getElementById('restore-file-name');
-//     confirmRestoreHtml.innerHTML = `${filename}`;
-
-//     // Confirm Restore Handler
-//     document.getElementById('restore-config-confirm').addEventListener('click', () => {
-//         document.getElementById('delete-config-confirmation').classList.add('hidden');
-//         document.getElementById('config-action-btns').classList.remove('hidden');
-//         document.getElementById('restore-config-cancel').classList.add('hidden');
-//         document.getElementById('restore-config-confirm').classList.add('hidden');
-//         document.getElementById('config-action-message').classList.remove('hidden');
-//         document.getElementById('config-action-complete').classList.remove('hidden');
-//         restoreBackup(filename);
-//     });
-// }
-
-// // Create Backup
-// export function createBackup() {
-//     const programConfig = document.getElementById('program-config').checked ? 1 : 0;
-//     const sensorConfig = document.getElementById('sensor-config').checked ? 1 : 0;
-//     const backupMsg = document.getElementById('backup-result');
-//     fetch('/backup', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ programConfig, sensorConfig })
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//     	  const backupMsg = document.getElementById('backup-result');
-//         if (data.success) {
-//             backupMsg.innerHTML = 'Backup created successfully!';
-//         } else {
-//             backupMsg.innerHTML = 'Backup failed: ' + (data.error || 'Unknown error');
-//         }
-//     })
-//     .catch(error => {
-//         backupMsg.innerHTML = 'Backup failed: Network error';
-//         console.error('Backup error:', error);
-//     });
-// }
-
-// // Delete Backup
-// export function deleteBackup(filename) {
-//     fetch('/delete_backup', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ filename })
-//     })
-//         .then(res => res.json())
-//         .then(() => {
-//             document.getElementById('config-action-result').innerHTML = 'Backup file deleted successful';
-//         })
-//         .catch(error => {
-//             document.getElementById('config-action-result').innerText = 'Failed to delete Backup.';
-//             console.error('Error restoring Backup:', error);
-//         });
-// }
-
-// // Restore Backup
-// export async function restoreBackup(filename) {
-//     document.getElementById('restore-config-confirmation').classList.add('hidden');
-//     document.getElementById('config-action-message').classList.remove('hidden');
-//     const restoreResult = document.getElementById('config-action-result');
-//     restoreResult.innerHTML = 'Restoring backup...';
-//     const restoreConfig = confirm('Restore config.json?');
-//     const restoreSensors = confirm('Restore sensors.json?');
-//     const res = await fetch('restore_backup', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ filename, restore_config: restoreConfig, restore_sensors: restoreSensors })
-//     });
-//     const result = await res.json();
-//     restoreResult.innerHTML = '';
-//     if (result.success) {
-//         restoreResult.innerHTML = 'Restore successful. Please reload or restart the app.';
-//     } else {
-//         restoreResult.innerHTML = 'Restore failed: ' + result.error;
-        
-//     }
-// }
+/**
+ * Check if an entry represents a sensor (not system data)
+ * @param {string} name - Entry name
+ * @param {Object} sensor - Entry data
+ * @returns {boolean} True if this is a sensor entry
+ */
+export function isSensorEntry(name, sensor) {
+    const systemEntries = ['totals', 'devices', 'system_status'];
+    return !systemEntries.includes(name) && sensor && sensor.type && sensor.data;
+}
