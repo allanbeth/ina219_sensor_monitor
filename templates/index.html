@@ -159,12 +159,8 @@
                             <div class="settings-entries" id="system-card-entries">
                                 <!-- System settings will be populated here -->
                             </div>
-                            <div class="settings-result hidden" id="system-action-message">
-                                <div class="settings-entry">
-                                    <label class="settings-label" id="system-save-result">
-                                        <!-- System save result message -->
-                                    </label>
-                                </div>
+                            <div class="settings-actions hidden" id="system-action-message">
+                                <!-- System save confirmation message -->
                             </div>
                         </div>
                     </div>
@@ -187,12 +183,8 @@
                             <div class="settings-entries" id="polling-card-entries">
                                 <!-- Polling settings will be populated here -->
                             </div>
-                            <div class="settings-result hidden" id="polling-action-message">
-                                <div class="settings-entry">
-                                    <label class="settings-label" id="polling-save-result">
-                                        <!-- Polling save result message -->
-                                    </label>
-                                </div>
+                            <div class="settings-actions hidden" id="polling-action-message">
+                                <!-- Polling save confirmation message -->
                             </div>
                         </div>
                     </div>
@@ -215,12 +207,8 @@
                             <div class="settings-entries" id="mqtt-card-entries">
                                 <!-- MQTT settings will be populated here -->
                             </div>
-                            <div class="settings-result hidden" id="mqtt-action-message">
-                                <div class="settings-entry">
-                                    <label class="settings-label" id="mqtt-save-result">
-                                        <!-- MQTT save result message -->
-                                    </label>
-                                </div>
+                            <div class="settings-actions hidden" id="mqtt-action-message">
+                                <!-- MQTT save confirmation message -->
                             </div>
                         </div>
                     </div>
@@ -243,12 +231,8 @@
                             <div class="settings-entries" id="webserver-card-entries">
                                 <!-- Web server settings will be populated here -->
                             </div>
-                            <div class="settings-result hidden" id="webserver-action-message">
-                                <div class="settings-entry">
-                                    <label class="settings-label" id="webserver-save-result">
-                                        <!-- Web server save result message -->
-                                    </label>
-                                </div>
+                            <div class="settings-actions hidden" id="webserver-action-message">
+                                <!-- Web server save confirmation message -->
                             </div>
                         </div>
                     </div>
@@ -283,10 +267,8 @@
                             <div class="new-device hidden" id="new-device">
                                 <!-- New device form will be populated here -->    
                             </div>
-                             <div class="settings-entry hidden" id="action-message">
-                                <label id="settings-label">
-                                    <!-- Backup result message -->
-                                </label>                              
+                             <div class="settings-actions hidden" id="devices-action-message">
+                                <!-- Device action confirmation message -->                           
                             </div>  
                         </div>
                     </div>
@@ -323,12 +305,9 @@
                                     <!-- Selected backup file name will be shown here -->
                                 </span>
                             </div>
-                            <div class="settings-entry hidden" id="backup-message">
-                                <label id="backup-result">
-                                    <!-- Backup result message -->
-                                </label>                              
+                            <div class="settings-actions hidden" id="backup-action-message">
+                                <!-- Backup message -->                            
                             </div>
-                            
                         </div>
                     </div>
 
@@ -365,10 +344,8 @@
                                     <!-- Selected backup file name will be shown here -->
                                 </span>
                             </div>
-                            <div class="settings-entry hidden" id="config-action-message">
-                                <label id="config-action-result">
-                                    <!-- Restore result message -->
-                                </label>                              
+                            <div class="settings-actions hidden" id="restore-action-message">
+                                <!-- Restore result message -->                          
                             </div>
                         </div>
                     </div>
@@ -382,10 +359,6 @@
                                 <h3>Restart Service</h3>
                                 <p>Restart the monitoring service</p>
                             </div>
-                            <div class="action-btns settings-actions hidden" id="restart-action-btns">
-                                <i class="fa-solid fa-xmark" id="restart-close" title="Cancel Restart"></i>
-                                <i class="fa-solid fa-check" id="restart-confirm" title="Confirm Restart"></i>
-                            </div>
                         </div>
                         <div class="settings-card-content" id="restart-card-content">
                             <div class="settings-entries" id="restart-entries">
@@ -396,11 +369,16 @@
                                     <label class="settings-label restart-label" id="restart-btn"><i class="fa-solid fa-power-off"></i> Restart Now</label>
                                 </div>
                             </div>
-                            <div class="settings-entry hidden" id="restart-confirmation">
-                                <label class="settings-label restart-confirmation">Are you sure you want to restart the service?</label>
-                            </div>
-                            <div class="settings-entry hidden" id="restart-message">
-                                <!-- Restart success message -->
+                            <div class="settings-actions hidden" id="restart-action-message">
+                                <div class="card-dialog">
+                                    <div class="dialog-message">
+                                        <label class="dialog-label">Are you sure you want to restart the service?</label>
+                                    </div>
+                                    <div class="action-btns dialog-btns" id="restart-dialog-action-btns">
+                                        <i class="fa-solid fa-xmark" id="restart-close" title="Cancel Restart"></i>
+                                        <i class="fa-solid fa-check" id="restart-confirm" title="Confirm Restart"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

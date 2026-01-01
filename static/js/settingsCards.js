@@ -232,6 +232,64 @@ export function fetchSettings() {
     });
 }
 
+export function confirmSettingSave(cardName) {
+    let confimHtml = '';
+    confimHtml = `
+        <div class="card-dialog">
+            <div class="dialog-message">
+                <label class="dialog-label">Are you sure you want to save the changes to ${cardName.replace(/\b\w/g, l => l.toUpperCase())}?</label>
+            </div>
+            <div class="action-btns dialog-btns" id="${cardName}-dialog-action-btns">
+                <i class="fa-solid fa-xmark" id="${cardName}-save-cancel-btn" title="Confirm Save"></i>
+                <i class="fa-solid fa-check" id="${cardName}-save-confirm-btn" title="Cancel Save"></i>
+            </div>
+        </div>
+    `;
+
+    if (cardName === 'all') {
+        // Open modal confirmation for all settings
+        document.getElementById('dialog-container').classList.remove('hidden');
+        document.getElementById('dialog-content').innerHTML = confimHtml;
+
+        // add event listener for cancel button
+        document.getElementById(`${cardName}-save-cancel-btn`).addEventListener('click', () => {
+            document.getElementById(`dialog-container`).classList.add('hidden');
+        });
+    }
+    else if (cardName === 'devices') {
+        // devices card confirmation
+        
+    } else {
+        document.getElementById(`${cardName}-action-message`).classList.remove('hidden');
+        document.getElementById(`${cardName}-card-entries`).classList.add('hidden');
+        document.getElementById(`${cardName}-save-btn`).classList.add('hidden');
+        document.getElementById(`${cardName}-action-message`).innerHTML = confimHtml;
+
+        //add event listener for cancel button
+        document.getElementById(`${cardName}-save-cancel-btn`).addEventListener('click', () => {
+        document.getElementById(`${cardName}-action-message`).classList.add('hidden');
+        document.getElementById(`${cardName}-card-entries`).classList.remove('hidden');
+        document.getElementById(`${cardName}-save-btn`).classList.remove('hidden');
+    });
+    }
+    // Add event listeners for confirm and cancel buttons
+
+    document.getElementById(`${cardName}-save-confirm-btn`).addEventListener('click', () => {
+        saveSettings(cardName === 'all' ? 0 :
+                     cardName === 'system' ? 1 : 
+                     cardName === 'polling' ? 2 : 
+                     cardName === 'mqtt' ? 3 : 
+                     cardName === 'webserver' ? 4 :
+                     cardName === 'devices' ? 5 : 0);
+    });
+}
+
+export function cancelSettingSave(cardName) {
+    document.getElementById(`${cardName}-action-message`).classList.add('hidden');
+    document.getElementById(`${cardName}-card-entries`).classList.remove('hidden');
+    document.getElementById(`${cardName}-save-btn`).classList.remove('hidden');
+}
+
 // Save the settings to the server
 export function saveSettings(settingsSaveFlag) {
     let maxLog = currentConfigData.max_log ?? '';
@@ -411,17 +469,15 @@ export function openNewDeviceConfig() {
 
 // Restart Confirmation
 export function restartConfirmation() {
-    document.getElementById("restart-action").classList.add("hidden");
-    document.getElementById("restart-confirmation").classList.remove("hidden");
-    document.getElementById("restart-action-btns").classList.remove("hidden");
+    document.getElementById("restart-action-message").classList.remove("hidden");
+    document.getElementById("restart-entries").classList.add("hidden");
+    
 }
 
 // Close Restart Confirmation
 export function closeRestart() {
-    document.getElementById("restart-confirmation").classList.add("hidden");
-    document.getElementById("restart-message").classList.add("hidden");
-    document.getElementById("restart-action-btns").classList.add("hidden");
-    document.getElementById("restart-action").classList.remove("hidden");
+    document.getElementById("restart-entries").classList.remove("hidden");
+    document.getElementById("restart-action-message").classList.add("hidden");
 }
 // Restart Application
 export async function restartApplication() {
@@ -505,22 +561,44 @@ export function fetchBackups() {
 
 // Delete Backup Confirmation
 export function deleteBackupConfirmation(filename) {
+    let confimHtml = '';
+    confimHtml = `
+        <div class="card-dialog">
+            <div class="dialog-message" id="dialog-message">
+                <label class="dialog-label">Are you sure you want to delete the config file?</label>
+            </div>
+            <div class="dialog-message" id="dialog-file-name">
+                <label class="dialog-label">${filename}</label>
+            </div>
+            <div class="action-btns dialog-btns" id="delete-file-dialog-action-btns">
+                <i class="fa-solid fa-xmark" id="delete-file-save-cancel-btn" title="Confirm Delete"></i>
+                <i class="fa-solid fa-check" id="delete-file-save-confirm-btn" title="Cancel Delete"></i>
+            </div>
+        </div>
+    `;
     document.getElementById('config-file-selection').classList.add('hidden');
-    document.getElementById('delete-config-confirmation').classList.remove('hidden');
-    document.getElementById('config-action-btns').classList.remove('hidden');
-    document.getElementById('delete-config-cancel').classList.remove('hidden');
-    document.getElementById('delete-config-confirm').classList.remove('hidden');
-    const confirmDeleteHtml = document.getElementById('delete-file-name');
-    confirmDeleteHtml.innerHTML = `${filename}`;
+    document.getElementById('restore-action-message').classList.remove('hidden');
+    // document.getElementById('config-action-btns').classList.remove('hidden');
+    // document.getElementById('delete-config-cancel').classList.remove('hidden');
+    // document.getElementById('delete-config-confirm').classList.remove('hidden');
+    // const confirmDeleteHtml = document.getElementById('delete-file-name');
+    // confirmDeleteHtml.innerHTML = `${filename}`;
+    document.getElementById('restore-action-message').innerHTML = confimHtml;
+
+    // Cancel Delete Handler
+    document.getElementById('delete-file-save-cancel-btn').addEventListener('click', () => {
+        document.getElementById('config-file-selection').classList.remove('hidden');
+        document.getElementById('restore-action-message').classList.add('hidden');
+    });
 
     // Confirm Delete Handler
-    document.getElementById('delete-config-confirm').addEventListener('click', () => {
-        document.getElementById('delete-config-confirmation').classList.add('hidden');
-        document.getElementById('config-action-btns').classList.remove('hidden');
-        document.getElementById('delete-config-cancel').classList.add('hidden');
-        document.getElementById('delete-config-confirm').classList.add('hidden');
-        document.getElementById('config-action-message').classList.remove('hidden');
-        document.getElementById('config-action-complete').classList.remove('hidden');
+    document.getElementById('delete-file-save-confirm-btn').addEventListener('click', () => {
+        // document.getElementById('delete-config-confirmation').classList.add('hidden');
+        // document.getElementById('config-action-btns').classList.remove('hidden');
+        // document.getElementById('delete-config-cancel').classList.add('hidden');
+        // document.getElementById('delete-config-confirm').classList.add('hidden');
+        // document.getElementById('config-action-message').classList.remove('hidden');
+        // document.getElementById('config-action-complete').classList.remove('hidden');
 
         deleteBackup(filename);
     });
@@ -581,10 +659,10 @@ export function deleteBackup(filename) {
     })
         .then(res => res.json())
         .then(() => {
-            document.getElementById('config-action-result').innerHTML = 'Backup file deleted successful';
+            document.getElementById('dialog-message').innerHTML = '<label class="dialog-label">Config File Deleted Successfully.</label>';
         })
         .catch(error => {
-            document.getElementById('config-action-result').innerText = 'Failed to delete Backup.';
+            document.getElementById('dialog-message').innerText = '<label class="dialog-label">Failed to delete Config File.</label>.';
             console.error('Error restoring Backup:', error);
         });
 }

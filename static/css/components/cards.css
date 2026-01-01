@@ -155,7 +155,8 @@
 .dashboard-entries,
 .sensor-entries,
 .settings-entries,
-.log-files-entries {
+.log-files-entries,
+.settings-actions{
     display: flex;
     flex-direction: column;
     border-radius: var(--radius-md);
@@ -196,6 +197,25 @@
     max-height: 210px;
     min-height: 60px;
 }
+
+.card-dialog {
+    align-items: center;
+    width: 100%;
+}
+
+.dialog-label {
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    text-align: center;
+}
+
+.dialog-btns {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    margin-top: var(--spacing-lg);}
 
 /* ========== action btns ========== */
 

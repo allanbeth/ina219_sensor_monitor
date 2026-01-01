@@ -111,7 +111,7 @@ export function setupEventHandlers() {
 
     // Settings Save (header button - only visible on settings page)
     document.getElementById('settings-save-header-btn').addEventListener('click', () => {
-        settingsCards.saveSettings(0); // Save all settings
+        settingsCards.confirmSettingSave('all') // Save all settings
     });
 
     // Refresh Logs (header button - only visible on logs page)
@@ -124,22 +124,23 @@ export function setupEventHandlers() {
     // =========================
     // System Save Button
     document.getElementById('system-save-btn').addEventListener('click', () => {
-        settingsCards.saveSettings(1); // Save only system settings
+        // settingsCards.saveSettings(1); // Save only system settings
+        settingsCards.confirmSettingSave('system');
     });
 
     // Polling Save Button
     document.getElementById('polling-save-btn').addEventListener('click', () => {
-        settingsCards.saveSettings(2); // Save only polling settings
+        settingsCards.confirmSettingSave('polling');
     });
 
     // MQTT Save Button
     document.getElementById('mqtt-save-btn').addEventListener('click', () => {
-        settingsCards.saveSettings(3); // Save only MQTT settings
+        settingsCards.confirmSettingSave('mqtt');   
     });
 
     // Web Server Save Button
     document.getElementById('webserver-save-btn').addEventListener('click', () => {
-        settingsCards.saveSettings(4); // Save only web server settings
+        settingsCards.confirmSettingSave('webserver');
     });
 
     // New Device Button
