@@ -3,7 +3,7 @@
 // ==========================
 
 import { deviceList, currentConfigData, updateConfigData, deviceCount, connectedDeviceCount, sensorCount, connectedSensorCount, mqttConnectionStatus } from './globals.js';
-import { sleep, getConnectedDevicesInfo, getConnectedSensorsInfo, getMqttConnectionInfo} from './utils.js';
+import { sleep, getConnectedDevicesInfo, getConnectedSensorsInfo, getMqttConnectionInfo, getDialogElement} from './utils.js';
 
 // Fetch current system status information
 function fetchStatusInfo() {
@@ -233,23 +233,17 @@ export function fetchSettings() {
 }
 
 export function confirmSettingSave(cardName) {
-    let confimHtml = '';
-    confimHtml = `
-        <div class="card-dialog">
-            <div class="dialog-message">
-                <label class="dialog-label">Are you sure you want to save the changes to ${cardName.replace(/\b\w/g, l => l.toUpperCase())}?</label>
-            </div>
-            <div class="action-btns dialog-btns" id="${cardName}-dialog-action-btns">
-                <i class="fa-solid fa-xmark" id="${cardName}-save-cancel-btn" title="Confirm Save"></i>
-                <i class="fa-solid fa-check" id="${cardName}-save-confirm-btn" title="Cancel Save"></i>
-            </div>
-        </div>
-    `;
+    let dialogMessge = 'Are you sure you want to delete the config file?'
+    let dialogMessageId = 'dialog-message';
+    let dialogData = cardName.replace(/\b\w/g, l => l.toUpperCase());
+    let dialogDataId = cardName;
+    let actionId = cardName;
+    let dialogBox = getDialogElement(dialogMessge, dialogMessageId, dialogData, dialogDataId, actionId);
 
     if (cardName === 'all') {
         // Open modal confirmation for all settings
         document.getElementById('dialog-container').classList.remove('hidden');
-        document.getElementById('dialog-content').innerHTML = confimHtml;
+        document.getElementById('dialog-content').innerHTML = dialogBox;
 
         // add event listener for cancel button
         document.getElementById(`${cardName}-save-cancel-btn`).addEventListener('click', () => {
@@ -263,7 +257,7 @@ export function confirmSettingSave(cardName) {
         document.getElementById(`${cardName}-action-message`).classList.remove('hidden');
         document.getElementById(`${cardName}-card-entries`).classList.add('hidden');
         document.getElementById(`${cardName}-save-btn`).classList.add('hidden');
-        document.getElementById(`${cardName}-action-message`).innerHTML = confimHtml;
+        document.getElementById(`${cardName}-action-message`).innerHTML = dialogBox;
 
         //add event listener for cancel button
         document.getElementById(`${cardName}-save-cancel-btn`).addEventListener('click', () => {
@@ -561,29 +555,15 @@ export function fetchBackups() {
 
 // Delete Backup Confirmation
 export function deleteBackupConfirmation(filename) {
-    let confimHtml = '';
-    confimHtml = `
-        <div class="card-dialog">
-            <div class="dialog-message" id="dialog-message">
-                <label class="dialog-label">Are you sure you want to delete the config file?</label>
-            </div>
-            <div class="dialog-message" id="dialog-file-name">
-                <label class="dialog-label">${filename}</label>
-            </div>
-            <div class="action-btns dialog-btns" id="delete-file-dialog-action-btns">
-                <i class="fa-solid fa-xmark" id="delete-file-save-cancel-btn" title="Confirm Delete"></i>
-                <i class="fa-solid fa-check" id="delete-file-save-confirm-btn" title="Cancel Delete"></i>
-            </div>
-        </div>
-    `;
+    let dialogMessge = 'Are you sure you want to delete the config file?'
+    let dialogMessageId = 'dialog-message';
+    let dialogData = filename;
+    let dialogDataId = 'dialog-file-name';
+    let actionId = 'delete-file-dialog-action-btns';
+    let dialogBox = getDialogElement(dialogMessge, dialogMessageId, dialogData, dialogDataId, actionId);
     document.getElementById('config-file-selection').classList.add('hidden');
     document.getElementById('restore-action-message').classList.remove('hidden');
-    // document.getElementById('config-action-btns').classList.remove('hidden');
-    // document.getElementById('delete-config-cancel').classList.remove('hidden');
-    // document.getElementById('delete-config-confirm').classList.remove('hidden');
-    // const confirmDeleteHtml = document.getElementById('delete-file-name');
-    // confirmDeleteHtml.innerHTML = `${filename}`;
-    document.getElementById('restore-action-message').innerHTML = confimHtml;
+    document.getElementById('restore-action-message').innerHTML = dialogBox;
 
     // Cancel Delete Handler
     document.getElementById('delete-file-save-cancel-btn').addEventListener('click', () => {

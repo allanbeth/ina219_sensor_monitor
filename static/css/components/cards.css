@@ -50,7 +50,7 @@
 .dashboard-card:hover,
 .sensor-card:hover,
 .settings-card:hover {
-    transform: translateY(-5px);
+    transform: scale(1.02);
     box-shadow: var(--shadow-hover);
 }
 .dashboard-card-header,

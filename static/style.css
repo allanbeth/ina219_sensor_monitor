@@ -495,34 +495,7 @@ body {
     text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-.header-totals {
-    display: flex;
-    gap: 0.4em;
-    font-size: 1.0em;
-    color: #4a5568;
-    align-items: center;
-    justify-content: flex-start;
-    text-align: left;
-    font-weight: 600;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-}
 
-.header-totals .totals-data {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3em;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.header-totals .totals-data i {
-    flex-shrink: 0;
-}
-
-.header-totals .totals-text {
-    white-space: nowrap;
-}
 
 .header-btns {
     display: flex;
@@ -2783,39 +2756,7 @@ meter {
         text-align: center;
     }
     
-    .header-totals {
-        font-size: 0.9em;
-        gap: 0.4em;
-        justify-content: center;
-        text-align: center;
-        width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        display: flex;
-        align-items: center;
-        white-space: nowrap;
-    }
-    
-    .header-totals .totals-data {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.2em;
-        white-space: nowrap;
-        flex-shrink: 0;
-        font-size: 0.85em;
-    }
 
-    
-    .header-totals .totals-data i {
-        flex-shrink: 0;
-        font-size: 0.9em;
-    }
-    
-    .header-totals .totals-text {
-        white-space: nowrap;
-    }
     
     .sensor-card-title {
         font-size: 1.6em;

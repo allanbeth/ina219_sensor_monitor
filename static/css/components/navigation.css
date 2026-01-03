@@ -30,7 +30,7 @@
 
 .sidebar.collapsed .sidebar-header {
     justify-content: center;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
 }
 
 .sidebar.collapsed .nav-link {
@@ -54,7 +54,7 @@
 }
 
 .sidebar.collapsed .nav-link:hover {
-    transform: translateX(5px);
+    transform: scale(1.1);
 }
 
 /* ========== Sidebar Header ========== */
@@ -62,7 +62,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 30px;
+    margin-bottom: var(--spacing-sm);
     padding-bottom: var(--spacing-xs);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
@@ -78,12 +78,12 @@
 
 .sidebar-header h2 i {
     color: #667eea;
-    font-size: 1.1em;
+    font-size: 1.5em;
 }
 
 .burger-menu {
     cursor: pointer;
-    font-size: 1.2em;
+    font-size: 1.5em;
     color: var(--text-secondary);
     transition: color var(--transition-fast);
     padding: var(--spacing-sm);
@@ -132,7 +132,7 @@
 
 .nav-link i {
     margin-right: 12px;
-    font-size: 1.1em;
+    font-size: 1.5em;
     width: 20px;
     text-align: center;
 }
@@ -192,11 +192,7 @@
     margin: 0;
 }
 
-.header-totals {
-    font-size: 0.9em;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
+
 
 /* ========== Header Buttons ========== */
 .header-btns {
@@ -225,18 +221,19 @@
 .header-count-display {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) 12px;
+    /* gap: var(--spacing-xm); */
+    padding: var(--spacing-xs);
     background: rgba(255, 255, 255, 0.5);
     border-radius: var(--radius-md);
     border: 1px solid var(--border-light);
     transition: all var(--transition-fast);
-    cursor: help;
+    
 }
 
 .header-count-display:hover {
     background: rgba(255, 255, 255, 0.8);
     transform: translateY(-1px);
+    cursor: help;
 }
 
 .header-count-display i {

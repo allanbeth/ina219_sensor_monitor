@@ -118,7 +118,6 @@ export function showPage(pageName) {
     
     // Update header based on page
     const pageHeading = document.getElementById('page-heading');
-    const headerTotals = document.getElementById('header-totals');
     const solarSensorsFilterBtn = document.getElementById('solar-sensor-filter-header-btn');
     const windSensorsFilterBtn = document.getElementById('wind-sensor-filter-header-btn');
     const batterySensorsFilterBtn = document.getElementById('battery-sensor-filter-header-btn');
@@ -158,7 +157,7 @@ export function showPage(pageName) {
         }
     }
     
-    if (pageHeading && headerTotals && solarSensorsFilterBtn && windSensorsFilterBtn && batterySensorsFilterBtn && clearSensorFilterBtn && addSensorBtn && settingsSaveBtn && refreshLogsBtn && deviceCountDisplay && sensorCountDisplay) {
+    if (pageHeading && solarSensorsFilterBtn && windSensorsFilterBtn && batterySensorsFilterBtn && clearSensorFilterBtn && addSensorBtn && settingsSaveBtn && refreshLogsBtn && deviceCountDisplay && sensorCountDisplay) {
         switch(pageName) {
             case 'dashboard':
                 pageHeading.textContent = 'Dashboard';
@@ -238,7 +237,6 @@ export function showPage(pageName) {
                 break;
             default:
                 pageHeading.style.display = 'none';
-                headerTotals.classList.add('hidden');
                 addSensorBtn.classList.add('hidden');
                 settingsSaveBtn.classList.add('hidden');
                 refreshLogsBtn.classList.add('hidden');
@@ -721,17 +719,7 @@ export function getAbout() {
         });
 }
 
-// ========================================
-// Sensor Utility Functions
-// ========================================
-
-/**
- * Format sensor values with appropriate units and precision
- * @param {number|null|undefined} value - Value to format
- * @param {string} unit - Unit suffix (e.g., 'V', 'A', 'W')
- * @param {number} decimals - Number of decimal places
- * @returns {string} Formatted value string
- */
+// Format value with unit and decimal places
 export function formatValue(value, unit = '', decimals = 2) {
     if (value === undefined || value === null || isNaN(value)) {
         return `-- ${unit}`.trim();
@@ -745,11 +733,7 @@ export function formatValue(value, unit = '', decimals = 2) {
     return `${value.toFixed(decimals)} ${unit}`.trim();
 }
 
-/**
- * Normalize filter type string to proper case
- * @param {string} filterType - Filter type to normalize
- * @returns {string} Normalized filter type
- */
+// Normalize filter type string
 export function normalizeFilterType(filterType) {
     const typeMap = {
         'solar': 'Solar',
@@ -759,13 +743,28 @@ export function normalizeFilterType(filterType) {
     return typeMap[filterType.toLowerCase()] || filterType;
 }
 
-/**
- * Check if an entry represents a sensor (not system data)
- * @param {string} name - Entry name
- * @param {Object} sensor - Entry data
- * @returns {boolean} True if this is a sensor entry
- */
+// Check if entry is a valid sensor (not system entry)
 export function isSensorEntry(name, sensor) {
     const systemEntries = ['totals', 'devices', 'system_status'];
     return !systemEntries.includes(name) && sensor && sensor.type && sensor.data;
+}
+
+export function getDialogElement(message, messageId, data, dataId, actionId) {
+    const dialogHtml = `
+        <div class="card-dialog">
+            <div class="dialog-entry" id="${messageId}">
+                <label class="dialog-label">${message}</label>
+            </div>
+            <div class="dialog-entry" id="${dataId}">
+                <label class="dialog-label">${data}</label>
+            </div>
+            <div class="action-btns dialog-btns" id="${actionId}-dialog-action-btns">
+                <i class="fa-solid fa-xmark" id="${actionId}-save-cancel-btn" title="Confirm Delete"></i>
+                <i class="fa-solid fa-check" id="${actionId}-save-confirm-btn" title="Cancel Delete"></i>
+            </div>
+        </div>
+    `;
+
+    
+    return dialogHtml;
 }
